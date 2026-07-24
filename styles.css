@@ -5254,11 +5254,13 @@ body.external-share-active .bottom-app-nav{
 }
 
 
-/* Build 704.9.2.4 — orden manual de colecciones */
-.collection-order-tools{margin:4px 0 18px;padding:15px;border:1px solid #e4e7ec;border-radius:17px;background:#f8fafc}
-.collection-order-tools>span{display:block;margin-bottom:10px;font-size:10px;font-weight:900;letter-spacing:.13em;color:#667085}
-.collection-order-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.collection-order-buttons button{min-height:46px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#344054;font-size:14px;font-weight:850}
-.collection-order-buttons button:active:not(:disabled){background:#eef4fb;color:#1473e6}
-.collection-order-buttons button:disabled{opacity:.38}
-.collection-order-tools small{display:block;margin-top:9px;color:#667085;font-size:11px;line-height:1.35}
+/* Build 704.9.2.5 — orden visible de colecciones */
+.collection-card-order{position:absolute;right:53px;top:10px;display:flex;gap:4px;z-index:3}
+.collection-card-order button{width:34px;height:34px;border:1px solid #d8dee8;border-radius:10px;background:#fff;color:#475467;font-size:17px;font-weight:900;line-height:1}
+.collection-card-order button:active:not(:disabled){background:#eef4fb;color:#1473e6}
+.collection-card-order button:disabled{opacity:.28}
+.collection-card-order+ .collection-card-menu{top:10px}
+.collection-card-main{padding-right:132px}
+.collection-bulk-adjust{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.collection-bulk-adjust button{min-width:0}
+@media(max-width:430px){.collection-card-order{right:49px}.collection-card-order button{width:32px;height:32px}.collection-card-main{padding-right:124px}.collection-bulk-adjust{grid-template-columns:1fr}}

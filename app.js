@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.4";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.5";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -150,20 +150,12 @@ function getMasterInventoryForProject(project){
 }
 function ensureCollectionOrder(){
  const items=Object.values(projects||{});
- const used=new Set();
- let next=0;
- items.forEach(project=>{
-   const value=Number(project.collectionOrder);
-   if(Number.isFinite(value)&&!used.has(value)){used.add(value);next=Math.max(next,value+1);}
+ const ordered=items.slice().sort((a,b)=>{
+   const av=Number.isFinite(Number(a.collectionOrder))?Number(a.collectionOrder):Number.MAX_SAFE_INTEGER;
+   const bv=Number.isFinite(Number(b.collectionOrder))?Number(b.collectionOrder):Number.MAX_SAFE_INTEGER;
+   return av-bv||String(a.createdAt||"").localeCompare(String(b.createdAt||""));
  });
- items.forEach(project=>{
-   const value=Number(project.collectionOrder);
-   if(!Number.isFinite(value)||items.filter(other=>Number(other.collectionOrder)===value).length>1){
-     while(used.has(next))next++;
-     project.collectionOrder=next;used.add(next);next++;
-   }
- });
- items.sort((a,b)=>(Number(a.collectionOrder)||0)-(Number(b.collectionOrder)||0)).forEach((project,index)=>project.collectionOrder=index);
+ ordered.forEach((project,index)=>project.collectionOrder=index);
 }
 function orderedProjects(){
  ensureCollectionOrder();
@@ -1933,7 +1925,7 @@ function collectionSafeText(value){
 function renderCollections(){
  const list=$("#collectionsList");if(!list)return;
  const items=orderedProjects();
- list.innerHTML=items.map(p=>{
+ list.innerHTML=items.map((p,index)=>{
    const s=collectionProgress(p),active=p.id===activeProjectId;
    return `<article class="collection-library-card clean-library-card ${active?"active":""}" data-collection-id="${p.id}">
     <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
@@ -1945,6 +1937,10 @@ function renderCollections(){
       </div>
       <span class="collection-card-chevron">›</span>
     </button>
+    <div class="collection-card-order" aria-label="Ordenar ${collectionSafeText(p.name)}">
+      <button type="button" data-move-collection="${p.id}" data-direction="-1" aria-label="Subir ${collectionSafeText(p.name)}" ${index===0?"disabled":""}>↑</button>
+      <button type="button" data-move-collection="${p.id}" data-direction="1" aria-label="Bajar ${collectionSafeText(p.name)}" ${index===items.length-1?"disabled":""}>↓</button>
+    </div>
     <button type="button" class="collection-card-menu" data-edit-collection="${p.id}" aria-label="Editar ${collectionSafeText(p.name)}">•••</button>
    </article>`;
  }).join("");
@@ -1956,6 +1952,26 @@ function renderCollections(){
  list.querySelectorAll("[data-edit-collection]").forEach(button=>button.onclick=event=>{
    event.stopPropagation();openEditCollection(button.dataset.editCollection);
  });
+ list.querySelectorAll("[data-move-collection]").forEach(button=>button.onclick=event=>{
+   event.stopPropagation();
+   moveCollectionInLibrary(button.dataset.moveCollection,Number(button.dataset.direction));
+ });
+}
+function moveCollectionInLibrary(id,direction){
+ if(!id||![1,-1].includes(direction))return;
+ const ordered=orderedProjects();
+ const index=ordered.findIndex(project=>project.id===id);
+ const target=index+direction;
+ if(index<0||target<0||target>=ordered.length)return;
+ const current=ordered[index],other=ordered[target];
+ const currentOrder=current.collectionOrder;
+ current.collectionOrder=other.collectionOrder;
+ other.collectionOrder=currentOrder;
+ persistProjects();
+ renderCollections();
+ renderProjectsList();
+ navigator.vibrate?.(15);
+ showToast(direction<0?"Colección movida hacia arriba":"Colección movida hacia abajo");
 }
 function openEditCollection(id){
  const p=projects[id],dialog=$("#editCollectionDialog");if(!p||!dialog)return;
@@ -1963,10 +1979,6 @@ function openEditCollection(id){
  $("#editCollectionName").value=p.name||"Colección";
  $("#editCollectionTarget").value=Math.max(1,Number(p.target)||1);
  $("#deleteCollectionButton").hidden=Object.keys(projects).length<=1;
- const ordered=orderedProjects(),index=ordered.findIndex(item=>item.id===id);
- const up=$("#moveCollectionUpButton"),down=$("#moveCollectionDownButton");
- if(up)up.disabled=index<=0;
- if(down)down.disabled=index<0||index>=ordered.length-1;
  dialog.showModal();
  setTimeout(()=>$("#editCollectionName")?.focus(),80);
 }
@@ -1974,20 +1986,6 @@ function closeEditCollection(){const dialog=$("#editCollectionDialog");if(dialog
 function changeEditTarget(delta){
  const input=$("#editCollectionTarget");if(!input)return;
  input.value=String(Math.min(20,Math.max(1,(Number(input.value)||1)+delta)));
-}
-function moveEditedCollection(direction){
- const id=$("#editCollectionId")?.value;
- if(!id||![1,-1].includes(direction))return;
- const ordered=orderedProjects(),index=ordered.findIndex(project=>project.id===id),target=index+direction;
- if(index<0||target<0||target>=ordered.length)return;
- const current=ordered[index],other=ordered[target],temporary=current.collectionOrder;
- current.collectionOrder=other.collectionOrder;other.collectionOrder=temporary;
- persistProjects();renderCollections();renderProjectsList();
- const up=$("#moveCollectionUpButton"),down=$("#moveCollectionDownButton"),newIndex=target;
- if(up)up.disabled=newIndex<=0;
- if(down)down.disabled=newIndex>=ordered.length-1;
- navigator.vibrate?.(15);
- showToast(direction<0?"Colección movida hacia arriba":"Colección movida hacia abajo");
 }
 function saveEditedCollection(){
  const id=$("#editCollectionId").value,p=projects[id];if(!p)return;
@@ -2916,8 +2914,6 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("#closeEditCollectionDialog")?.addEventListener("click",closeEditCollection);
  $("#editTargetMinus")?.addEventListener("click",()=>changeEditTarget(-1));
  $("#editTargetPlus")?.addEventListener("click",()=>changeEditTarget(1));
- $("#moveCollectionUpButton")?.addEventListener("click",()=>moveEditedCollection(-1));
- $("#moveCollectionDownButton")?.addEventListener("click",()=>moveEditedCollection(1));
  $("#duplicateCollectionButton")?.addEventListener("click",duplicateEditedCollection);
  $("#emptyCollectionButton")?.addEventListener("click",emptyEditedCollection);
  $("#completeOneAlbumButton")?.addEventListener("click",completeOneAlbumEditedCollection);

@@ -664,17 +664,13 @@
       <small>Define cuántas copias quieres completar.</small>
     </label>
     <button class="collection-save-button" type="submit">Guardar cambios</button>
-    <section class="collection-order-tools">
-      <span>ORDEN EN COLECCIONES</span>
-      <div class="collection-order-buttons">
-        <button id="moveCollectionUpButton" type="button">↑ Subir</button>
-        <button id="moveCollectionDownButton" type="button">↓ Bajar</button>
-      </div>
-      <small>El orden se guarda automáticamente y se mantiene entre dispositivos.</small>
-    </section>
     <section class="collection-stock-tools">
       <span>INVENTARIO</span>
       <button id="completeOneAlbumButton" type="button"><b>✓ Completar 1 álbum</b><small>Añade 1 unidad donde falte, conservando las repetidas</small></button>
+      <div class="collection-bulk-adjust">
+        <button id="addOneToAllButton" type="button"><b>＋1 a todo</b><small>Suma una unidad a cada referencia</small></button>
+        <button id="removeOneFromAllButton" type="button"><b>−1 a todo</b><small>Resta una unidad sin bajar de cero</small></button>
+      </div>
       <button id="emptyCollectionButton" class="danger-soft" type="button"><b>Vaciar cartas</b><small>Pone todo el stock de esta colección a cero</small></button>
     </section>
     <div class="collection-edit-secondary">

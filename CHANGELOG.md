@@ -1,3 +1,8 @@
+## 704.9.2.5
+- Controles visibles ↑/↓ en cada tarjeta de Colecciones.
+- Se mantienen +1 a todo y −1 a todo dentro de Editar colección.
+- El orden se guarda y sincroniza.
+
 # Build 704.9.2.2
 
 - Restaura literalmente la estructura estable del app shell y la barra inferior.
