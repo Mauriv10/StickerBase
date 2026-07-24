@@ -5252,3 +5252,13 @@ body.external-share-active .bottom-app-nav{
   bottom:0!important;
   inset:auto 0 0 0!important;
 }
+
+
+/* Build 704.9.2.4 — orden manual de colecciones */
+.collection-order-tools{margin:4px 0 18px;padding:15px;border:1px solid #e4e7ec;border-radius:17px;background:#f8fafc}
+.collection-order-tools>span{display:block;margin-bottom:10px;font-size:10px;font-weight:900;letter-spacing:.13em;color:#667085}
+.collection-order-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.collection-order-buttons button{min-height:46px;border:1px solid #d0d5dd;border-radius:13px;background:#fff;color:#344054;font-size:14px;font-weight:850}
+.collection-order-buttons button:active:not(:disabled){background:#eef4fb;color:#1473e6}
+.collection-order-buttons button:disabled{opacity:.38}
+.collection-order-tools small{display:block;margin-top:9px;color:#667085;font-size:11px;line-height:1.35}

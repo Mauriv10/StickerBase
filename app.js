@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.3";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.4";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -58,7 +58,7 @@ function makeId(){return crypto.randomUUID?.()||`p-${Date.now()}-${Math.random()
 function emptyInventory(){return Object.fromEntries(Object.entries(originalInventory).map(([team,stickers])=>[team,Object.fromEntries(Object.keys(stickers).map(code=>[code,0]))]))}
 function defaultProject(name,target,projectInventory,seedType="custom"){
  return {
-   id:makeId(),name,target:Number(target)||1,seedType,inventory:structuredClone(projectInventory),
+   id:makeId(),name,target:Number(target)||1,seedType,collectionOrder:Object.keys(projects||{}).length,inventory:structuredClone(projectInventory),
    history:[],finishedSessions:[],sessionStats:{plus:0,minus:0,startedAt:new Date().toISOString()},
    exchange:{give:{},receive:{}},teamOrder:Object.keys(projectInventory),selectedTeam:Object.keys(projectInventory)[0]||"",
    pendingSync:{},lastSyncedAt:null,ui:{teamFilter:"all",collectionFilter:"all",currentFilter:"all",sort:"album",mainTab:"collection",scrollY:0},createdAt:new Date().toISOString()
@@ -148,7 +148,29 @@ function bootstrapProjectsFromSeed(seedData){
 function getMasterInventoryForProject(project){
  return structuredClone(masterInventories[project?.seedType]||originalInventory);
 }
+function ensureCollectionOrder(){
+ const items=Object.values(projects||{});
+ const used=new Set();
+ let next=0;
+ items.forEach(project=>{
+   const value=Number(project.collectionOrder);
+   if(Number.isFinite(value)&&!used.has(value)){used.add(value);next=Math.max(next,value+1);}
+ });
+ items.forEach(project=>{
+   const value=Number(project.collectionOrder);
+   if(!Number.isFinite(value)||items.filter(other=>Number(other.collectionOrder)===value).length>1){
+     while(used.has(next))next++;
+     project.collectionOrder=next;used.add(next);next++;
+   }
+ });
+ items.sort((a,b)=>(Number(a.collectionOrder)||0)-(Number(b.collectionOrder)||0)).forEach((project,index)=>project.collectionOrder=index);
+}
+function orderedProjects(){
+ ensureCollectionOrder();
+ return Object.values(projects||{}).sort((a,b)=>Number(a.collectionOrder)-Number(b.collectionOrder));
+}
 function persistProjects(){
+ ensureCollectionOrder();
  localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));
  localStorage.setItem(ACTIVE_PROJECT_KEY,activeProjectId);
  if(!cloudApplying)scheduleCloudSave();
@@ -1910,7 +1932,7 @@ function collectionSafeText(value){
 }
 function renderCollections(){
  const list=$("#collectionsList");if(!list)return;
- const items=Object.values(projects);
+ const items=orderedProjects();
  list.innerHTML=items.map(p=>{
    const s=collectionProgress(p),active=p.id===activeProjectId;
    return `<article class="collection-library-card clean-library-card ${active?"active":""}" data-collection-id="${p.id}">
@@ -1941,6 +1963,10 @@ function openEditCollection(id){
  $("#editCollectionName").value=p.name||"Colección";
  $("#editCollectionTarget").value=Math.max(1,Number(p.target)||1);
  $("#deleteCollectionButton").hidden=Object.keys(projects).length<=1;
+ const ordered=orderedProjects(),index=ordered.findIndex(item=>item.id===id);
+ const up=$("#moveCollectionUpButton"),down=$("#moveCollectionDownButton");
+ if(up)up.disabled=index<=0;
+ if(down)down.disabled=index<0||index>=ordered.length-1;
  dialog.showModal();
  setTimeout(()=>$("#editCollectionName")?.focus(),80);
 }
@@ -1948,6 +1974,20 @@ function closeEditCollection(){const dialog=$("#editCollectionDialog");if(dialog
 function changeEditTarget(delta){
  const input=$("#editCollectionTarget");if(!input)return;
  input.value=String(Math.min(20,Math.max(1,(Number(input.value)||1)+delta)));
+}
+function moveEditedCollection(direction){
+ const id=$("#editCollectionId")?.value;
+ if(!id||![1,-1].includes(direction))return;
+ const ordered=orderedProjects(),index=ordered.findIndex(project=>project.id===id),target=index+direction;
+ if(index<0||target<0||target>=ordered.length)return;
+ const current=ordered[index],other=ordered[target],temporary=current.collectionOrder;
+ current.collectionOrder=other.collectionOrder;other.collectionOrder=temporary;
+ persistProjects();renderCollections();renderProjectsList();
+ const up=$("#moveCollectionUpButton"),down=$("#moveCollectionDownButton"),newIndex=target;
+ if(up)up.disabled=newIndex<=0;
+ if(down)down.disabled=newIndex>=ordered.length-1;
+ navigator.vibrate?.(15);
+ showToast(direction<0?"Colección movida hacia arriba":"Colección movida hacia abajo");
 }
 function saveEditedCollection(){
  const id=$("#editCollectionId").value,p=projects[id];if(!p)return;
@@ -2040,7 +2080,7 @@ function adjustAllEditedCollection(delta){
 function renderProjectsList(){
  const list=$("#projectsList");
  if(!list)return;
- list.innerHTML=Object.values(projects).map(p=>{
+ list.innerHTML=orderedProjects().map(p=>{
    const stats=projectStats(p);
    return `<article class="project-item ${p.id===activeProjectId?"active":""}">
     <div class="project-item-copy"><strong>${p.name}</strong><small>Objetivo ${p.target} · ${stats.total} cromos · ${stats.pending} pendientes</small></div>
@@ -2876,6 +2916,8 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("#closeEditCollectionDialog")?.addEventListener("click",closeEditCollection);
  $("#editTargetMinus")?.addEventListener("click",()=>changeEditTarget(-1));
  $("#editTargetPlus")?.addEventListener("click",()=>changeEditTarget(1));
+ $("#moveCollectionUpButton")?.addEventListener("click",()=>moveEditedCollection(-1));
+ $("#moveCollectionDownButton")?.addEventListener("click",()=>moveEditedCollection(1));
  $("#duplicateCollectionButton")?.addEventListener("click",duplicateEditedCollection);
  $("#emptyCollectionButton")?.addEventListener("click",emptyEditedCollection);
  $("#completeOneAlbumButton")?.addEventListener("click",completeOneAlbumEditedCollection);

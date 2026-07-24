@@ -1,11 +1,3 @@
-# Build 704.9.2.3
-
-- Añadidos +1 a todo y −1 a todo en la edición de cada colección.
-- −1 nunca reduce una referencia por debajo de cero.
-- Confirmación y copia automática antes de cada ajuste global.
-- Los cambios quedan registrados para sincronización e historial.
-- Conserva la barra inferior y la creación desde repetidas de la 704.9.2.2.
-
 # Build 704.9.2.2
 
 - Restaura literalmente la estructura estable del app shell y la barra inferior.
