@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.2";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.3";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1999,6 +1999,44 @@ function completeOneAlbumEditedCollection(){
  persistProjects();if(id===activeProjectId)loadProjectState();renderAll();renderProjectsList();closeEditCollection();showToast("Álbum completado con 1 unidad por referencia");
 }
 
+function adjustAllEditedCollection(delta){
+ const id=$("#editCollectionId").value,p=projects[id];if(!p||![1,-1].includes(delta))return;
+ if(id===activeProjectId)commitProjectState();
+ const references=Object.values(p.inventory||{}).reduce((sum,stickers)=>sum+Object.keys(stickers||{}).length,0);
+ const positive=Object.values(p.inventory||{}).reduce((sum,stickers)=>sum+Object.values(stickers||{}).filter(q=>Number(q)>0).length,0);
+ const affected=delta>0?references:positive;
+ if(!affected){showToast("No hay unidades que restar");return;}
+ const action=delta>0?"sumar una unidad a":"restar una unidad de";
+ const detail=delta>0?`${affected} referencias`:`${affected} referencias con stock`;
+ if(!confirm(`¿${delta>0?"Añadir +1 a todo":"Aplicar −1 a todo"} en “${p.name}”? Se va a ${action} ${detail}.`))return;
+ createAutomaticBackup(delta>0?"antes-de-sumar-uno-a-todo":"antes-de-restar-uno-a-todo");
+ const at=new Date().toISOString();
+ p.history=Array.isArray(p.history)?p.history:[];
+ p.pendingSync=p.pendingSync&&typeof p.pendingSync==="object"?p.pendingSync:{};
+ p.sessionStats=p.sessionStats||{plus:0,minus:0,startedAt:at};
+ let changed=0;
+ Object.entries(p.inventory||{}).forEach(([team,stickers])=>{
+   Object.keys(stickers||{}).forEach(code=>{
+     const previous=Math.max(0,Number(stickers[code])||0);
+     const next=Math.max(0,previous+delta);
+     if(next===previous)return;
+     stickers[code]=next;changed++;
+     const key=syncKey(team,code),existing=p.pendingSync[key];
+     p.pendingSync[key]={team,code,firstPrevious:existing?existing.firstPrevious:previous,latestValue:next,updatedAt:at,source:"ajuste-global"};
+     p.history.push({id:crypto.randomUUID?.()||String(Date.now()+Math.random()),team,code,previous,next,delta,at});
+   });
+ });
+ p.history=p.history.slice(-300);
+ if(delta>0)p.sessionStats.plus=(Number(p.sessionStats.plus)||0)+changed;
+ else p.sessionStats.minus=(Number(p.sessionStats.minus)||0)+changed;
+ p.updatedAt=at;
+ persistProjects();
+ if(id===activeProjectId)loadProjectState();
+ renderAll();renderProjectsList();closeEditCollection();
+ navigator.vibrate?.(25);
+ showToast(`${delta>0?"+1":"−1"} aplicado a ${changed} referencias`);
+}
+
 function renderProjectsList(){
  const list=$("#projectsList");
  if(!list)return;
@@ -2841,6 +2879,8 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("#duplicateCollectionButton")?.addEventListener("click",duplicateEditedCollection);
  $("#emptyCollectionButton")?.addEventListener("click",emptyEditedCollection);
  $("#completeOneAlbumButton")?.addEventListener("click",completeOneAlbumEditedCollection);
+ $("#addOneToAllButton")?.addEventListener("click",()=>adjustAllEditedCollection(1));
+ $("#removeOneFromAllButton")?.addEventListener("click",()=>adjustAllEditedCollection(-1));
  $("#deleteCollectionButton")?.addEventListener("click",deleteEditedCollection);
  $("#editCollectionDialog")?.addEventListener("click",event=>{if(event.target===$("#editCollectionDialog"))closeEditCollection()});
 });
