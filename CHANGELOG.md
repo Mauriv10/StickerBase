@@ -1,3 +1,10 @@
+# Build 704.9.2.7
+
+- Cuadrícula de cromos adaptada a 4 referencias por fila en móvil.
+- Tarjetas más anchas para evitar cortes en nombres como Bellingham.
+- Botones + y − ampliados y espaciado ajustado.
+- Se conservan todas las funciones de la 704.9.2.6.
+
 ## 704.9.2.6
 
 - Nombres compactos en Extra Stickers para evitar cortes en las tarjetas.
