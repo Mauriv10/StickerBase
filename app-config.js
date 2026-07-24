@@ -1,5 +1,5 @@
 globalThis.WC26_CONFIG = {
-  version: "704.9.2.7",
+  version: "704.9.2.8",
   versionUrl: "./version.json",
   updateCheckIntervalMs: 15 * 60 * 1000
 };

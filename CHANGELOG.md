@@ -1,9 +1,7 @@
-# Build 704.9.2.7
-
-- Cuadrícula de cromos adaptada a 4 referencias por fila en móvil.
-- Tarjetas más anchas para evitar cortes en nombres como Bellingham.
-- Botones + y − ampliados y espaciado ajustado.
-- Se conservan todas las funciones de la 704.9.2.6.
+## 704.9.2.8
+- Cuadrícula adaptativa: selecciones y FWC vuelven a 5 cromos por fila.
+- Extra Stickers conserva 4 cromos por fila para mostrar mejor los nombres.
+- Se mantienen todas las funciones de la 704.9.2.7.
 
 ## 704.9.2.6
 

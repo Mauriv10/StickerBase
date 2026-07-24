@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.7";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.8";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1216,7 +1216,7 @@ function renderGlobalCollection(){
    const total=Object.values(stickers).reduce((sum,q)=>sum+Number(q||0),0);
    const missing=Object.values(stickers).reduce((sum,q)=>sum+Math.max(0,target-Number(q||0)),0);
    const section=document.createElement("section");
-   section.className="collection-team";
+   section.className=`collection-team${isExtraTeam(team)?" collection-team-extra":""}`;
    section.innerHTML=`<header class="collection-team-header">
      <div class="collection-team-title">${flagHTML(team)}<strong>${isExtraTeam(team)?`Extra Stickers · ${extraVariantForTeam(team).label}`:team}</strong></div>
      <div class="collection-team-summary"><strong>${total} cromos</strong>${missing?`${missing} pendientes`:"Completa"}</div>
