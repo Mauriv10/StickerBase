@@ -1,3 +1,8 @@
+## 704.9.2.6
+
+- Nombres compactos en Extra Stickers para evitar cortes en las tarjetas.
+- No cambia códigos, inventarios ni sincronización.
+
 ## 704.9.2.5
 - Controles visibles ↑/↓ en cada tarjeta de Colecciones.
 - Se mantienen +1 a todo y −1 a todo dentro de Editar colección.

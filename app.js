@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.5";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.6";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -6,10 +6,10 @@ const PROJECTS_KEY="world-cup-2026-projects-v600";
 const ACTIVE_PROJECT_KEY="world-cup-2026-active-project-v600";
 
 const EXTRA_PLAYERS=[
- "Lionel Messi","Cristiano Ronaldo","Lamine Yamal","Kylian Mbappé","Erling Haaland",
- "Vinícius Júnior","Jude Bellingham","Federico Valverde","Luka Modric","Achraf Hakimi",
- "Luis Díaz","Mohamed Salah","Heungmin Son","Jérémy Doku","Florian Wirtz",
- "Moisés Caicedo","Alphonso Davies","Cody Gakpo","Christian Pulisic","Raúl Jiménez"
+ "Messi","CR7","L. Yamal","Mbappé","Haaland",
+ "Vini Jr.","Bellingham","Valverde","Modric","Hakimi",
+ "Luis Díaz","Salah","Son","Doku","Wirtz",
+ "Caicedo","Davies","Gakpo","Pulisic","Raúl Jiménez"
 ];
 const EXTRA_VARIANTS=[
  {key:"epic",team:"Extra · Epic",label:"Epic",icon:"🟣",code:"EPI"},
