@@ -1,3 +1,10 @@
+# Build 704.9.2.2
+
+- Restaura literalmente la estructura estable del app shell y la barra inferior.
+- Corrige el texto visible de versión en Ajustes.
+- Conserva la lógica rehecha de creación de proyectos desde repetidas de 704.9.2.1.
+- Mantiene una sola copia funcional de los diálogos duplicados sin reserializar el HTML.
+
 # Build 704.9.2.1
 
 - Base funcional 704.8.2 con Extra Stickers y herramientas de inventario.
