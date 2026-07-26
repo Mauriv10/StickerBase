@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.8";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.9";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -293,7 +293,62 @@ window.addEventListener("wc-auth-changed",event=>{
  const session=event.detail?.session;if(session&&!cloudReady)initialCloudSync(session).catch(console.error);
  if(!session){cloudSession=null;cloudReady=false;if(cloudSubscription)cloudClient()?.removeChannel(cloudSubscription);cloudSubscription=null}
 });
-window.addEventListener("online",()=>{if(cloudSession){cloudReady=true;scheduleCloudSave(100)}});
+function hasLocalPendingChanges(){
+ return Object.values(projects||{}).some(project=>Object.keys(project?.pendingSync||{}).length>0)||Object.keys(pendingSync||{}).length>0;
+}
+function mergePendingInventoryIntoCloud(remoteProjects){
+ const merged=structuredClone(remoteProjects||{});
+ Object.entries(projects||{}).forEach(([projectId,localProject])=>{
+   const changes=localProject?.pendingSync||{};
+   if(!merged[projectId]){
+     if(Object.keys(changes).length)merged[projectId]=structuredClone(localProject);
+     return;
+   }
+   Object.values(changes).forEach(change=>{
+     if(!change?.team||!change?.code)return;
+     merged[projectId].inventory=merged[projectId].inventory||{};
+     merged[projectId].inventory[change.team]=merged[projectId].inventory[change.team]||{};
+     merged[projectId].inventory[change.team][change.code]=Math.max(0,Number(change.latestValue)||0);
+     merged[projectId].pendingSync=merged[projectId].pendingSync||{};
+     merged[projectId].pendingSync[syncKey(change.team,change.code)]=structuredClone(change);
+   });
+ });
+ return merged;
+}
+async function refreshCloudState({reason="manual"}={}){
+ const client=cloudClient();
+ if(!client||!cloudSession||!navigator.onLine||cloudApplying)return false;
+ const {data,error}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
+ if(error){console.error("No se pudo refrescar la nube",reason,error);setCloudStatus("Sin conexión con la nube","error");return false}
+ if(!data?.payload?.projects)return false;
+ const remoteRevision=Number(data.revision)||0;
+ const remoteUpdated=Date.parse(data.updated_at||0)||0;
+ const localUpdated=Date.parse(cloudLastUpdatedAt||cloudMeta().updatedAt||0)||0;
+ if(remoteRevision<cloudRevision||(remoteRevision===cloudRevision&&remoteUpdated<=localUpdated))return false;
+ if(hasLocalPendingChanges()){
+   const mergedProjects=mergePendingInventoryIntoCloud(data.payload.projects);
+   cloudApplying=true;
+   try{
+     projects=mergedProjects;
+     activeProjectId=projects[activeProjectId]?activeProjectId:(data.payload.activeProjectId&&projects[data.payload.activeProjectId]?data.payload.activeProjectId:Object.keys(projects)[0]);
+     cloudRevision=remoteRevision;cloudLastUpdatedAt=data.updated_at||null;
+     Object.values(projects).forEach(ensureProjectTeamOrder);
+     localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));localStorage.setItem(ACTIVE_PROJECT_KEY,activeProjectId);
+     writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession.user.id});
+     loadProjectState();renderProjectsList();
+   }finally{cloudApplying=false}
+   await saveCloudState();
+   showToast("Cambios combinados y sincronizados");
+   return true;
+ }
+ await applyCloudPayload(data,{silent:reason==="initial"});
+ return true;
+}
+window.addEventListener("online",()=>{if(cloudSession){cloudReady=true;refreshCloudState({reason:"online"}).catch(console.error)}});
+window.addEventListener("focus",()=>{if(cloudSession)refreshCloudState({reason:"focus"}).catch(console.error)});
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="visible"&&cloudSession)refreshCloudState({reason:"foreground"}).catch(console.error);
+});
 
 // Build 703.1: foreground recovery for iOS PWAs and desktop browser tabs.
 // A token refresh or a restored page must not leave the loading overlay above

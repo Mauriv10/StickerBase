@@ -1,3 +1,10 @@
+# Build 704.9.2.9
+
+- La app vuelve a consultar Supabase al regresar del segundo plano, recuperar conexión o enfocar la pestaña.
+- Evita subir automáticamente un inventario local antiguo al recuperar internet.
+- Si hay cambios locales pendientes y datos más recientes en la nube, combina las cantidades pendientes antes de guardar.
+- Conserva la cuadrícula adaptativa y todas las funciones anteriores.
+
 ## 704.9.2.8
 - Cuadrícula adaptativa: selecciones y FWC vuelven a 5 cromos por fila.
 - Extra Stickers conserva 4 cromos por fila para mostrar mejor los nombres.
