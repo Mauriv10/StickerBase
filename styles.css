@@ -5312,3 +5312,9 @@ body.external-share-active .bottom-app-nav{
     padding:12px;
   }
 }
+.cloud-conflict-dialog{max-width:min(94vw,520px);border:0;border-radius:24px;padding:0;box-shadow:0 24px 80px rgba(15,23,42,.28)}
+.cloud-conflict-dialog::backdrop{background:rgba(15,23,42,.58);backdrop-filter:blur(4px)}
+.cloud-conflict-dialog .dialog-card{padding:20px;margin:0}.cloud-conflict-dialog h2{margin:.2rem 0 0}.cloud-conflict-dialog .dialog-body{padding:14px 0}
+.cloud-conflict-comparison{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.cloud-conflict-comparison article{display:flex;flex-direction:column;gap:5px;border:1px solid var(--line,#dbe3ef);border-radius:16px;padding:13px;background:var(--surface-soft,#f7f9fc)}
+.cloud-conflict-comparison article strong{font-size:.95rem}.cloud-conflict-comparison article span{font-weight:700}.cloud-conflict-comparison article small{opacity:.7}.cloud-conflict-actions{display:grid;gap:9px}.cloud-conflict-actions button{min-height:46px}
+@media(max-width:390px){.cloud-conflict-comparison{grid-template-columns:1fr}.cloud-conflict-dialog .dialog-card{padding:16px}}

@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.9.2.9";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.0";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -44,7 +44,7 @@ let pendingExcelImport=null;
 
 const CLOUD_STATE_TABLE="wc_user_state";
 const CLOUD_LOCAL_META_KEY="world-cup-2026-cloud-meta-v7007";
-let cloudSession=null,cloudSubscription=null,cloudSaveTimer=null,cloudApplying=false,cloudReady=false,cloudRevision=0,cloudLastUpdatedAt=null;
+let cloudSession=null,cloudSubscription=null,cloudSaveTimer=null,cloudApplying=false,cloudReady=false,cloudRevision=0,cloudLastUpdatedAt=null,cloudConflictOpen=false;
 let pendingBackupRestore=null;
 let appDataReady=false,appDataReadyResolve;
 const appDataReadyPromise=new Promise(resolve=>{appDataReadyResolve=resolve});
@@ -169,6 +169,52 @@ function persistProjects(){
 }
 
 function cloudClient(){return window.WCAuth?.client||window.wcSupabase||null}
+function canonicalize(value){
+ if(Array.isArray(value))return value.map(canonicalize);
+ if(value&&typeof value==="object")return Object.fromEntries(Object.keys(value).sort().map(key=>[key,canonicalize(value[key])]));
+ return value;
+}
+function comparableProjects(source=projects){
+ return Object.fromEntries(Object.entries(source||{}).map(([id,p])=>[id,{
+   id:p.id,name:p.name,target:Number(p.target)||1,seedType:p.seedType||"custom",collectionOrder:Number(p.collectionOrder)||0,
+   inventory:p.inventory||{},collectionOptions:p.collectionOptions||{},teamOrder:p.teamOrder||[],selectedTeam:p.selectedTeam||"",
+   exchange:p.exchange||{give:{},receive:{}},createdAt:p.createdAt||null
+ }]));
+}
+function hashText(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,"0")}
+function stateFingerprint(sourceProjects=projects,sourceActive=activeProjectId){return hashText(JSON.stringify(canonicalize({activeProjectId:sourceActive||"",projects:comparableProjects(sourceProjects)})))}
+function projectTotals(sourceProjects,sourceActive){
+ const p=sourceProjects?.[sourceActive]||Object.values(sourceProjects||{})[0];if(!p)return {missing:0,duplicates:0,stickers:0};
+ const target=Math.max(1,Number(p.target)||1);let missing=0,duplicates=0,stickers=0;
+ Object.values(p.inventory||{}).forEach(team=>Object.values(team||{}).forEach(raw=>{const n=Math.max(0,Number(raw)||0);stickers+=n;missing+=Math.max(0,target-n);duplicates+=Math.max(0,n-target)}));
+ return {missing,duplicates,stickers};
+}
+function saveExternalCloudBackup(row,reason="cloud-conflict"){
+ if(!row?.payload?.projects)return;
+ const snapshots=readJSON("panini-mercat-auto-backups-v5",[]);
+ snapshots.push({format:"panini-mercat-backup",schemaVersion:DATA_SCHEMA_VERSION,createdAt:new Date().toISOString(),reason,activeProjectId:row.payload.activeProjectId,projects:structuredClone(row.payload.projects)});
+ localStorage.setItem("panini-mercat-auto-backups-v5",JSON.stringify(snapshots.slice(-10)));
+}
+function ensureCloudConflictDialog(){
+ let dialog=$("#cloudConflictDialog");if(dialog)return dialog;
+ dialog=document.createElement("dialog");dialog.id="cloudConflictDialog";dialog.className="app-dialog cloud-conflict-dialog";
+ dialog.innerHTML=`<form method="dialog" class="dialog-card"><header><div><small>Sincronización protegida</small><h2>Hay dos inventarios diferentes</h2></div></header><div class="dialog-body"><p>La app no reemplazará ninguno automáticamente. Revisa los totales y elige qué copia conservar.</p><div id="cloudConflictComparison" class="cloud-conflict-comparison"></div><p class="settings-note">Antes de reemplazar nada se guardará una copia local de seguridad.</p></div><footer class="cloud-conflict-actions"><button id="cloudConflictUseCloud" class="primary" type="button">Usar datos de la nube</button><button id="cloudConflictUseLocal" class="secondary" type="button">Usar este dispositivo</button><button id="cloudConflictCancel" class="ghost" type="button">Cancelar sin cambiar nada</button></footer></form>`;
+ document.body.appendChild(dialog);return dialog;
+}
+function askCloudConflict(row,{reason="sync"}={}){
+ if(cloudConflictOpen)return Promise.resolve("cancel");
+ const dialog=ensureCloudConflictDialog(),localTotals=projectTotals(projects,activeProjectId),remoteTotals=projectTotals(row.payload.projects,row.payload.activeProjectId);
+ $("#cloudConflictComparison").innerHTML=`<article><strong>Este dispositivo</strong><span>${localTotals.missing} me faltan</span><span>${localTotals.duplicates} repetidas</span><small>${localTotals.stickers} unidades registradas</small></article><article><strong>Nube</strong><span>${remoteTotals.missing} me faltan</span><span>${remoteTotals.duplicates} repetidas</span><small>${remoteTotals.stickers} unidades registradas</small></article>`;
+ cloudConflictOpen=true;setCloudStatus("⚠ Conflicto pendiente","error");
+ return new Promise(resolve=>{
+   const finish=choice=>{cloudConflictOpen=false;dialog.close();resolve(choice)};
+   $("#cloudConflictUseCloud").onclick=()=>finish("cloud");
+   $("#cloudConflictUseLocal").onclick=()=>finish("local");
+   $("#cloudConflictCancel").onclick=()=>finish("cancel");
+   dialog.oncancel=e=>{e.preventDefault();finish("cancel")};
+   dialog.showModal();
+ });
+}
 function cloudMeta(){return readJSON(CLOUD_LOCAL_META_KEY,{revision:0,updatedAt:null,userId:null})}
 function writeCloudMeta(meta){localStorage.setItem(CLOUD_LOCAL_META_KEY,JSON.stringify(meta))}
 function cloudPayload(){
@@ -194,19 +240,28 @@ function scheduleCloudSave(delay=450){
  if(!cloudReady||!cloudSession||cloudApplying)return;
  clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(()=>saveCloudState().catch(console.error),delay);
 }
-async function saveCloudState(){
- const client=cloudClient();if(!client||!cloudSession||!navigator.onLine)return;
- clearTimeout(cloudSaveTimer);cloudSaveTimer=null;setCloudStatus("Sincronizando…","syncing");
+async function saveCloudState({force=false}={}){
+ const client=cloudClient();if(!client||!cloudSession||!navigator.onLine||cloudApplying||cloudConflictOpen)return false;
+ clearTimeout(cloudSaveTimer);cloudSaveTimer=null;setCloudStatus("Comprobando la nube…","syncing");
+ if(!force){
+   const {data:remote,error:readError}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
+   if(readError){setCloudStatus("No se pudo comprobar la nube","error");throw readError}
+   if(remote?.payload?.projects&&Number(remote.revision)>cloudRevision){
+     const choice=await askCloudConflict(remote,{reason:"before-save"});
+     if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");await applyCloudPayload(remote);return false}
+     if(choice==="local"){saveExternalCloudBackup(remote,"antes-de-reemplazar-nube");cloudRevision=Number(remote.revision)||0;cloudLastUpdatedAt=remote.updated_at||null;return saveCloudState({force:true})}
+     setCloudStatus("Sin sincronizar: elige una copia","error");return false;
+   }
+ }
+ setCloudStatus("Sincronizando…","syncing");
  const nextRevision=Math.max(cloudRevision,Number(cloudMeta().revision)||0)+1;
  const payload=cloudPayload();
- const {data,error}=await client.from(CLOUD_STATE_TABLE).upsert({
-   user_id:cloudSession.user.id,payload,revision:nextRevision,updated_at:new Date().toISOString()
- },{onConflict:"user_id"}).select("revision,updated_at").single();
- if(error){setCloudStatus("Guardado local · pendiente de nube","error");throw error}
+ const {data,error}=await client.from(CLOUD_STATE_TABLE).upsert({user_id:cloudSession.user.id,payload,revision:nextRevision,updated_at:new Date().toISOString()},{onConflict:"user_id"}).select("revision,updated_at").single();
+ if(error){setCloudStatus("Error al guardar en la nube","error");throw error}
  cloudRevision=Number(data.revision)||nextRevision;cloudLastUpdatedAt=data.updated_at;lastSyncedAt=data.updated_at;
  Object.values(projects).forEach(p=>{p.pendingSync={};p.lastSyncedAt=data.updated_at});pendingSync={};
- commitProjectStateLocalOnly();writeCloudMeta({revision:cloudRevision,updatedAt:data.updated_at,userId:cloudSession.user.id});
- updateSyncUI();setCloudStatus("✓ Guardado en la nube","synced");
+ commitProjectStateLocalOnly();writeCloudMeta({revision:cloudRevision,updatedAt:data.updated_at,userId:cloudSession.user.id,fingerprint:stateFingerprint()});
+ updateSyncUI();setCloudStatus("✓ Guardado en la nube","synced");return true;
 }
 async function applyCloudPayload(row,{silent=false}={}){
  if(!row?.payload?.projects)return false;
@@ -218,7 +273,7 @@ async function applyCloudPayload(row,{silent=false}={}){
    activeProjectId=row.payload.activeProjectId&&projects[row.payload.activeProjectId]?row.payload.activeProjectId:Object.keys(projects)[0];
    cloudRevision=Number(row.revision)||0;cloudLastUpdatedAt=row.updated_at||null;
    localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));localStorage.setItem(ACTIVE_PROJECT_KEY,activeProjectId);
-   writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null});
+   writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:stateFingerprint()});
    loadProjectState();renderProjectsList();
    if(!silent)showToast("Datos actualizados desde la nube");
    setCloudStatus("✓ Sincronizado","synced");return true;
@@ -276,16 +331,24 @@ async function initialCloudSync(session){
  if(error){setCloudStatus("Falta preparar la base de datos","error");console.error(error);hideAppSplash();return}
  cloudReady=true;
  if(data?.payload?.projects&&Object.keys(data.payload.projects).length){
-   await applyCloudPayload(data,{silent:true});startRealtime();showReturningWelcome(session);
- }else{
-   cloudReady=false;openFirstCollectionOnboarding(session);
- }
+   const meta=cloudMeta(),localFp=stateFingerprint(),remoteFp=stateFingerprint(data.payload.projects,data.payload.activeProjectId),baseline=meta.fingerprint||null;
+   if(localFp===remoteFp){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:session.user.id,fingerprint:localFp});setCloudStatus("✓ Sincronizado","synced")}
+   else if(baseline&&localFp===baseline){createAutoBackup("antes-de-actualizar-desde-nube");await applyCloudPayload(data,{silent:true})}
+   else if(baseline&&remoteFp===baseline){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;saveExternalCloudBackup(data,"nube-anterior");await saveCloudState({force:true})}
+   else{
+     const choice=await askCloudConflict(data,{reason:"initial"});
+     if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");await applyCloudPayload(data,{silent:true})}
+     else if(choice==="local"){saveExternalCloudBackup(data,"antes-de-reemplazar-nube");cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;await saveCloudState({force:true})}
+     else setCloudStatus("Sin sincronizar: elige una copia","error");
+   }
+   startRealtime();showReturningWelcome(session);
+ }else{cloudReady=false;openFirstCollectionOnboarding(session)}
 }
 function startRealtime(){
  const client=cloudClient();if(!client||!cloudSession)return;
  if(cloudSubscription)client.removeChannel(cloudSubscription);
  cloudSubscription=client.channel(`wc-state-${cloudSession.user.id}`).on("postgres_changes",{event:"UPDATE",schema:"public",table:CLOUD_STATE_TABLE,filter:`user_id=eq.${cloudSession.user.id}`},payload=>{
-   const row=payload.new;if(!row||Number(row.revision)<=cloudRevision)return;applyCloudPayload(row).catch(console.error);
+   const row=payload.new;if(!row||Number(row.revision)<=cloudRevision)return;reconcileCloudRow(row,{reason:"realtime"}).catch(console.error);
  }).subscribe();
 }
 window.addEventListener("wc-auth-ready",event=>{if(event.detail?.session)initialCloudSync(event.detail.session).catch(console.error)});
@@ -294,55 +357,27 @@ window.addEventListener("wc-auth-changed",event=>{
  if(!session){cloudSession=null;cloudReady=false;if(cloudSubscription)cloudClient()?.removeChannel(cloudSubscription);cloudSubscription=null}
 });
 function hasLocalPendingChanges(){
- return Object.values(projects||{}).some(project=>Object.keys(project?.pendingSync||{}).length>0)||Object.keys(pendingSync||{}).length>0;
+ return stateFingerprint()!==(cloudMeta().fingerprint||stateFingerprint())||Object.values(projects||{}).some(project=>Object.keys(project?.pendingSync||{}).length>0)||Object.keys(pendingSync||{}).length>0;
 }
-function mergePendingInventoryIntoCloud(remoteProjects){
- const merged=structuredClone(remoteProjects||{});
- Object.entries(projects||{}).forEach(([projectId,localProject])=>{
-   const changes=localProject?.pendingSync||{};
-   if(!merged[projectId]){
-     if(Object.keys(changes).length)merged[projectId]=structuredClone(localProject);
-     return;
-   }
-   Object.values(changes).forEach(change=>{
-     if(!change?.team||!change?.code)return;
-     merged[projectId].inventory=merged[projectId].inventory||{};
-     merged[projectId].inventory[change.team]=merged[projectId].inventory[change.team]||{};
-     merged[projectId].inventory[change.team][change.code]=Math.max(0,Number(change.latestValue)||0);
-     merged[projectId].pendingSync=merged[projectId].pendingSync||{};
-     merged[projectId].pendingSync[syncKey(change.team,change.code)]=structuredClone(change);
-   });
- });
- return merged;
+async function reconcileCloudRow(row,{reason="manual"}={}){
+ if(!row?.payload?.projects||cloudConflictOpen)return false;
+ const localFp=stateFingerprint(),remoteFp=stateFingerprint(row.payload.projects,row.payload.activeProjectId),baseline=cloudMeta().fingerprint||null;
+ if(localFp===remoteFp){cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:localFp});setCloudStatus("✓ Sincronizado","synced");return true}
+ if(baseline&&localFp===baseline){createAutoBackup("antes-de-actualizar-desde-nube");return applyCloudPayload(row,{silent:reason!=="manual"})}
+ if(baseline&&remoteFp===baseline){cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;saveExternalCloudBackup(row,"nube-anterior");return saveCloudState({force:true})}
+ const choice=await askCloudConflict(row,{reason});
+ if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");return applyCloudPayload(row)}
+ if(choice==="local"){saveExternalCloudBackup(row,"antes-de-reemplazar-nube");cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;return saveCloudState({force:true})}
+ setCloudStatus("Sin sincronizar: elige una copia","error");return false;
 }
 async function refreshCloudState({reason="manual"}={}){
- const client=cloudClient();
- if(!client||!cloudSession||!navigator.onLine||cloudApplying)return false;
+ const client=cloudClient();if(!client||!cloudSession||!navigator.onLine||cloudApplying||cloudConflictOpen)return false;
  const {data,error}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
  if(error){console.error("No se pudo refrescar la nube",reason,error);setCloudStatus("Sin conexión con la nube","error");return false}
  if(!data?.payload?.projects)return false;
  const remoteRevision=Number(data.revision)||0;
- const remoteUpdated=Date.parse(data.updated_at||0)||0;
- const localUpdated=Date.parse(cloudLastUpdatedAt||cloudMeta().updatedAt||0)||0;
- if(remoteRevision<cloudRevision||(remoteRevision===cloudRevision&&remoteUpdated<=localUpdated))return false;
- if(hasLocalPendingChanges()){
-   const mergedProjects=mergePendingInventoryIntoCloud(data.payload.projects);
-   cloudApplying=true;
-   try{
-     projects=mergedProjects;
-     activeProjectId=projects[activeProjectId]?activeProjectId:(data.payload.activeProjectId&&projects[data.payload.activeProjectId]?data.payload.activeProjectId:Object.keys(projects)[0]);
-     cloudRevision=remoteRevision;cloudLastUpdatedAt=data.updated_at||null;
-     Object.values(projects).forEach(ensureProjectTeamOrder);
-     localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));localStorage.setItem(ACTIVE_PROJECT_KEY,activeProjectId);
-     writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession.user.id});
-     loadProjectState();renderProjectsList();
-   }finally{cloudApplying=false}
-   await saveCloudState();
-   showToast("Cambios combinados y sincronizados");
-   return true;
- }
- await applyCloudPayload(data,{silent:reason==="initial"});
- return true;
+ if(remoteRevision<cloudRevision)return false;
+ return reconcileCloudRow(data,{reason});
 }
 window.addEventListener("online",()=>{if(cloudSession){cloudReady=true;refreshCloudState({reason:"online"}).catch(console.error)}});
 window.addEventListener("focus",()=>{if(cloudSession)refreshCloudState({reason:"focus"}).catch(console.error)});
