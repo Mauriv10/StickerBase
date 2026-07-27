@@ -1,15 +1,22 @@
+# Build 704.10.3
+
+- Restaura el orden oficial de selecciones en el desplegable y en «Todas las selecciones».
+- Evita que un orden antiguo o alterado sincronizado desde la nube sustituya el orden de la edición.
+- Mantiene «Exportar álbum» y la sincronización protegida.
+
+# Build 704.10.2
+
+- Añade «Exportar álbum» dentro de los tres puntos de cada colección.
+- Incluye todas las referencias y cantidades del inventario, incluso las que están a cero.
+- Mantiene los tres formatos existentes: compartir con banderas, copiar texto y copiar compacto.
+
 # Build 704.10.1
 
-- Corregida la descarga desde Supabase al elegir «Usar datos de la nube».
-- Corregida la actualización automática al volver a la PWA del iPhone.
-- La copia previa a una descarga es ahora estrictamente local y no programa otra subida.
-- Se mantienen hasta 10 copias de seguridad locales.
+- Corrige la descarga desde Supabase al elegir «Usar datos de la nube».
+- Corrige la actualización automática al volver a la PWA del iPhone.
+- La copia previa a una descarga es estrictamente local.
 
-# Build 704.10.1
+# Build 704.10.0
 
-- Sincronización protegida PC/iPhone.
-- Detección de conflictos mediante huella del estado.
-- Nunca reemplaza dos inventarios divergentes sin elección explícita.
-- Copia automática antes de usar nube o dispositivo.
-- Comprobación de revisión remota antes de cada subida.
-- Recuperación segura al volver de segundo plano o recuperar conexión.
+- Sincronización protegida PC/iPhone y detección de conflictos.
+- Copia automática antes de reemplazar inventarios.

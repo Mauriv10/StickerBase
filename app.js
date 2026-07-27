@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.1";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.3";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -66,11 +66,15 @@ function defaultProject(name,target,projectInventory,seedType="custom"){
 }
 function projectTeamOrder(project=projects?.[activeProjectId],sourceInventory=project?.inventory||inventory){
  const available=Object.keys(sourceInventory||{});
- const preferred=Array.isArray(project?.teamOrder)&&project.teamOrder.length
-   ? project.teamOrder
-   : Object.keys(masterInventories[project?.seedType]||{});
+ // El orden de las selecciones debe seguir siempre el orden oficial del álbum.
+ // Un teamOrder antiguo recibido desde la nube no puede reordenar el desplegable
+ // ni la vista «Todas las selecciones». Solo se usa para referencias adicionales
+ // que no formen parte de la edición maestra.
+ const masterOrder=Object.keys(masterInventories[project?.seedType]||{});
+ const storedOrder=Array.isArray(project?.teamOrder)?project.teamOrder:[];
  const seen=new Set();
- return [...preferred,...available].filter(team=>available.includes(team)&&!seen.has(team)&&seen.add(team));
+ return [...masterOrder,...storedOrder,...available]
+   .filter(team=>available.includes(team)&&!seen.has(team)&&seen.add(team));
 }
 function currentCollectionOptions(project=projects?.[activeProjectId]){
  if(!project)return {collaborationEnabled:true,extra:{epic:false,bronze:false,silver:false,gold:false}};
@@ -1000,71 +1004,79 @@ function paniniInternalCode(team,displayNumber){
 }
 
 
-function collectShareGroups(type){
- const target=getTarget();
+function collectShareGroups(type,projectId=activeProjectId){
+ if(projectId===activeProjectId)commitProjectStateLocalOnly();
+ const project=projects?.[projectId]||projects?.[activeProjectId];
+ const sourceInventory=project?.inventory||inventory;
+ const target=Math.max(1,Number(project?.target)||1);
  const groups=[];
- let totalUnits=0;
- currentTeamOrder().forEach(team=>{
-   const stickers=inventory[team]||{};
+ let totalUnits=0,totalReferences=0;
+ projectTeamOrder(project,sourceInventory).filter(team=>teamVisibleForProject(team,project)).forEach(team=>{
+   const stickers=sourceInventory[team]||{};
    const items=Object.entries(stickers)
      .map(([code,raw])=>{
-       const qty=Number(raw)||0;
-       const units=type==="missing"?Math.max(0,target-qty):Math.max(0,qty-target);
-       return {code,units};
+       const qty=Math.max(0,Number(raw)||0);
+       const units=type==="album"?qty:type==="missing"?Math.max(0,target-qty):Math.max(0,qty-target);
+       return {code,units,qty};
      })
-     .filter(item=>item.units>0)
+     .filter(item=>type==="album"||item.units>0)
      .sort((a,b)=>Number(a.code)-Number(b.code));
    if(!items.length)return;
-   totalUnits+=items.reduce((sum,item)=>sum+item.units,0);
+   totalReferences+=items.length;
+   totalUnits+=items.reduce((sum,item)=>sum+(type==="album"?item.qty:item.units),0);
    groups.push({team,items});
  });
- return {groups,totalUnits};
+ return {groups,totalUnits,totalReferences,project};
 }
 
-function buildShareCollectionText(type,{flags=false,compact=false}={}){
- const projectName=projects?.[activeProjectId]?.name||"Mundial 2026";
- const {groups,totalUnits}=collectShareGroups(type);
- if(!groups.length)return {text:"",totalUnits:0};
- const missing=type==="missing";
- const lines=[
-   "🏆 "+projectName,
-   "",
-   missing?`Me faltan ${totalUnits} cromos`:`Tengo ${totalUnits} cromos repetidos para cambiar`,
-   ""
- ];
+function buildShareCollectionText(type,{flags=false,compact=false,projectId=activeProjectId}={}){
+ const {groups,totalUnits,totalReferences,project}=collectShareGroups(type,projectId);
+ if(!groups.length)return {text:"",totalUnits:0,totalReferences:0};
+ const projectName=project?.name||"Mundial 2026";
+ const missing=type==="missing",album=type==="album";
+ const summary=album
+   ?`Inventario completo · ${totalReferences} referencias · ${totalUnits} cromos`
+   :missing?`Me faltan ${totalUnits} cromos`:`Tengo ${totalUnits} cromos repetidos para cambiar`;
+ const lines=["🏆 "+projectName,"",summary,""];
  groups.forEach((group,index)=>{
    const officialCode=TEAM_TO_PANINI_CODE[group.team]||group.team;
    const heading=(flags?`${TEAM_FLAG_EMOJI[group.team]||""} `:"")+officialCode;
    const stickers=group.items.map(item=>{
      const shown=paniniDisplayCode(group.team,item.code);
+     if(album)return `${shown} x${item.qty}`;
      return item.units>1?`${shown} x${item.units}`:shown;
    }).join(", ");
-   if(compact){
-     lines.push(`${heading.trim()}: ${stickers}`);
-   }else{
-     lines.push(heading.trim());
-     lines.push(stickers);
+   if(compact)lines.push(`${heading.trim()}: ${stickers}`);
+   else{
+     lines.push(heading.trim());lines.push(stickers);
      if(index<groups.length-1)lines.push("");
    }
  });
- return {text:lines.join("\n"),totalUnits};
+ return {text:lines.join("\n"),totalUnits,totalReferences};
 }
 
-function openShareOptions(){
- const type=activeShareListType();
+function openShareOptions(type=activeShareListType(),projectId=activeProjectId){
  if(!type)return;
- const {totalUnits}=collectShareGroups(type);
- if(!totalUnits){
+ const {totalUnits,totalReferences}=collectShareGroups(type,projectId);
+ if(type!=="album"&&!totalUnits){
    showToast(type==="missing"?"No te falta ningún cromo":"No tienes cromos repetidos");
    return;
  }
+ if(type==="album"&&!totalReferences){showToast("Esta colección no contiene referencias");return;}
  const sheet=$("#shareOptionsSheet");
  if(!sheet)return;
- sheet.dataset.type=type;
- $("#shareOptionsTitle").textContent=type==="missing"?"Compartir cromos que me faltan":"Compartir cromos repetidos";
+ sheet.dataset.type=type;sheet.dataset.projectId=projectId;
+ $("#shareOptionsTitle").textContent=type==="album"?"Exportar álbum":type==="missing"?"Compartir cromos que me faltan":"Compartir cromos repetidos";
  sheet.hidden=false;
  requestAnimationFrame(()=>sheet.classList.add("open"));
  document.body.classList.add("share-sheet-open");
+}
+
+function exportEditedCollectionAlbum(){
+ const projectId=$("#editCollectionId")?.value;
+ if(!projectId||!projects?.[projectId])return;
+ closeEditCollection();
+ setTimeout(()=>openShareOptions("album",projectId),80);
 }
 
 function closeShareOptions(){
@@ -1105,16 +1117,18 @@ function actionFeedback(button,{busy="Procesando…",done="Hecho ✓",error="Err
 }
 
 async function runShareOption(mode){
- const type=$("#shareOptionsSheet")?.dataset.type||activeShareListType();
+ const sheet=$("#shareOptionsSheet");
+ const type=sheet?.dataset.type||activeShareListType();
+ const projectId=sheet?.dataset.projectId||activeProjectId;
  if(!type)return;
- const options=mode==="share"?{flags:true,compact:true}:mode==="compact"?{flags:false,compact:true}:{flags:false,compact:false};
- const {text,totalUnits}=buildShareCollectionText(type,options);
- if(!text||!totalUnits){
+ const options=mode==="share"?{flags:true,compact:true,projectId}:mode==="compact"?{flags:false,compact:true,projectId}:{flags:false,compact:false,projectId};
+ const {text,totalUnits,totalReferences}=buildShareCollectionText(type,options);
+ if(!text||(type==="album"?!totalReferences:!totalUnits)){
    closeShareOptions();
-   showToast(type==="missing"?"No te falta ningún cromo":"No tienes cromos repetidos");
+   showToast(type==="album"?"Esta colección no contiene referencias":type==="missing"?"No te falta ningún cromo":"No tienes cromos repetidos");
    return;
  }
- const title=type==="missing"?"Cromos que me faltan":"Cromos repetidos";
+ const title=type==="album"?"Inventario completo":type==="missing"?"Cromos que me faltan":"Cromos repetidos";
  closeShareOptions();
  try{
    if(mode==="share"){
@@ -1287,7 +1301,7 @@ function closeTradeAnalyzer(){const dialog=$("#tradeAnalyzerDialog");if(dialog?.
 
 
 async function shareActiveCollectionList(){
- openShareOptions();
+ openShareOptions(activeShareListType(),activeProjectId);
 }
 
 function renderGlobalCollection(){
@@ -3027,6 +3041,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("#completeOneAlbumButton")?.addEventListener("click",completeOneAlbumEditedCollection);
  $("#addOneToAllButton")?.addEventListener("click",()=>adjustAllEditedCollection(1));
  $("#removeOneFromAllButton")?.addEventListener("click",()=>adjustAllEditedCollection(-1));
+ $("#exportCollectionAlbumButton")?.addEventListener("click",exportEditedCollectionAlbum);
  $("#deleteCollectionButton")?.addEventListener("click",deleteEditedCollection);
  $("#editCollectionDialog")?.addEventListener("click",event=>{if(event.target===$("#editCollectionDialog"))closeEditCollection()});
 });
