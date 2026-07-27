@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.0";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.1";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -194,6 +194,24 @@ function saveExternalCloudBackup(row,reason="cloud-conflict"){
  const snapshots=readJSON("panini-mercat-auto-backups-v5",[]);
  snapshots.push({format:"panini-mercat-backup",schemaVersion:DATA_SCHEMA_VERSION,createdAt:new Date().toISOString(),reason,activeProjectId:row.payload.activeProjectId,projects:structuredClone(row.payload.projects)});
  localStorage.setItem("panini-mercat-auto-backups-v5",JSON.stringify(snapshots.slice(-10)));
+}
+function createAutoBackup(reason="antes-de-sincronizar"){
+ // Copia estrictamente local: no llama a commitProjectState(), porque esa función
+ // programa una subida a Supabase y podría competir con la descarga elegida.
+ commitProjectStateLocalOnly();
+ const snapshots=readJSON("panini-mercat-auto-backups-v5",[]);
+ const snapshot={
+   format:"panini-mercat-backup",
+   version:APP_VERSION,
+   schemaVersion:DATA_SCHEMA_VERSION,
+   createdAt:new Date().toISOString(),
+   reason,
+   activeProjectId,
+   projects:structuredClone(projects)
+ };
+ snapshots.push(snapshot);
+ localStorage.setItem("panini-mercat-auto-backups-v5",JSON.stringify(snapshots.slice(-10)));
+ return snapshot;
 }
 function ensureCloudConflictDialog(){
  let dialog=$("#cloudConflictDialog");if(dialog)return dialog;
