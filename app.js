@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.3";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.4";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1019,7 +1019,7 @@ function collectShareGroups(type,projectId=activeProjectId){
        const units=type==="album"?qty:type==="missing"?Math.max(0,target-qty):Math.max(0,qty-target);
        return {code,units,qty};
      })
-     .filter(item=>type==="album"||item.units>0)
+     .filter(item=>type==="album"?item.qty>0:item.units>0)
      .sort((a,b)=>Number(a.code)-Number(b.code));
    if(!items.length)return;
    totalReferences+=items.length;
@@ -1035,7 +1035,7 @@ function buildShareCollectionText(type,{flags=false,compact=false,projectId=acti
  const projectName=project?.name||"Mundial 2026";
  const missing=type==="missing",album=type==="album";
  const summary=album
-   ?`Inventario completo · ${totalReferences} referencias · ${totalUnits} cromos`
+   ?`Inventario del álbum · ${totalReferences} referencias · ${totalUnits} cromos`
    :missing?`Me faltan ${totalUnits} cromos`:`Tengo ${totalUnits} cromos repetidos para cambiar`;
  const lines=["🏆 "+projectName,"",summary,""];
  groups.forEach((group,index)=>{
