@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.4";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.5";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -56,20 +56,31 @@ const LIGA_ESTE_TEAM_INFO={
  "Valencia":{"01":["Escudo","Escudo"],"02":["Carlos Corberán","Entrenador"],"03":["Dimitrievski","Portero"],"04":["Rivero","Portero"],"05":["Foulquier","Defensa"],"06":["Copete","Defensa"],"07":["Tárrega","Defensa"],"08A":["Cömert","Defensa"],"08B":["Diakhaby","Defensa"],"09":["Gayà","Defensa"],"10":["Jesús Vázquez","Defensa"],"11":["Pepelu","Medio"],"12":["Guido Rodríguez","Medio"],"13":["Javi Guerra","Medio"],"14":["Luis Rioja","Medio"],"15":["Ugrinic","Medio"],"16":["André Almeida","Medio"],"17":["Hugo Duro","Delantero"],"18":["Diego López","Delantero"],"19":["Ramazani","Delantero"],"20A":["Sadiq","Delantero"],"20B":["Lucas Beltrán","Delantero"]},
  "Villarreal":{"01":["Escudo","Escudo"],"02":["Íñigo Pérez","Entrenador"],"03":["Luiz Júnior","Portero"],"04":["Arnau Tenas","Portero"],"05":["Mouriño","Defensa"],"06A":["Pau Navarro","Defensa"],"06B":["Logan Costa","Defensa"],"07A":["Foyth","Defensa"],"07B":["Freeman","Defensa"],"08A":["Kambwala","Defensa"],"08B":["Rafa Marín","Defensa"],"09":["Renato Veiga","Defensa"],"10":["Sergi Cardona","Defensa"],"11":["Pape Gueye","Medio"],"12":["Santi Comesaña","Medio"],"13":["Maciá","Medio"],"14":["Moleiro","Medio"],"15":["Buchanan","Delantero"],"16":["Oluwaseyi","Delantero"],"17":["Ayoze","Delantero"],"18":["Pépé","Delantero"],"19":["Mikautadze","Delantero"],"20":["Gerard Moreno","Delantero"]}
 };
-const LIGA_ESTE_TEAM_DOMAINS={
- "Deportivo Alavés":"deportivoalaves.com","Athletic Club de Bilbao":"athletic-club.eus","Atlético de Madrid":"atleticodemadrid.com","FC Barcelona":"fcbarcelona.com","Real Betis":"realbetisbalompie.es","RC Celta de Vigo":"rccelta.es","Deportivo":"rcdeportivo.es","Elche CF":"elchecf.es","RCD Espanyol":"rcdespanyol.com","Getafe CF":"getafecf.com","Levante UD":"levanteud.com","Real Madrid CF":"realmadrid.com","Malaga CF":"malagacf.com","Osasuna":"osasuna.es","Racing de Santander":"realracingclub.es","Rayo Vallecano":"rayovallecano.es","Real Sociedad":"realsociedad.eus","Sevilla":"sevillafc.es","Valencia":"valenciacf.com","Villarreal":"villarrealcf.es"
+const LIGA_ESTE_CRESTS={
+ "Deportivo Alavés":"./assets/club-crests/deportivo-alaves.png",
+ "Athletic Club de Bilbao":"./assets/club-crests/athletic-club-de-bilbao.png",
+ "Atlético de Madrid":"./assets/club-crests/atletico-de-madrid.png",
+ "FC Barcelona":"./assets/club-crests/fc-barcelona.png",
+ "Real Betis":"./assets/club-crests/real-betis.png",
+ "RC Celta de Vigo":"./assets/club-crests/rc-celta-de-vigo.png",
+ "Deportivo":"./assets/club-crests/deportivo.png",
+ "Elche CF":"./assets/club-crests/elche-cf.png",
+ "RCD Espanyol":"./assets/club-crests/rcd-espanyol.png",
+ "Getafe CF":"./assets/club-crests/getafe-cf.png",
+ "Levante UD":"./assets/club-crests/levante-ud.png",
+ "Real Madrid CF":"./assets/club-crests/real-madrid-cf.png",
+ "Malaga CF":"./assets/club-crests/malaga-cf.png",
+ "Osasuna":"./assets/club-crests/osasuna.png",
+ "Racing de Santander":"./assets/club-crests/racing-de-santander.png",
+ "Rayo Vallecano":"./assets/club-crests/rayo-vallecano.png",
+ "Real Sociedad":"./assets/club-crests/real-sociedad.png",
+ "Sevilla":"./assets/club-crests/sevilla.png",
+ "Valencia":"./assets/club-crests/valencia.png",
+ "Villarreal":"./assets/club-crests/villarreal.png"
 };
 function ligaEsteStickerInfo(team,code){return LIGA_ESTE_TEAM_INFO?.[team]?.[code]||null}
-function ligaEsteCrestUrl(team){
- const overrides={
-  "Real Madrid CF":"https://www.google.com/s2/favicons?domain_url=https%3A%2F%2Fwww.realmadrid.com&sz=256",
-  "Valencia":"https://www.google.com/s2/favicons?domain_url=https%3A%2F%2Fwww.valenciacf.com&sz=256"
- };
- if(overrides[team])return overrides[team];
- const d=LIGA_ESTE_TEAM_DOMAINS[team];
- return d?`https://www.google.com/s2/favicons?domain_url=${encodeURIComponent("https://"+d)}&sz=256`:"";
-}
-function ligaEsteTeamSearchText(team){const rows=Object.entries(LIGA_ESTE_TEAM_INFO?.[team]||{}).flatMap(([code,[name,pos]])=>[code,name,pos]);return normalizeTradeName([team,...rows].join(" "))}
+function ligaEsteCrestUrl(team){return LIGA_ESTE_CRESTS[team]||""}
+function ligaEsteTeamSearchText(team){const source=LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{};const rows=Object.entries(source).flatMap(([code,[name,pos]])=>[code,name,pos]);return normalizeTradeName([team,...rows].join(" "))}
 
 const LIGA_ESTE_INSERTS={
  "ADN / LALIGA PRIME":Array.from({length:15},(_,i)=>String(i+1).padStart(2,"0")),
@@ -81,7 +92,7 @@ const LIGA_ESTE_INSERTS={
  "EXTRA STICKER ORO":["01","02","03","04","05"]
 };
 const LIGA_ESTE_EXTRA_NAMES=["Lamine Yamal","Mbappé","Nico Williams","Pedri","Oblak"];
-const LIGA_ESTE_INSERT_INFO={};
+const LIGA_ESTE_INSERT_INFO={"ADN / LALIGA PRIME":{"01":["Antony (Betis)","Delantero"],"02":["Bellingham (Real Madrid)","Medio"],"03":["Courtois (Real Madrid)","Portero"],"04":["Fermín (Barcelona)","Medio"],"05":["Julián Alvarez (Atlético)","Delantero"],"06":["Lamine Yamal (Barcelona)","Delantero"],"07":["Lookman (Atlético)","Delantero"],"08":["Mbappé (Real Madrid)","Delantero"],"09":["Moleiro (Villarreal)","Medio"],"10":["Nico Williams (Athletic)","Delantero"],"11":["Oyarzabal (Real Sociedad)","Delantero"],"12":["Pedri (Barcelona)","Medio"],"13":["Raphinha (Barcelona)","Delantero"],"14":["Unai Simón (Athletic)","Portero"],"15":["Vinícius (Real Madrid)","Delantero"]},"LALIGA FANTASY":{"01":["Hansi Flick (Barcelona)","Entrenador"],"02":["Joan García (Barcelona)","Portero"],"03":["Lejeune (Rayo Vallecano)","Defensa"],"04":["Fornals (Betis)","Medio"],"05":["Lamine Yamal (Barcelona)","Delantero"],"06":["Luis Milla (Getafe)","Medio"],"07":["Pedri (Barcelona)","Medio"],"08":["Luis Milla (Getafe)","Medio"],"09":["Mbappé (Real Madrid)","Delantero"]},"DRAFT 23":{"01":["Asencio (Real Madrid)","Defensa"],"02":["Balde (Barcelona)","Defensa"],"03":["Barrios (Atlético de Madrid)","Medio"],"04":["Carlos Espí (Levante)","Delantero"],"05":["Carreras (Real Madrid)","Defensa"],"06":["Cubarsí (Barcelona)","Defensa"],"07":["Fer López (Celta)","Medio"],"08":["Gavi (Barcelona)","Medio"],"09":["Gonzalo (Real Madrid)","Delantero"],"10":["Huijsen (Real Madrid)","Defensa"],"11":["Jauregizar (Athletic)","Medio"],"12":["Javi Guerra (Valencia)","Medio"],"13":["Jon Martín (Real Sociedad)","Defensa"],"14":["Juanlu (Sevilla)","Defensa"],"15":["Marc Bernal (Barcelona)","Medio"],"16":["Mastantuono (Real Madrid)","Medio"],"17":["Oso (Sevilla)","Medio"],"18":["Pau Navarro (Villarreal)","Defensa"],"19":["Pubill (Atlético de Madrid)","Defensa"],"20":["Renato Veiga (Villarreal)","Defensa"],"21":["Rodri Mendoza (Atlético de Madrid)","Medio"],"22":["Thiago Pitarch (Real Madrid)","Medio"],"23":["Yeremay (Deportivo)","Delantero"]},"DRAFT 23 KROMIX":{"K1":["Asencio (Real Madrid)","Defensa"],"K2":["Balde (Barcelona)","Defensa"],"K3":["Barrios (Atlético de Madrid)","Medio"],"K4":["Carlos Espí (Levante)","Delantero"],"K5":["Carreras (Real Madrid)","Defensa"],"K6":["Cubarsí (Barcelona)","Defensa"],"K7":["Fer López (Celta)","Medio"],"K8":["Gavi (Barcelona)","Medio"],"K9":["Gonzalo (Real Madrid)","Delantero"],"K10":["Huijsen (Real Madrid)","Defensa"],"K11":["Jauregizar (Athletic)","Medio"],"K12":["Javi Guerra (Valencia)","Medio"],"K13":["Jon Martín (Real Sociedad)","Defensa"],"K14":["Juanlu (Sevilla)","Defensa"],"K15":["Marc Bernal (Barcelona)","Medio"],"K16":["Mastantuono (Real Madrid)","Medio"],"K17":["Oso (Sevilla)","Medio"],"K18":["Pau Navarro (Villarreal)","Defensa"],"K19":["Pubill (Atlético de Madrid)","Defensa"],"K20":["Renato Veiga (Villarreal)","Defensa"],"K21":["Rodri Mendoza (Atlético de Madrid)","Medio"],"K22":["Thiago Pitarch (Real Madrid)","Medio"],"K23":["Yeremay (Deportivo)","Delantero"]},"EXTRA STICKER BRONCE":{"01":["Lamine Yamal (Barcelona)","Delantero"],"02":["Mbappé (Real Madrid)","Delantero"],"03":["Nico Williams (Athletic)","Delantero"],"04":["Pedri (Barcelona)","Medio"],"05":["Oblak (Atlético de Madrid)","Portero"]},"EXTRA STICKER PLATA":{"01":["Lamine Yamal (Barcelona)","Delantero"],"02":["Mbappé (Real Madrid)","Delantero"],"03":["Nico Williams (Athletic)","Delantero"],"04":["Pedri (Barcelona)","Medio"],"05":["Oblak (Atlético de Madrid)","Portero"]},"EXTRA STICKER ORO":{"01":["Lamine Yamal (Barcelona)","Delantero"],"02":["Mbappé (Real Madrid)","Delantero"],"03":["Nico Williams (Athletic)","Delantero"],"04":["Pedri (Barcelona)","Medio"],"05":["Oblak (Atlético de Madrid)","Portero"]}};
 function ligaEsteInsertInfo(team,code){return LIGA_ESTE_INSERT_INFO?.[team]?.[code]||null}
 
 function inventoryFromCodeMap(map){return Object.fromEntries(Object.entries(map).map(([team,codes])=>[team,Object.fromEntries(codes.map(code=>[code,0]))]));}
@@ -698,7 +709,7 @@ function saveAll(message="Todo guardado"){
  $("#saveStatus").textContent=message;
  $("#saveDot").textContent="✓";
 }
-function collectionAllTeamsLabel(){const type=inferCollectionType(projects?.[activeProjectId]);return type==="world-cup-2026"?"Todas las selecciones":type==="liga-este-2026-27"?"Todos los clubes e inserts":"Todos los equipos e inserts";}
+function collectionAllTeamsLabel(){const type=inferCollectionType(projects?.[activeProjectId]);return type==="world-cup-2026"?"Todas las selecciones":type==="liga-este-2026-27"?"Todos los clubes":"Todos los equipos e inserts";}
 function populateTeams(){
  teamSelect.innerHTML="";
  const allOption=document.createElement("option");
@@ -1468,7 +1479,7 @@ function toggleLigaEsteTeam(team){
  p.ui.ligaEsteOpenTeams[team]=!p.ui.ligaEsteOpenTeams[team];persistProjects();renderGlobalCollection();
 }
 function ligaEsteRow(team,code,qty){
- const info=ligaEsteStickerInfo(team,code)||[stickerDisplayLabel(team,code),""];
+ const info=ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code)||[stickerDisplayLabel(team,code),""];
  const [name,position]=info,st=stateFor(qty),pending=name==="Pendiente";
  const row=document.createElement("div");row.className=`ligaeste-player-row ${st.kind}${pending?" ligaeste-pending-row":""}`;row.dataset.code=code;
  row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}</span></div><div class="ligaeste-row-stock"><button type="button" class="ligaeste-row-step minus" aria-label="Restar ${collectionSafeText(name)}">−</button><strong>${qty}</strong><button type="button" class="ligaeste-row-step plus" aria-label="Sumar ${collectionSafeText(name)}">+</button></div>`;
@@ -1478,7 +1489,7 @@ function ligaEsteRow(team,code,qty){
 }
 function renderLigaEsteCollection(){
  const list=$("#globalCollectionList");if(!list)return;list.innerHTML="";
- let teams=currentTeamOrder().filter(team=>!isLigaEsteInsertTeam(team));
+ let teams=currentTeamOrder().filter(team=>!isLigaEsteInsertTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));
  const insertTeams=currentTeamOrder().filter(team=>isLigaEsteInsertTeam(team));
  if(collectionSort==="az")teams.sort((a,b)=>a.localeCompare(b,"es"));
  teams.forEach(team=>{
@@ -1693,7 +1704,7 @@ teamSearch.oninput=()=>{
  const isLiga=inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27";
  const worldMatch=!isLiga&&["todo","todos","mundo","global","selecciones"].some(word=>word.includes(q)||q.includes(word));
  suggestions.innerHTML=(worldMatch?`<button class="suggestion" data-team="all"><span>🌍</span><strong>Todas las selecciones</strong></button>`:"")
-   +matches.map(team=>{const hit=isLiga?Object.entries(LIGA_ESTE_TEAM_INFO?.[team]||{}).find(([code,[name,pos]])=>normalizeTradeName(`${code} ${name} ${pos}`).includes(q)):null;return `<button class="suggestion" data-team="${team}">${flagHTML(team)}<strong>${team}</strong><small>${hit?`${hit[0]} · ${hit[1][0]}`:(TEAM_TO_PANINI_CODE[team]||"")}</small></button>`}).join("");
+   +matches.map(team=>{const hit=isLiga?Object.entries(LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{}).find(([code,[name,pos]])=>normalizeTradeName(`${code} ${name} ${pos}`).includes(q)):null;return `<button class="suggestion" data-team="${team}">${flagHTML(team)}<strong>${team}</strong><small>${hit?`${hit[0]} · ${hit[1][0]}`:(TEAM_TO_PANINI_CODE[team]||"")}</small></button>`}).join("");
  suggestions.hidden=!(matches.length||worldMatch);
  suggestions.querySelectorAll("button").forEach(button=>button.onclick=()=>selectTeam(button.dataset.team));
 };

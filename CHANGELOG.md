@@ -1,4 +1,13 @@
-## 704.11.4 — Liga Este: identidad completa y clubes
+# Build 704.11.5
+
+- Liga Este: cabecera fija compacta rediseñada; solo el área central hace scroll.
+- Selector general renombrado a «Todos los clubes».
+- 20 escudos 2026/27 incluidos como assets PNG locales transparentes; sin dependencia de red ni fondos lilas.
+- ADN / LaLiga Prime, LaLiga Fantasy, Draft 23, Draft 23 Kromix y Extra Sticker Bronce/Plata/Oro incluyen nombre real y posición según la checklist de Davileti9.
+- Al seleccionar un insert se muestra su listado vertical con stock, igual que un club.
+- Brillantes y Colaboración permanecen ocultos en Liga Este.
+
+## 704.11.5 — Liga Este: identidad completa y clubes
 
 - Cabecera morada/dorada reforzada con insignia Liga Este 26/27.
 - Terminología contextual: Club, Elegir club y Todos los clubes.
