@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.2";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.3";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -106,7 +106,10 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
  const subtitle=document.querySelector(".collection-header-subtitle");if(subtitle)subtitle.textContent=def.subtitle;
  if(teamSearch)teamSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador, equipo o nº…":"Buscar selección…";
- const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador o equipo…":"Buscar selección…";
+ const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador o club…":"Buscar selección…";
+ const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=project.collectionType==="liga-este-2026-27"?"Club":"Selección";
+ const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=project.collectionType==="liga-este-2026-27"?"Elegir club":"Elegir selección";
+ const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo)logo.hidden=project.collectionType!=="liga-este-2026-27";
 }
 
 const EXTRA_PLAYERS=[
@@ -631,9 +634,13 @@ async function loadData(){
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
 function flagHTML(team){
+ if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){
+   if(isLigaEsteInsertTeam(team))return `<span class="ligaeste-insert-mark" aria-hidden="true">✦</span>`;
+   const crest=ligaEsteCrestUrl(team);
+   if(crest)return `<span class="ligaeste-crest-wrap"><span class="ligaeste-crest-fallback">${collectionSafeText(team).slice(0,2).toUpperCase()}</span><img class="ligaeste-team-crest" src="${crest}" alt="Escudo de ${collectionSafeText(team)}" onerror="this.style.display='none'"></span>`;
+ }
  const flag=flags[team]||TEAM_FLAG_EMOJI?.[team]||"";
  if(flag)return /^(?:\.|\/|https?:|data:)/.test(flag)?`<img src="${flag}" alt="">`:`<span class="inline-flag-emoji" aria-hidden="true">${flag}</span>`;
- if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27")return `<span class="inline-flag-emoji" aria-hidden="true">${isLigaEsteInsertTeam(team)?"✨":"⚽"}</span>`;
  return '<span class="inline-flag-emoji" aria-hidden="true"></span>';
 }
 function formatTime(iso){return new Date(iso).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})}
@@ -679,7 +686,7 @@ function saveAll(message="Todo guardado"){
  $("#saveStatus").textContent=message;
  $("#saveDot").textContent="✓";
 }
-function collectionAllTeamsLabel(){return inferCollectionType(projects?.[activeProjectId])==="world-cup-2026"?"Todas las selecciones":"Todos los equipos e inserts";}
+function collectionAllTeamsLabel(){const type=inferCollectionType(projects?.[activeProjectId]);return type==="world-cup-2026"?"Todas las selecciones":type==="liga-este-2026-27"?"Todos los clubes e inserts":"Todos los equipos e inserts";}
 function populateTeams(){
  teamSelect.innerHTML="";
  const allOption=document.createElement("option");
@@ -733,8 +740,9 @@ function selectTeam(team){
  renderAll();
 }
 function renderTeamList(teams){
+ const isLiga=inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27";
  const worldButton=`<button class="team-option world-option" data-team="all">
-   <span class="team-option-world-icon">🌍</span><strong>Todas las selecciones</strong>
+   <span class="team-option-world-icon">${isLiga?"🏟️":"🌍"}</span><strong>${isLiga?"Todos los clubes":"Todas las selecciones"}</strong>
  </button>`;
  const pinned=["FWC","Coca-Cola",...EXTRA_TEAMS].filter(team=>teams.includes(team));
  const regular=teams.filter(team=>!pinned.includes(team));
@@ -1565,7 +1573,7 @@ function renderStatistics(){
    statsFwcTotal:s.fwc.toLocaleString("es-ES"),
    statsBadgesTotal:s.badges.toLocaleString("es-ES"),
    statsCollaborationTotal:s.collaboration.toLocaleString("es-ES"),
-   statsCompleteTeamsText:`${s.complete} selecciones completas`
+   statsCompleteTeamsText:`${s.complete} ${inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"?"clubes completos":"selecciones completas"}`
  };
  Object.entries(values).forEach(([id,value])=>{const node=$("#"+id);if(node)node.textContent=value});
  const ring=$("#statsProgressRing");

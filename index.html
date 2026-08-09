@@ -98,6 +98,7 @@
   <div class="app-scroll" id="appScroll">
 <header class="app-header premium-home-header compact-home-header">
   <div class="compact-home-titlebar">
+    <div id="ligaEsteHeaderLogo" class="ligaeste-header-logo" hidden aria-label="Liga Este 26/27"><span>LIGA</span><span>ESTE</span><b>26/27</b></div>
     <div class="compact-home-copy">
       <span id="collectionHeaderKicker" class="collection-header-kicker">WORLD CUP 2026</span>
       <h1 id="homeCollectionName">Colección</h1>
@@ -119,7 +120,7 @@
     <img id="currentTeamFlag" class="premium-team-flag" alt="">
     <span id="currentTeamEmoji" class="premium-team-emoji" hidden aria-hidden="true"></span>
     <span class="premium-team-copy">
-      <small>Selección</small>
+      <small id="teamSelectorLabel">Selección</small>
       <strong id="currentTeamName">Seleccionar</strong>
     </span>
     <span class="premium-chevron">⌄</span>
@@ -616,7 +617,7 @@
 
 <dialog id="teamDialog" class="team-dialog">
   <div class="dialog-header">
-    <h2>Elegir selección</h2>
+    <h2 id="teamDialogTitle">Elegir selección</h2>
     <button id="closeTeamDialog">✕</button>
   </div>
   <input id="dialogSearch" class="dialog-search" type="search" placeholder="Buscar selección…">

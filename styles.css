@@ -5424,3 +5424,36 @@ body.collection-theme-ligaeste .global-collection-list{display:flex;flex-directi
 .ligaeste-specials-group{background:linear-gradient(145deg,#32105f,#5c209d);color:#fff;border-radius:17px;padding:14px;display:grid;gap:8px;margin-top:6px}.ligaeste-specials-title{display:flex;align-items:center;gap:10px;margin-bottom:4px}.ligaeste-specials-title>span{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#f7cf3f;color:#33105f;font-size:20px}.ligaeste-specials-title>div{display:flex;flex-direction:column}.ligaeste-specials-title strong{font-size:15px}.ligaeste-specials-title small{font-size:10px;color:#d9caed;margin-top:2px}.ligaeste-special-shortcut{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;border-radius:11px;padding:9px 11px;display:flex;justify-content:space-between;align-items:center;text-align:left}.ligaeste-special-shortcut strong{color:#f8d34d}
 body.collection-theme-ligaeste #currentTeamFlag{width:42px!important;height:42px!important;object-fit:contain!important;border-radius:9px!important;background:#fff!important;padding:2px!important}
 @media(max-width:430px){.ligaeste-list-head,.ligaeste-player-row{grid-template-columns:36px minmax(0,1fr) 88px}.ligaeste-player-row{padding-left:10px;padding-right:10px}.ligaeste-player-copy strong{font-size:12px}.ligaeste-team-toggle{padding:11px 12px}}
+
+
+/* === 704.11.3 · Liga Este — identidad completa, clubes y escudos === */
+body.collection-theme-ligaeste .compact-home-titlebar{
+  min-height:150px!important;display:grid!important;grid-template-columns:92px minmax(0,1fr) auto!important;align-items:center!important;gap:18px!important;
+  margin:-1px -1px 16px!important;padding:24px 22px 22px!important;border-radius:0 0 30px 30px!important;
+  background:radial-gradient(circle at 78% 15%,rgba(151,71,208,.55),transparent 34%),linear-gradient(118deg,#21083f 0%,#461177 50%,#6d28a8 100%)!important;
+}
+body.collection-theme-ligaeste .compact-home-copy{min-width:0;align-self:center}
+body.collection-theme-ligaeste .compact-home-titlebar h1{font-size:clamp(28px,7vw,43px)!important;line-height:1!important;letter-spacing:-.035em!important;margin:7px 0 8px!important;white-space:nowrap}
+body.collection-theme-ligaeste .collection-header-subtitle{font-size:14px!important;font-weight:700!important;opacity:.94}
+body.collection-theme-ligaeste .ligaeste-header-logo{width:82px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:.82;border:3px solid #f4c430;border-radius:18px 18px 26px 26px;color:#fff;background:linear-gradient(155deg,#59219a,#2d0a55);box-shadow:0 8px 20px rgba(15,3,35,.28),inset 0 0 0 2px rgba(255,255,255,.08);font-weight:950;letter-spacing:.02em;position:relative;z-index:2}
+body.collection-theme-ligaeste .ligaeste-header-logo span{font-size:20px}.ligaeste-header-logo b{font-size:15px;color:#f8d34d;margin-top:8px}
+body:not(.collection-theme-ligaeste) .ligaeste-header-logo{display:none!important}
+body.collection-theme-ligaeste .top-actions{align-self:center;z-index:3}
+body.collection-theme-ligaeste #teamSelectorLabel{text-transform:uppercase;letter-spacing:.08em;color:#786f80;font-weight:850}
+body.collection-theme-ligaeste .ligaeste-team-toggle .ligaeste-crest-wrap,
+body.collection-theme-ligaeste #teamList .ligaeste-crest-wrap{width:42px;height:42px;flex-basis:42px}
+body.collection-theme-ligaeste .ligaeste-team-toggle .ligaeste-team-crest,
+body.collection-theme-ligaeste #teamList .ligaeste-team-crest{width:40px;height:40px}
+body.collection-theme-ligaeste #teamList .team-option{gap:14px}
+body.collection-theme-ligaeste #teamList .inline-flag-emoji{display:none!important}
+/* Acerca la barra al borde inferior; safe-area sigue protegida por iOS. */
+body.collection-theme-ligaeste .bottom-app-nav{bottom:0!important;border-radius:20px 20px 0 0!important;padding:6px 7px max(3px,env(safe-area-inset-bottom))!important;left:0!important;right:0!important}
+body.collection-theme-ligaeste{padding-bottom:calc(72px + env(safe-area-inset-bottom))!important}
+@media(max-width:430px){
+ body.collection-theme-ligaeste .compact-home-titlebar{grid-template-columns:74px minmax(0,1fr) 44px!important;gap:12px!important;min-height:132px!important;padding:20px 16px!important}
+ body.collection-theme-ligaeste .ligaeste-header-logo{width:68px;height:84px;border-radius:15px 15px 22px 22px}
+ body.collection-theme-ligaeste .ligaeste-header-logo span{font-size:17px}.ligaeste-header-logo b{font-size:12px;margin-top:7px}
+ body.collection-theme-ligaeste .compact-home-titlebar h1{font-size:clamp(25px,7vw,34px)!important}
+ body.collection-theme-ligaeste .collection-header-kicker{font-size:10px!important}
+ body.collection-theme-ligaeste .collection-header-subtitle{font-size:12px!important}
+}

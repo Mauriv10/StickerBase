@@ -1,3 +1,11 @@
+## 704.11.3 — Liga Este: identidad completa y clubes
+
+- Cabecera morada/dorada reforzada con insignia Liga Este 26/27.
+- Terminología contextual: Club, Elegir club y Todos los clubes.
+- Escudos reales también en acordeones y selector de clubes.
+- Barra inferior Liga Este ajustada al borde inferior respetando safe-area.
+- Mundial 2026 mantiene su interfaz y terminología de selecciones.
+
 ## 704.11.2 — Liga Este: interfaz vertical por jugadores
 - Liga Este pasa a una interfaz propia morado/dorado en cabecera y navegación inferior.
 - Equipos en acordeón desplegable para evitar una lista interminable.
