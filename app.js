@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.5";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.7";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -79,6 +79,15 @@ const LIGA_ESTE_CRESTS={
  "Villarreal":"./assets/club-crests/villarreal.png"
 };
 function ligaEsteStickerInfo(team,code){return LIGA_ESTE_TEAM_INFO?.[team]?.[code]||null}
+const LIGA_ESTE_SPECIAL_BADGES={
+ "ADN / LALIGA PRIME":"./assets/ligaeste-specials/adn-laliga-prime.png",
+ "LALIGA FANTASY":"./assets/ligaeste-specials/laliga-fantasy.png",
+ "DRAFT 23":"./assets/ligaeste-specials/draft-23.png",
+ "DRAFT 23 KROMIX":"./assets/ligaeste-specials/draft-23-kromix.png",
+ "EXTRA STICKER BRONCE":"./assets/ligaeste-specials/extra-bronce.png",
+ "EXTRA STICKER PLATA":"./assets/ligaeste-specials/extra-plata.png",
+ "EXTRA STICKER ORO":"./assets/ligaeste-specials/extra-oro.png"
+};
 function ligaEsteCrestUrl(team){return LIGA_ESTE_CRESTS[team]||""}
 function ligaEsteTeamSearchText(team){const source=LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{};const rows=Object.entries(source).flatMap(([code,[name,pos]])=>[code,name,pos]);return normalizeTradeName([team,...rows].join(" "))}
 
@@ -658,7 +667,10 @@ function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))
 function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
 function flagHTML(team){
  if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){
-   if(isLigaEsteInsertTeam(team))return `<span class="ligaeste-insert-mark" aria-hidden="true">✦</span>`;
+   if(isLigaEsteInsertTeam(team)){
+  const badge=LIGA_ESTE_SPECIAL_BADGES[team];
+  return badge?`<span class="ligaeste-insert-mark"><img src="${badge}" alt="${collectionSafeText(team)}"></span>`:`<span class="ligaeste-insert-mark" aria-hidden="true">✦</span>`;
+ }
    const crest=ligaEsteCrestUrl(team);
    if(crest)return `<span class="ligaeste-crest-wrap"><span class="ligaeste-crest-fallback">${collectionSafeText(team).slice(0,2).toUpperCase()}</span><img class="ligaeste-team-crest" src="${crest}" alt="Escudo de ${collectionSafeText(team)}" onerror="this.style.display='none'"></span>`;
  }
