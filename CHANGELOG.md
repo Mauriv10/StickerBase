@@ -1,4 +1,14 @@
-# Build 704.11.1 · Liga Este 2026/27 + selector de colección
+## 704.11.2 — Liga Este: interfaz vertical por jugadores
+- Liga Este pasa a una interfaz propia morado/dorado en cabecera y navegación inferior.
+- Equipos en acordeón desplegable para evitar una lista interminable.
+- Checklist de primera edición con número, nombre real y posición según Davileti9.
+- Los huecos aún no publicados permanecen como Pendiente para futuras ediciones.
+- Controles de stock − / cantidad / + en cada fila.
+- Buscador ampliado a jugador, equipo, posición y número.
+- Escudos de club mediante favicon oficial con fallback visual sin emoji.
+- Mundial 2026 mantiene su interfaz anterior.
+
+# Build 704.11.2 · Liga Este 2026/27 + selector de colección
 
 - Añade selector visual de tipo al crear una nueva colección.
 - Liga Este 2026/27 ya se puede crear desde la APP con checklist de primera edición.

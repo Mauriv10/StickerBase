@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.1";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.2";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -34,6 +34,35 @@ const LIGA_ESTE_TEAMS={
  "Valencia":["01","02","03","04","05","06","07","08A","08B","09","10","11","12","13","14","15","16","17","18","19","20A","20B"],
  "Villarreal":["01","02","03","04","05","06A","06B","07A","07B","08A","08B","09","10","11","12","13","14","15","16","17","18","19","20"]
 };
+const LIGA_ESTE_TEAM_INFO={
+ "Deportivo Alavés":{"01":["Escudo","Escudo"],"02":["Quique Sánchez Flores","Entrenador"],"03":["Sivera","Portero"],"04":["Pendiente","Pendiente"],"05":["Jonny","Defensa"],"06":["Koski","Defensa"],"07":["Tenaglia","Defensa"],"08":["Parada","Defensa"],"09":["Yusi","Defensa"],"10":["Pendiente","Pendiente"],"11":["Benavidez","Medio"],"12":["Blanco","Medio"],"13":["Guevara","Medio"],"14":["Aleñá","Medio"],"15":["Pablo Ibáñez","Medio"],"16":["Denis Suárez","Medio"],"17":["Ángel Pérez","Delantero"],"18A":["Abde","Delantero"],"18B":["Mañas","Delantero"],"19":["Toni Martínez","Delantero"],"20":["Boyé","Delantero"]},
+ "Athletic Club de Bilbao":{"01":["Escudo","Escudo"],"02":["Edin Terzic","Entrenador"],"03":["Unai Simón","Portero"],"04":["Padilla","Portero"],"05":["Areso","Defensa"],"06A":["Paredes","Defensa"],"06B":["Yeray","Defensa"],"07":["Vivian","Defensa"],"08":["Laporte","Defensa"],"09A":["Yuri","Defensa"],"09B":["Adama Boiro","Defensa"],"10":["Jauregizar","Medio"],"11":["Ruiz de Galarreta","Medio"],"12":["Rego","Medio"],"13":["Unai Gómez","Medio"],"14":["Sancet","Medio"],"15":["Nico Serrano","Medio"],"16":["Berenguer","Delantero"],"17A":["Robert Navarro","Delantero"],"17B":["Maroan","Delantero"],"18":["Nico Williams","Delantero"],"19":["Williams","Delantero"],"20":["Guruzeta","Delantero"]},
+ "Atlético de Madrid":{"01":["Escudo","Escudo"],"02":["Cholo Simeone","Entrenador"],"03":["Oblak","Portero"],"04":["Musso","Portero"],"05":["Marcos Llorente","Defensa"],"06":["Nahuel Molina","Defensa"],"07":["Pubill","Defensa"],"08A":["Le Normand","Defensa"],"08B":["Giménez","Defensa"],"09":["Hancko","Defensa"],"10":["Ruggeri","Defensa"],"11":["Koke","Medio"],"12":["Barrios","Medio"],"13":["Johnny Cardoso","Medio"],"14A":["Rodri Mendoza","Medio"],"14B":["Obed Vargas","Medio"],"15":["Álex Baena","Medio"],"16":["Almada","Medio"],"17":["Giuliano","Delantero"],"18":["Lookman","Delantero"],"19":["Sorloth","Delantero"],"20":["Julián Alvarez","Delantero"]},
+ "FC Barcelona":{"01":["Escudo","Escudo"],"02":["Hansi Flick","Entrenador"],"03":["Joan García","Portero"],"04":["Szczesny","Portero"],"05":["Koundé","Defensa"],"06A":["Araujo","Defensa"],"06B":["Christensen","Defensa"],"07":["Cubarsí","Defensa"],"08":["Gerard Martín","Defensa"],"09":["Joao Cancelo","Defensa"],"10":["Balde","Defensa"],"11":["Eric García","Defensa"],"12":["De Jong","Medio"],"13":["Gavi","Medio"],"14":["Bernal","Medio"],"15":["Pedri","Medio"],"16":["Fermín","Medio"],"17":["Dani Olmo","Delantero"],"18":["Ferran Torres","Delantero"],"19":["Raphinha","Delantero"],"20":["Lamine Yamal","Delantero"]},
+ "Real Betis":{"01":["Escudo","Escudo"],"02":["Manuel Pellegrini","Entrenador"],"03":["Valles","Portero"],"04":["Pau López","Portero"],"05A":["Aitor Ruibal","Defensa"],"05B":["Bellerín","Defensa"],"06":["Diego Llorente","Defensa"],"07":["Bartra","Defensa"],"08":["Natan","Defensa"],"09":["Valentín Gómez","Defensa"],"10":["Marc Roca","Medio"],"11":["Amrabat","Medio"],"12":["Fidalgo","Medio"],"13":["Pendiente","Pendiente"],"14":["Lo Celso","Medio"],"15":["Pablo Fornals","Medio"],"16":["Isco","Medio"],"17":["Riquelme","Delantero"],"18":["Antony","Delantero"],"19":["Cucho Hernández","Delantero"],"20":["Abde","Delantero"]},
+ "RC Celta de Vigo":{"01":["Escudo","Escudo"],"02":["Claudio Giráldez","Entrenador"],"03":["Radu","Portero"],"04":["Iván Villar","Portero"],"05":["Álvaro Núñez","Defensa"],"06":["Javi Rueda","Defensa"],"07":["Javi Rodríguez","Defensa"],"08":["Starfelt","Defensa"],"09A":["Marcos Alonso","Defensa"],"09B":["Yoel Lago","Defensa"],"10":["Carreira","Defensa"],"11":["Ilaix Moriba","Medio"],"12":["Miguel Román","Medio"],"13":["Hugo Álvarez","Medio"],"14":["Sotelo","Medio"],"15":["Fer López","Medio"],"16":["Swedberg","Medio"],"17":["Iago Aspas","Delantero"],"18A":["Pablo Durán","Delantero"],"18B":["El-Abdellaoui","Delantero"],"19":["Jutglà","Delantero"],"20":["Borja Iglesias","Delantero"]},
+ "Deportivo":{"01":["Escudo","Escudo"],"02":["Antonio Hidalgo","Entrenador"],"03":["Álvaro Fernández","Portero"],"04":["Germán Parreño","Portero"],"05":["Adrià Altimira","Defensa"],"06":["Loureiro","Defensa"],"07":["Noubi","Defensa"],"08":["Dani Barcia","Defensa"],"09A":["Ximo Navarro","Defensa"],"09B":["Arnau Comas","Defensa"],"10":["Quagliata","Defensa"],"11":["Villares","Medio"],"12":["Riki","Medio"],"13":["Mario Soriano","Medio"],"14":["José Ángel","Medio"],"15":["Luismi Cruz","Medio"],"16":["Mella","Medio"],"17":["Pendiente","Pendiente"],"18":["Yeremay","Delantero"],"19":["Eddahchouri","Delantero"],"20":["Nsongo","Delantero"]},
+ "Elche CF":{"01":["Escudo","Escudo"],"02":["Eder Saravia","Entrenador"],"03":["Dituro","Portero"],"04":["Pendiente","Pendiente"],"05":["Pétrot","Defensa"],"06":["Chust","Defensa"],"07":["Bigas","Defensa"],"08":["Affengruber","Defensa"],"09A":["Pedrosa","Defensa"],"09B":["Sangaré","Defensa"],"10":["Germán Valera","Medio"],"11":["Martim Neto","Medio"],"12":["Gonzalo Villar","Medio"],"13A":["Fede Redondo","Medio"],"13B":["Jon Chetauya","Medio"],"14":["Marc Aguado","Medio"],"15":["Josan","Medio"],"16":["Morente","Medio"],"17":["Pendiente","Pendiente"],"18":["Cepeda","Delantero"],"19":["Diangana","Delantero"],"20":["Yago Santiago","Delantero"]},
+ "RCD Espanyol":{"01":["Escudo","Escudo"],"02":["Manolo González","Entrenador"],"03":["Dmitrovic","Portero"],"04":["Fortuño","Portero"],"05":["El Hilali","Defensa"],"06":["Rubén Sánchez","Defensa"],"07":["Riedel","Defensa"],"08":["Cabrera","Defensa"],"09":["Miguel Rubio","Defensa"],"10":["Pendiente","Pendiente"],"11":["Pol Lozano","Medio"],"12":["Urko","Medio"],"13":["Edu Expósito","Medio"],"14":["Jofre","Medio"],"15":["Pendiente","Pendiente"],"16":["Dolan","Delantero"],"17":["Pere Milla","Delantero"],"18":["Puado","Delantero"],"19":["Kike García","Delantero"],"20":["Roberto Fernández","Delantero"]},
+ "Getafe CF":{"01":["Escudo","Escudo"],"02":["Jose Bordalás","Entrenador"],"03":["David Soria","Portero"],"04":["Letacek","Portero"],"05":["Kiko Femenía","Defensa"],"06":["Djené","Defensa"],"07":["Boselli","Defensa"],"08":["Abqar","Defensa"],"09":["Zaid Romero","Defensa"],"10":["Davinchi","Defensa"],"11":["Mario Martín","Medio"],"12":["Javi Muñoz","Medio"],"13":["Pendiente","Pendiente"],"14":["Pendiente","Pendiente"],"15":["Pendiente","Pendiente"],"16":["Pendiente","Pendiente"],"17":["Álex Sancris","Delantero"],"18":["Borja Mayoral","Delantero"],"19":["Luis Vázquez","Delantero"],"20":["Satriano","Delantero"]},
+ "Levante UD":{"01":["Escudo","Escudo"],"02":["Luís Castro","Entrenador"],"03":["Ryan","Portero"],"04":["Pablo Campos","Portero"],"05":["Toljan","Defensa"],"06":["Elgezabal","Defensa"],"07":["Dela","Defensa"],"08":["Pendiente","Pendiente"],"09":["Manu Sánchez","Defensa"],"10":["Arriaga","Medio"],"11":["Oriol Rey","Medio"],"12":["Olasagasti","Medio"],"13":["Pendiente","Pendiente"],"14A":["Victor García","Medio"],"14B":["Paco Cortés","Medio"],"15":["Carlos Álvarez","Medio"],"16":["Tunde","Delantero"],"17":["Brugué","Delantero"],"18":["Iván Romero","Delantero"],"19":["Etta Eyong","Delantero"],"20":["Carlos Espí","Delantero"]},
+ "Real Madrid CF":{"01":["Escudo","Escudo"],"02":["José Mourinho","Entrenador"],"03":["Courtois","Portero"],"04":["Lunin","Portero"],"05":["Trent","Defensa"],"06":["Militao","Defensa"],"07":["Asencio","Defensa"],"08":["Rüdiger","Defensa"],"09":["Huijsen","Defensa"],"10A":["Carreras","Defensa"],"10B":["Mendy","Defensa"],"11":["Tchouaméni","Medio"],"12":["Fede Valverde","Medio"],"13":["Camavinga","Medio"],"14":["Bellingham","Medio"],"15A":["Güler","Medio"],"15B":["Thiago Pitarch","Medio"],"16A":["Mastantuono","Medio"],"16B":["Brahim Díaz","Delantero"],"17":["Gonzalo","Delantero"],"18":["Rodrygo","Delantero"],"19":["Vinícius","Delantero"],"20":["Mbappé","Delantero"]},
+ "Malaga CF":{"01":["Escudo","Escudo"],"02":["Juan Franisco Funes","Entrenador"],"03":["Alfonso Herrero","Portero"],"04":["Carlos López","Portero"],"05":["Puga","Defensa"],"06":["Murillo","Defensa"],"07":["Pendiente","Pendiente"],"08":["Einar Galilea","Defensa"],"09":["Rafita","Defensa"],"10":["Pendiente","Pendiente"],"11":["Izan Mérino","Medio"],"12":["Dani Lorenzo","Medio"],"13A":["Rafa Rodríguez","Medio"],"13B":["Juanpe","Medio"],"14":["Dotor","Medio"],"15":["Aarón Ochoa","Medio"],"16":["Larrubia","Delantero"],"17":["Lobete","Delantero"],"18":["Adrián Niño","Delantero"],"19":["Joaquín","Delantero"],"20":["Chupe","Delantero"]},
+ "Osasuna":{"01":["Escudo","Escudo"],"02":["Luis Miguel Ramis","Entrenador"],"03":["Sergio Herrera","Portero"],"04":["Aitor Fernández","Portero"],"05A":["Rosier","Defensa"],"05B":["Arguibide","Defensa"],"06":["Boyomo","Defensa"],"07":["Herrando","Defensa"],"08":["Catena","Defensa"],"09":["Abel Bretones","Defensa"],"10":["Osambela","Medio"],"11":["Torró","Medio"],"12":["Moncayola","Medio"],"13A":["Moi Gómez","Medio"],"13B":["Iker Muñoz","Medio"],"14":["Rubén García","Medio"],"15":["Aimar Oroz","Medio"],"16":["Iker Benito","Medio"],"17":["Raúl Moro","Delantero"],"18":["Raúl García","Delantero"],"19":["Kike Barja","Delantero"],"20":["Budimir","Delantero"]},
+ "Racing de Santander":{"01":["Escudo","Escudo"],"02":["José Alberto López","Entrenador"],"03":["Pendiente","Pendiente"],"04":["Eriksson","Portero"],"05":["Mantilla","Defensa"],"06":["Sangalli","Defensa"],"07":["Facu González","Defensa"],"08":["Javi Castro","Defensa"],"09A":["Manu Hernando","Defensa"],"09B":["Mario García","Defensa"],"10":["Jorge Salinas","Defensa"],"11A":["Maguette","Medio"],"11B":["Nteka","Medio"],"12":["Gustavo Puerta","Medio"],"13":["Íñigo","Medio"],"14":["Aldasoro","Medio"],"15":["Suleiman","Delantero"],"16":["Andrés Martín","Delantero"],"17":["Guliashvili","Delantero"],"18":["Íñigo Vicente","Delantero"],"19":["Arana","Delantero"],"20":["Villalibre","Delantero"]},
+ "Rayo Vallecano":{"01":["Escudo","Escudo"],"02":["Beñat San José","Entrenador"],"03":["Batalla","Portero"],"04":["Cárdenas","Portero"],"05":["Ratiu","Defensa"],"06":["Balliu","Defensa"],"07":["Nobel Mendy","Defensa"],"08":["Lejeune","Defensa"],"09":["Luiz Felipe","Defensa"],"10":["Pep Chavarría","Defensa"],"11":["Pedro Díaz","Medio"],"12":["Pathé Ciss","Medio"],"13":["Óscar Valentín","Medio"],"14":["Unai López","Medio"],"15":["Isi","Medio"],"16":["De Frutos","Delantero"],"17":["Fran Pérez","Delantero"],"18":["Álvaro García","Delantero"],"19":["Camello","Delantero"],"20":["Alemao","Delantero"]},
+ "Real Sociedad":{"01":["Escudo","Escudo"],"02":["Pellegrino Matarazzo","Entrenador"],"03":["Remiro","Portero"],"04":["Marrero","Portero"],"05":["Aramburu","Defensa"],"06":["Zubeldia","Defensa"],"07":["Jon Martín","Defensa"],"08":["Sergio Gómez","Defensa"],"09":["Aihen Muñoz","Defensa"],"10":["Gorrotxategi","Medio"],"11":["Pablo Marín","Medio"],"12":["Turrientes","Medio"],"13A":["Yangel Herrera","Medio"],"13B":["Pendiente","Pendiente"],"14":["Carlos Soler","Medio"],"15":["Sucic","Medio"],"16":["Barrenetxea","Delantero"],"17":["Kubo","Delantero"],"18":["Guedes","Delantero"],"19":["Oskarsson","Delantero"],"20":["Oyarzabal","Delantero"]},
+ "Sevilla":{"01":["Escudo","Escudo"],"02":["Luis García","Entrenador"],"03":["Vlachodimos","Portero"],"04":["Pendiente","Pendiente"],"05":["Carmona","Defensa"],"06":["Juanlu","Defensa"],"07":["Kike Salas","Defensa"],"08":["Nianzou","Defensa"],"09A":["Castrín","Defensa"],"09B":["Marcao","Defensa"],"10":["Suazo","Defensa"],"11":["Oso","Medio"],"12":["Agoumé","Medio"],"13":["Pendiente","Pendiente"],"14":["Sow","Medio"],"15":["Vargas","Medio"],"16":["Manu Bueno","Medio"],"17":["Peque","Delantero"],"18":["Ejuke","Delantero"],"19":["Akor Adams","Delantero"],"20":["Isaac Romero","Delantero"]},
+ "Valencia":{"01":["Escudo","Escudo"],"02":["Carlos Corberán","Entrenador"],"03":["Dimitrievski","Portero"],"04":["Rivero","Portero"],"05":["Foulquier","Defensa"],"06":["Copete","Defensa"],"07":["Tárrega","Defensa"],"08A":["Cömert","Defensa"],"08B":["Diakhaby","Defensa"],"09":["Gayà","Defensa"],"10":["Jesús Vázquez","Defensa"],"11":["Pepelu","Medio"],"12":["Guido Rodríguez","Medio"],"13":["Javi Guerra","Medio"],"14":["Luis Rioja","Medio"],"15":["Ugrinic","Medio"],"16":["André Almeida","Medio"],"17":["Hugo Duro","Delantero"],"18":["Diego López","Delantero"],"19":["Ramazani","Delantero"],"20A":["Sadiq","Delantero"],"20B":["Lucas Beltrán","Delantero"]},
+ "Villarreal":{"01":["Escudo","Escudo"],"02":["Íñigo Pérez","Entrenador"],"03":["Luiz Júnior","Portero"],"04":["Arnau Tenas","Portero"],"05":["Mouriño","Defensa"],"06A":["Pau Navarro","Defensa"],"06B":["Logan Costa","Defensa"],"07A":["Foyth","Defensa"],"07B":["Freeman","Defensa"],"08A":["Kambwala","Defensa"],"08B":["Rafa Marín","Defensa"],"09":["Renato Veiga","Defensa"],"10":["Sergi Cardona","Defensa"],"11":["Pape Gueye","Medio"],"12":["Santi Comesaña","Medio"],"13":["Maciá","Medio"],"14":["Moleiro","Medio"],"15":["Buchanan","Delantero"],"16":["Oluwaseyi","Delantero"],"17":["Ayoze","Delantero"],"18":["Pépé","Delantero"],"19":["Mikautadze","Delantero"],"20":["Gerard Moreno","Delantero"]}
+};
+const LIGA_ESTE_TEAM_DOMAINS={
+ "Deportivo Alavés":"deportivoalaves.com","Athletic Club de Bilbao":"athletic-club.eus","Atlético de Madrid":"atleticodemadrid.com","FC Barcelona":"fcbarcelona.com","Real Betis":"realbetisbalompie.es","RC Celta de Vigo":"rccelta.es","Deportivo":"rcdeportivo.es","Elche CF":"elchecf.es","RCD Espanyol":"rcdespanyol.com","Getafe CF":"getafecf.com","Levante UD":"levanteud.com","Real Madrid CF":"realmadrid.com","Malaga CF":"malagacf.com","Osasuna":"osasuna.es","Racing de Santander":"realracingclub.es","Rayo Vallecano":"rayovallecano.es","Real Sociedad":"realsociedad.eus","Sevilla":"sevillafc.es","Valencia":"valenciacf.com","Villarreal":"villarrealcf.es"
+};
+function ligaEsteStickerInfo(team,code){return LIGA_ESTE_TEAM_INFO?.[team]?.[code]||null}
+function ligaEsteCrestUrl(team){const d=LIGA_ESTE_TEAM_DOMAINS[team];return d?`https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=128`:""}
+function ligaEsteTeamSearchText(team){const rows=Object.entries(LIGA_ESTE_TEAM_INFO?.[team]||{}).flatMap(([code,[name,pos]])=>[code,name,pos]);return normalizeTradeName([team,...rows].join(" "))}
+
 const LIGA_ESTE_INSERTS={
  "ADN / LALIGA PRIME":Array.from({length:15},(_,i)=>String(i+1).padStart(2,"0")),
  "LALIGA FANTASY":Array.from({length:9},(_,i)=>String(i+1).padStart(2,"0")),
@@ -76,6 +105,8 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  document.body.classList.add(`collection-theme-${def.theme}`);
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
  const subtitle=document.querySelector(".collection-header-subtitle");if(subtitle)subtitle.textContent=def.subtitle;
+ if(teamSearch)teamSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador, equipo o nº…":"Buscar selección…";
+ const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador o equipo…":"Buscar selección…";
 }
 
 const EXTRA_PLAYERS=[
@@ -95,7 +126,10 @@ function isExtraTeam(team){return EXTRA_TEAMS.includes(team)}
 function extraVariantForTeam(team){return EXTRA_VARIANTS.find(item=>item.team===team)||null}
 function extraPlayerName(code){return EXTRA_PLAYERS[Math.max(0,Number(code)-1)]||String(code)}
 function stickerDisplayLabel(team,code){
- if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"&&team.startsWith("EXTRA STICKER"))return LIGA_ESTE_EXTRA_NAMES[Math.max(0,Number(code)-1)]||code;
+ if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){
+   if(team.startsWith("EXTRA STICKER"))return LIGA_ESTE_EXTRA_NAMES[Math.max(0,Number(code)-1)]||code;
+   const info=ligaEsteStickerInfo(team,code);if(info)return info[0];
+ }
  return isExtraTeam(team)?extraPlayerName(code):code;
 }
 function stickerFeedbackLabel(team,code){return isExtraTeam(team)?`${extraVariantForTeam(team)?.label||"Extra"} · ${extraPlayerName(code)}`:`${team} ${code}`}
@@ -678,8 +712,9 @@ function updateCurrentTeamUI(){
  }
  const flagSource=flags[team]||"";
  if(!flagSource){
+   if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"&&!isLigaEsteInsertTeam(team)){const crest=ligaEsteCrestUrl(team);if(crest){if(emoji){emoji.hidden=true;emoji.textContent="";}flag.style.display="";flag.src=crest;flag.alt=team;return;}}
    flag.removeAttribute("src");flag.style.display="none";
-   if(emoji){emoji.textContent=isLigaEsteInsertTeam(team)?"✨":"⚽";emoji.hidden=false;}
+   if(emoji){emoji.textContent=isLigaEsteInsertTeam(team)?"✦":"";emoji.hidden=false;}
    return;
  }
  if(emoji){emoji.hidden=true;emoji.textContent="";}
@@ -1076,6 +1111,7 @@ function normalizeTradeName(value){return String(value||"").normalize("NFD").rep
 const PANINI_NORMALIZED_NAME_TO_CODE=(()=>{const map={};Object.keys(PANINI_TEAM_CODES).forEach(code=>{map[normalizeTradeName(code)]=code;});Object.entries(PANINI_TEAM_NAME_ALIASES).forEach(([code,names])=>names.forEach(name=>map[normalizeTradeName(name)]=code));return map;})();
 const PANINI_SORTED_NAME_ALIASES=Object.keys(PANINI_NORMALIZED_NAME_TO_CODE).sort((a,b)=>b.length-a.length);
 function teamSearchText(team){
+ if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"&&!isLigaEsteInsertTeam(team))return ligaEsteTeamSearchText(team);
  const code=TEAM_TO_PANINI_CODE[team]||team;
  const aliases=PANINI_TEAM_NAME_ALIASES[code]||[];
  return normalizeTradeName([team,code,...aliases].join(" "));
@@ -1402,8 +1438,51 @@ async function shareActiveCollectionList(){
  openShareOptions(activeShareListType(),activeProjectId);
 }
 
+function ligaEsteIsOpen(team){
+ const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.ligaEsteOpenTeams=p.ui.ligaEsteOpenTeams||{};
+ if(collectionTeamFilter!=="all")return team===collectionTeamFilter;
+ return !!p.ui.ligaEsteOpenTeams[team];
+}
+function toggleLigaEsteTeam(team){
+ const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.ligaEsteOpenTeams=p.ui.ligaEsteOpenTeams||{};
+ p.ui.ligaEsteOpenTeams[team]=!p.ui.ligaEsteOpenTeams[team];persistProjects();renderGlobalCollection();
+}
+function ligaEsteRow(team,code,qty){
+ const info=ligaEsteStickerInfo(team,code)||[stickerDisplayLabel(team,code),""];
+ const [name,position]=info,st=stateFor(qty),pending=name==="Pendiente";
+ const row=document.createElement("div");row.className=`ligaeste-player-row ${st.kind}${pending?" ligaeste-pending-row":""}`;row.dataset.code=code;
+ row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}</span></div><div class="ligaeste-row-stock"><button type="button" class="ligaeste-row-step minus" aria-label="Restar ${collectionSafeText(name)}">−</button><strong>${qty}</strong><button type="button" class="ligaeste-row-step plus" aria-label="Sumar ${collectionSafeText(name)}">+</button></div>`;
+ row.querySelector(".minus").onclick=e=>changeQuantity(team,code,-1,e.currentTarget);
+ row.querySelector(".plus").onclick=e=>changeQuantity(team,code,1,e.currentTarget);
+ return row;
+}
+function renderLigaEsteCollection(){
+ const list=$("#globalCollectionList");if(!list)return;list.innerHTML="";
+ let teams=currentTeamOrder().filter(team=>!isLigaEsteInsertTeam(team));
+ const insertTeams=currentTeamOrder().filter(team=>isLigaEsteInsertTeam(team));
+ if(collectionSort==="az")teams.sort((a,b)=>a.localeCompare(b,"es"));
+ teams.forEach(team=>{
+   if(collectionTeamFilter!=="all"&&team!==collectionTeamFilter)return;
+   const stickers=inventory[team]||{};
+   const entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));
+   if(!entries.length)return;
+   const target=getTarget(),total=Object.values(stickers).reduce((sum,q)=>sum+Number(q||0),0),missing=Object.values(stickers).reduce((sum,q)=>sum+Math.max(0,target-Number(q||0)),0),open=ligaEsteIsOpen(team);
+   const section=document.createElement("section");section.className=`ligaeste-team-accordion${open?" open":""}`;
+   section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cromos · ${missing?`${missing} pendientes`:"Completo"}</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / cromo</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
+   section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleLigaEsteTeam(team);
+   const rows=section.querySelector(".ligaeste-player-list");entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));
+   list.appendChild(section);
+ });
+ if(collectionTeamFilter==="all"&&collectionFilter==="all"&&insertTeams.length){
+   const special=document.createElement("section");special.className="ligaeste-specials-group";special.innerHTML=`<div class="ligaeste-specials-title"><span>✦</span><div><strong>Especiales e inserts</strong><small>ADN · Fantasy · Draft 23 · Kromix · Extra Stickers</small></div></div>`;
+   insertTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special);
+ }
+ if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cromos para este filtro.</div>';
+}
+
 function renderGlobalCollection(){
  updateShareCollectionButton();
+ if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){renderLigaEsteCollection();return;}
  const list=$("#globalCollectionList");
  if(!list)return;
  list.innerHTML="";
@@ -1591,9 +1670,10 @@ teamSearch.oninput=()=>{
  const q=normalizeTradeName(teamSearch.value);
  if(!q){suggestions.hidden=true;return}
  const matches=filterTeamsByQuery(q).slice(0,8);
- const worldMatch=["todo","todos","mundo","global","selecciones"].some(word=>word.includes(q)||q.includes(word));
+ const isLiga=inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27";
+ const worldMatch=!isLiga&&["todo","todos","mundo","global","selecciones"].some(word=>word.includes(q)||q.includes(word));
  suggestions.innerHTML=(worldMatch?`<button class="suggestion" data-team="all"><span>🌍</span><strong>Todas las selecciones</strong></button>`:"")
-   +matches.map(team=>`<button class="suggestion" data-team="${team}">${flagHTML(team)}<strong>${team}</strong><small>${TEAM_TO_PANINI_CODE[team]||""}</small></button>`).join("");
+   +matches.map(team=>{const hit=isLiga?Object.entries(LIGA_ESTE_TEAM_INFO?.[team]||{}).find(([code,[name,pos]])=>normalizeTradeName(`${code} ${name} ${pos}`).includes(q)):null;return `<button class="suggestion" data-team="${team}">${flagHTML(team)}<strong>${team}</strong><small>${hit?`${hit[0]} · ${hit[1][0]}`:(TEAM_TO_PANINI_CODE[team]||"")}</small></button>`}).join("");
  suggestions.hidden=!(matches.length||worldMatch);
  suggestions.querySelectorAll("button").forEach(button=>button.onclick=()=>selectTeam(button.dataset.team));
 };
