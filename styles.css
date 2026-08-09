@@ -5608,3 +5608,53 @@ body.collection-theme-ligaeste .app-scroll{padding-bottom:calc(70px + env(safe-a
 
 body.collection-theme-megacracks .collection-filter-button[data-collection-filter="shiny"],body.collection-theme-megacracks .collection-filter-button[data-collection-filter="collaboration"]{display:none!important}
 body.collection-theme-megacracks .collection-filter-bar{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+
+/* Build 704.11.6 · selector de clubes y badges de especiales */
+body.collection-theme-ligaeste #teamDialog .team-list{
+  position:relative!important;
+  isolation:isolate!important;
+  padding:4px 8px 12px!important;
+}
+body.collection-theme-ligaeste #teamDialog .team-option{
+  position:relative!important;
+  z-index:1!important;
+}
+body.collection-theme-ligaeste #teamDialog .team-option.world-option{
+  position:sticky!important;
+  top:0!important;
+  z-index:100!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  margin:0 0 16px!important;
+  background:#edf5ff!important;
+  border:1px solid #d8e8fb!important;
+  box-shadow:
+    0 -12px 0 12px #fff,
+    0 10px 0 8px #fff,
+    0 16px 22px rgba(41,29,61,.10)!important;
+}
+body.collection-theme-ligaeste #teamDialog .team-option:not(.world-option){
+  z-index:1!important;
+}
+body.collection-theme-ligaeste #teamDialog .team-option:not(.world-option) .ligaeste-team-crest{
+  position:static!important;
+  z-index:auto!important;
+}
+body.collection-theme-ligaeste .ligaeste-insert-mark{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  display:inline-grid!important;
+  place-items:center!important;
+  padding:0!important;
+  border-radius:11px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+  box-shadow:0 0 0 1px #eee8f4!important;
+}
+body.collection-theme-ligaeste .ligaeste-insert-mark img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  display:block!important;
+}
