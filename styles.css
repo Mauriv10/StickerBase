@@ -5658,3 +5658,87 @@ body.collection-theme-ligaeste .ligaeste-insert-mark img{
   object-fit:cover!important;
   display:block!important;
 }
+\n\n/* Build 704.11.7 · buscador móvil limpio + selector Liga Este */
+body.collection-theme-ligaeste .premium-search,
+body.collection-theme-ligaeste .search-wrap{
+  z-index:20!important;
+}
+body.collection-theme-ligaeste #searchSuggestions.suggestions{
+  position:relative!important;
+  top:auto!important;
+  left:auto!important;
+  right:auto!important;
+  z-index:1!important;
+  margin:8px 0 2px!important;
+  max-height:220px!important;
+  overflow-y:auto!important;
+  border:1px solid #e5deee!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:0 10px 26px rgba(46,20,72,.10)!important;
+}
+body.collection-theme-ligaeste #searchSuggestions .suggestion{
+  min-height:58px!important;
+  padding:8px 12px!important;
+  border:0!important;
+  border-bottom:1px solid #eeeaf2!important;
+  border-radius:0!important;
+  background:#fff!important;
+  color:#17131d!important;
+}
+body.collection-theme-ligaeste #searchSuggestions .suggestion:last-child{border-bottom:0!important}
+body.collection-theme-ligaeste #searchSuggestions .suggestion strong{
+  color:#17131d!important;font-size:16px!important;
+}
+body.collection-theme-ligaeste #searchSuggestions .suggestion small{
+  color:#6f6878!important;white-space:nowrap!important;
+}
+body.collection-theme-ligaeste #searchSuggestions .ligaeste-crest-wrap,
+body.collection-theme-ligaeste #teamDialog .ligaeste-crest-wrap{
+  background:#fff!important;
+}
+body.collection-theme-ligaeste #teamDialog .ligaeste-team-crest{
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+body.collection-theme-ligaeste #teamDialog .ligaeste-insert-mark img{
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+
+
+/* Build 704.11.8 · búsqueda en flujo real + escudos del modal */
+body.collection-theme-ligaeste .premium-search{
+  padding-bottom:var(--main-search-results-height,0px)!important;
+  transition:padding-bottom .16s ease!important;
+}
+body.collection-theme-ligaeste #searchSuggestions.suggestions{
+  position:absolute!important;
+  top:calc(100% + 8px)!important;
+  left:0!important;
+  right:0!important;
+  z-index:45!important;
+  margin:0!important;
+  max-height:250px!important;
+  overflow-y:auto!important;
+}
+body.collection-theme-ligaeste #searchSuggestions[hidden]{display:none!important}
+body.collection-theme-ligaeste #teamDialog .ligaeste-crest-wrap{
+  position:relative!important;
+  isolation:isolate!important;
+}
+body.collection-theme-ligaeste #teamDialog .ligaeste-crest-fallback{
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+}
+body.collection-theme-ligaeste #teamDialog .ligaeste-team-crest{
+  position:relative!important;
+  z-index:2!important;
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+  background:#fff!important;
+}
