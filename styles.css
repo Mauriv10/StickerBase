@@ -5345,3 +5345,18 @@ body.external-share-active .bottom-app-nav{
 .transfer-preview-grid b{display:block;margin-top:2px;color:#101828;font-size:15px}
 .transfer-preview-warning{margin:9px 0 0;color:#b54708;font-size:11px;line-height:1.4}
 @media(max-width:430px){.transfer-preview-grid{grid-template-columns:1fr}}
+
+
+/* Build 704.11.0 · identidad visual multicolección */
+body.collection-theme-worldcup{--collection-accent:#1473e6;--collection-accent-soft:#eaf3ff;--collection-header-bg:linear-gradient(135deg,#ffffff 0%,#f4f8ff 100%)}
+body.collection-theme-ligaeste{--collection-accent:#7a35d3;--collection-accent-soft:#f1e8ff;--collection-header-bg:linear-gradient(135deg,#fff 0%,#f3eaff 52%,#fff7df 100%)}
+body.collection-theme-megacracks{--collection-accent:#111827;--collection-accent-soft:#eef0f4;--collection-header-bg:linear-gradient(135deg,#fff 0%,#eff2f7 55%,#e8f6ff 100%)}
+body[class*="collection-theme-"] .premium-home-header{background:var(--collection-header-bg)}
+body[class*="collection-theme-"] .collection-header-kicker{color:var(--collection-accent)}
+body.collection-theme-ligaeste .compact-home-titlebar{border-left:4px solid #7a35d3;padding-left:12px}
+body.collection-theme-megacracks .compact-home-titlebar{border-left:4px solid #111827;padding-left:12px}
+.collection-card-ligaeste .collection-album-icon{background:linear-gradient(145deg,#7a35d3,#b26bf0)!important;color:#fff!important}
+.collection-card-megacracks .collection-album-icon{background:linear-gradient(145deg,#111827,#4b5563)!important;color:#fff!important}
+.collection-card-worldcup .collection-album-icon{background:linear-gradient(145deg,#e9f3ff,#fff)!important;color:#1473e6!important}
+.collection-card-ligaeste .collection-progress-fill{background:#7a35d3!important}
+.collection-card-megacracks .collection-progress-fill{background:#111827!important}

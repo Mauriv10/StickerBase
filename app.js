@@ -1,9 +1,36 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.5";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.0";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
 const PROJECTS_KEY="world-cup-2026-projects-v600";
 const ACTIVE_PROJECT_KEY="world-cup-2026-active-project-v600";
+
+
+const COLLECTION_DEFINITIONS={
+  "world-cup-2026":{label:"WORLD CUP 2026",subtitle:"Mi colección",icon:"26",theme:"worldcup"},
+  "liga-este-2026-27":{label:"LIGA ESTE 2026/27",subtitle:"Panini · LaLiga EA Sports",icon:"LE",theme:"ligaeste"},
+  "megacracks-2026-27":{label:"MEGACRACKS 2026/27",subtitle:"25.º aniversario",icon:"MC",theme:"megacracks"}
+};
+function inferCollectionType(projectOrSeed={}){
+ const explicit=projectOrSeed.collectionType;
+ if(explicit&&COLLECTION_DEFINITIONS[explicit])return explicit;
+ const seed=String(projectOrSeed.seedType||"").toLowerCase();
+ const name=String(projectOrSeed.name||"").toLowerCase();
+ if(seed.includes("liga-este-2026-27")||name.includes("liga este 2026")||name.includes("liga este 26/27"))return "liga-este-2026-27";
+ if(seed.includes("megacracks-2026-27")||name.includes("megacracks 2026")||name.includes("megacracks 26/27"))return "megacracks-2026-27";
+ return "world-cup-2026";
+}
+function collectionDefinition(project=projects?.[activeProjectId]){return COLLECTION_DEFINITIONS[inferCollectionType(project)]||COLLECTION_DEFINITIONS["world-cup-2026"]}
+function applyCollectionIdentity(project=projects?.[activeProjectId]){
+ if(!project)return;
+ project.collectionType=inferCollectionType(project);
+ const def=collectionDefinition(project);
+ document.body.dataset.collectionType=project.collectionType;
+ document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks");
+ document.body.classList.add(`collection-theme-${def.theme}`);
+ const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
+ const subtitle=document.querySelector(".collection-header-subtitle");if(subtitle)subtitle.textContent=def.subtitle;
+}
 
 const EXTRA_PLAYERS=[
  "Messi","CR7","L. Yamal","Mbappé","Haaland",
@@ -58,7 +85,7 @@ function makeId(){return crypto.randomUUID?.()||`p-${Date.now()}-${Math.random()
 function emptyInventory(){return Object.fromEntries(Object.entries(originalInventory).map(([team,stickers])=>[team,Object.fromEntries(Object.keys(stickers).map(code=>[code,0]))]))}
 function defaultProject(name,target,projectInventory,seedType="custom"){
  return {
-   id:makeId(),name,target:Number(target)||1,seedType,collectionOrder:Object.keys(projects||{}).length,inventory:structuredClone(projectInventory),
+   id:makeId(),name,target:Number(target)||1,seedType,collectionType:inferCollectionType({name,seedType}),collectionOrder:Object.keys(projects||{}).length,inventory:structuredClone(projectInventory),
    history:[],finishedSessions:[],sessionStats:{plus:0,minus:0,startedAt:new Date().toISOString()},
    exchange:{give:{},receive:{}},teamOrder:Object.keys(projectInventory),selectedTeam:Object.keys(projectInventory)[0]||"",
    pendingSync:{},lastSyncedAt:null,ui:{teamFilter:"all",collectionFilter:"all",currentFilter:"all",sort:"album",mainTab:"collection",scrollY:0},createdAt:new Date().toISOString()
@@ -110,6 +137,7 @@ function ensureProjectInventorySchema(project){
 }
 function ensureProjectTeamOrder(project){
  if(!project)return;
+ project.collectionType=inferCollectionType(project);
  ensureProjectInventorySchema(project);
  project.teamOrder=projectTeamOrder(project,project.inventory);
  if(!project.selectedTeam||!project.inventory?.[project.selectedTeam])project.selectedTeam=project.teamOrder[0]||"";
@@ -135,6 +163,7 @@ function findSeedProject(seed){
 }
 function bootstrapProjectsFromSeed(seedData){
  const seedProjects=Array.isArray(seedData?.projects)?seedData.projects:[];
+ seedProjects.forEach(seed=>{seed.collectionType=inferCollectionType(seed)});
  masterInventories=Object.fromEntries(seedProjects.map(seed=>[seed.seedType,structuredClone(seed.inventory)]));
  originalInventory=structuredClone(masterInventories["world-cup-2026-main"]||originalInventory);
 
@@ -1431,6 +1460,7 @@ function setMainTab(tab){
 }
 
 function renderAll(){
+ applyCollectionIdentity();
  updateOptionalCollectionVisibility();
  const homeName=$("#homeCollectionName");if(homeName&&projects[activeProjectId])homeName.textContent=projects[activeProjectId].name;
  if(currentView!=="missing")renderCards();
@@ -2048,10 +2078,10 @@ function renderCollections(){
  const list=$("#collectionsList");if(!list)return;
  const items=orderedProjects();
  list.innerHTML=items.map((p,index)=>{
-   const s=collectionProgress(p),active=p.id===activeProjectId;
-   return `<article class="collection-library-card clean-library-card ${active?"active":""}" data-collection-id="${p.id}">
+   const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p);
+   return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${active?"active":""}" data-collection-id="${p.id}">
     <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
-      <div class="collection-album-icon" aria-hidden="true"><span>26</span></div>
+      <div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>
       <div class="collection-library-copy">
         <div class="collection-title-line"><h3>${collectionSafeText(p.name)}</h3>${active?'<span class="collection-active-badge">Activa</span>':''}</div>
         <span class="collection-brief">${s.progress}% completado · Objetivo ${p.target} ${albumWord(p.target)}</span>
@@ -2394,6 +2424,7 @@ function createProject(){
 
  // La operación se prepara completa antes de modificar projects, evitando estados parciales.
  const newProject=defaultProject(name,target,newInventory,source?.seedType||currentProject?.seedType||"custom");
+ newProject.collectionType=inferCollectionType(source||currentProject||newProject);
  newProject.collectionOptions=structuredClone(source?.collectionOptions||currentProject?.collectionOptions||{collaborationEnabled:true,extra:{epic:false,bronze:false,silver:false,gold:false}});
  ensureProjectTeamOrder(newProject);
 
