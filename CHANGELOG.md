@@ -1,4 +1,4 @@
-## 704.11.3 — Liga Este: identidad completa y clubes
+## 704.11.4 — Liga Este: identidad completa y clubes
 
 - Cabecera morada/dorada reforzada con insignia Liga Este 26/27.
 - Terminología contextual: Club, Elegir club y Todos los clubes.

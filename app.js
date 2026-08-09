@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.3";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.4";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -60,7 +60,15 @@ const LIGA_ESTE_TEAM_DOMAINS={
  "Deportivo Alavés":"deportivoalaves.com","Athletic Club de Bilbao":"athletic-club.eus","Atlético de Madrid":"atleticodemadrid.com","FC Barcelona":"fcbarcelona.com","Real Betis":"realbetisbalompie.es","RC Celta de Vigo":"rccelta.es","Deportivo":"rcdeportivo.es","Elche CF":"elchecf.es","RCD Espanyol":"rcdespanyol.com","Getafe CF":"getafecf.com","Levante UD":"levanteud.com","Real Madrid CF":"realmadrid.com","Malaga CF":"malagacf.com","Osasuna":"osasuna.es","Racing de Santander":"realracingclub.es","Rayo Vallecano":"rayovallecano.es","Real Sociedad":"realsociedad.eus","Sevilla":"sevillafc.es","Valencia":"valenciacf.com","Villarreal":"villarrealcf.es"
 };
 function ligaEsteStickerInfo(team,code){return LIGA_ESTE_TEAM_INFO?.[team]?.[code]||null}
-function ligaEsteCrestUrl(team){const d=LIGA_ESTE_TEAM_DOMAINS[team];return d?`https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=128`:""}
+function ligaEsteCrestUrl(team){
+ const overrides={
+  "Real Madrid CF":"https://www.google.com/s2/favicons?domain_url=https%3A%2F%2Fwww.realmadrid.com&sz=256",
+  "Valencia":"https://www.google.com/s2/favicons?domain_url=https%3A%2F%2Fwww.valenciacf.com&sz=256"
+ };
+ if(overrides[team])return overrides[team];
+ const d=LIGA_ESTE_TEAM_DOMAINS[team];
+ return d?`https://www.google.com/s2/favicons?domain_url=${encodeURIComponent("https://"+d)}&sz=256`:"";
+}
 function ligaEsteTeamSearchText(team){const rows=Object.entries(LIGA_ESTE_TEAM_INFO?.[team]||{}).flatMap(([code,[name,pos]])=>[code,name,pos]);return normalizeTradeName([team,...rows].join(" "))}
 
 const LIGA_ESTE_INSERTS={
@@ -73,6 +81,9 @@ const LIGA_ESTE_INSERTS={
  "EXTRA STICKER ORO":["01","02","03","04","05"]
 };
 const LIGA_ESTE_EXTRA_NAMES=["Lamine Yamal","Mbappé","Nico Williams","Pedri","Oblak"];
+const LIGA_ESTE_INSERT_INFO={};
+function ligaEsteInsertInfo(team,code){return LIGA_ESTE_INSERT_INFO?.[team]?.[code]||null}
+
 function inventoryFromCodeMap(map){return Object.fromEntries(Object.entries(map).map(([team,codes])=>[team,Object.fromEntries(codes.map(code=>[code,0]))]));}
 function collectionInventoryTemplate(type){
  if(type==="liga-este-2026-27")return inventoryFromCodeMap({...LIGA_ESTE_TEAMS,...LIGA_ESTE_INSERTS});
@@ -105,7 +116,7 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  document.body.classList.add(`collection-theme-${def.theme}`);
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
  const subtitle=document.querySelector(".collection-header-subtitle");if(subtitle)subtitle.textContent=def.subtitle;
- if(teamSearch)teamSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador, equipo o nº…":"Buscar selección…";
+ if(teamSearch)teamSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador, club o nº…":"Buscar selección…";
  const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador o club…":"Buscar selección…";
  const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=project.collectionType==="liga-este-2026-27"?"Club":"Selección";
  const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=project.collectionType==="liga-este-2026-27"?"Elegir club":"Elegir selección";
@@ -132,6 +143,7 @@ function stickerDisplayLabel(team,code){
  if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){
    if(team.startsWith("EXTRA STICKER"))return LIGA_ESTE_EXTRA_NAMES[Math.max(0,Number(code)-1)]||code;
    const info=ligaEsteStickerInfo(team,code);if(info)return info[0];
+   const insertInfo=ligaEsteInsertInfo(team,code);if(insertInfo)return insertInfo[0];
  }
  return isExtraTeam(team)?extraPlayerName(code):code;
 }
