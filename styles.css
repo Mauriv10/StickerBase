@@ -5323,3 +5323,25 @@ body.external-share-active .bottom-app-nav{
 .collection-export-album-button{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;margin-top:11px;padding:13px 15px;border:1px solid #cfe0f7;border-radius:15px;background:#f4f9ff;color:#1473e6;text-align:left}
 .collection-export-album-button b{font-size:14px;font-weight:850}
 .collection-export-album-button small{font-size:12px;font-weight:600;color:#6f7d90}
+
+/* Build 704.10.5 · traspaso de inventario entre colecciones */
+.collection-stock-tools button.transfer-inventory-button{background:#f4f7ff;border-color:#cfd9ff;color:#4255c5}
+.transfer-inventory-dialog form{max-height:min(86vh,760px);overflow:auto}
+.transfer-source-summary{margin:-5px 0 16px;padding:12px 14px;border-radius:14px;background:#f6f8fb;color:#475467;font-size:13px}
+.transfer-source-summary strong{display:block;color:#101828;font-size:14px;margin-bottom:3px}
+.collection-edit-field>select{width:100%;box-sizing:border-box;height:52px;border:1px solid #d8dee8;border-radius:15px;padding:0 42px 0 15px;background:#f9fafb;color:#101828;font-size:15px;font-weight:700}
+.collection-edit-field>select:focus{outline:3px solid rgba(20,115,230,.13);border-color:#1473e6;background:#fff}
+.transfer-choice-group{display:grid;gap:8px;margin:0 0 16px;padding:0;border:0}
+.transfer-choice-group legend{margin:0 0 7px 2px;font-size:13px;font-weight:800;color:#344054}
+.transfer-choice-group label{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid #e0e5ec;border-radius:14px;background:#fafbfc;cursor:pointer}
+.transfer-choice-group input{margin-top:3px;accent-color:#1473e6}
+.transfer-choice-group span{display:flex;flex-direction:column;gap:2px}
+.transfer-choice-group b{font-size:13px;color:#1d2939}
+.transfer-choice-group small{font-size:11px;line-height:1.35;color:#7b8494}
+.transfer-inventory-preview{margin:2px 0 16px;padding:14px;border:1px solid #dbe6f5;border-radius:15px;background:#f7fbff}
+.transfer-inventory-preview strong{display:block;margin-bottom:8px;color:#101828;font-size:14px}
+.transfer-preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.transfer-preview-grid span{padding:9px 10px;border-radius:11px;background:#fff;color:#475467;font-size:12px}
+.transfer-preview-grid b{display:block;margin-top:2px;color:#101828;font-size:15px}
+.transfer-preview-warning{margin:9px 0 0;color:#b54708;font-size:11px;line-height:1.4}
+@media(max-width:430px){.transfer-preview-grid{grid-template-columns:1fr}}

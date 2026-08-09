@@ -671,6 +671,7 @@
         <button id="addOneToAllButton" type="button"><b>＋1 a todo</b><small>Suma una unidad a cada referencia</small></button>
         <button id="removeOneFromAllButton" type="button"><b>−1 a todo</b><small>Resta una unidad sin bajar de cero</small></button>
       </div>
+      <button id="transferInventoryButton" class="transfer-inventory-button" type="button"><b>🔄 Traspasar inventario</b><small>Copia o mueve el stock a otra colección</small></button>
       <button id="emptyCollectionButton" class="danger-soft" type="button"><b>Vaciar cartas</b><small>Pone todo el stock de esta colección a cero</small></button>
     </section>
     <button id="exportCollectionAlbumButton" class="collection-export-album-button" type="button"><b>↗ Exportar álbum</b><small>Comparte el inventario completo en los tres formatos disponibles</small></button>
@@ -678,6 +679,35 @@
       <button id="duplicateCollectionButton" type="button">Duplicar colección</button>
       <button id="deleteCollectionButton" class="danger" type="button">Eliminar colección</button>
     </div>
+  </form>
+</dialog>
+
+<dialog id="transferInventoryDialog" class="collection-edit-dialog transfer-inventory-dialog">
+  <form id="transferInventoryForm" method="dialog">
+    <div class="collection-edit-handle" aria-hidden="true"></div>
+    <header class="collection-edit-header">
+      <div><span>INVENTARIO</span><h2>Traspasar inventario</h2></div>
+      <button id="closeTransferInventoryDialog" type="button" aria-label="Cerrar">✕</button>
+    </header>
+    <input id="transferSourceCollectionId" type="hidden">
+    <div class="transfer-source-summary" id="transferSourceSummary"></div>
+    <label class="collection-edit-field">
+      <span>Colección destino</span>
+      <select id="transferDestinationCollection" required></select>
+      <small>La colección de origen nunca puede seleccionarse como destino.</small>
+    </label>
+    <fieldset class="transfer-choice-group">
+      <legend>Qué quieres hacer</legend>
+      <label><input type="radio" name="transferAction" value="copy" checked><span><b>Copiar inventario</b><small>El origen se conserva sin cambios.</small></span></label>
+      <label><input type="radio" name="transferAction" value="move"><span><b>Mover inventario</b><small>Después del traspaso, el origen queda a cero.</small></span></label>
+    </fieldset>
+    <fieldset class="transfer-choice-group">
+      <legend>Cómo aplicar en destino</legend>
+      <label><input type="radio" name="transferMode" value="sum" checked><span><b>Sumar al destino</b><small>Añade las unidades del origen a las existentes.</small></span></label>
+      <label><input type="radio" name="transferMode" value="replace"><span><b>Reemplazar inventario</b><small>El destino adopta exactamente el inventario del origen.</small></span></label>
+    </fieldset>
+    <section id="transferInventoryPreview" class="transfer-inventory-preview" aria-live="polite"></section>
+    <button id="confirmTransferInventoryButton" class="collection-save-button" type="submit">Revisar y confirmar</button>
   </form>
 </dialog>
 

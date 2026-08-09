@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.4";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.10.5";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2197,6 +2197,105 @@ function adjustAllEditedCollection(delta){
  showToast(`${delta>0?"+1":"−1"} aplicado a ${changed} referencias`);
 }
 
+function inventorySummary(project){
+ let references=0,units=0,positive=0;
+ Object.values(project?.inventory||{}).forEach(stickers=>Object.values(stickers||{}).forEach(raw=>{
+   references++;const qty=Math.max(0,Number(raw)||0);units+=qty;if(qty>0)positive++;
+ }));
+ return {references,units,positive};
+}
+function closeTransferInventory(){const dialog=$("#transferInventoryDialog");if(dialog?.open)dialog.close()}
+function openTransferInventory(){
+ const sourceId=$("#editCollectionId")?.value,source=projects[sourceId],dialog=$("#transferInventoryDialog");
+ if(!source||!dialog)return;
+ if(sourceId===activeProjectId)commitProjectState();
+ const destinations=orderedProjects().filter(project=>project.id!==sourceId);
+ if(!destinations.length){showToast("Necesitas otra colección para hacer un traspaso");return;}
+ $("#transferSourceCollectionId").value=sourceId;
+ const summary=inventorySummary(source);
+ $("#transferSourceSummary").innerHTML=`<strong>Origen · ${collectionSafeText(source.name)}</strong>${summary.units} unidades registradas · ${summary.positive} referencias con stock`;
+ const select=$("#transferDestinationCollection");
+ select.innerHTML=destinations.map(project=>`<option value="${project.id}">${collectionSafeText(project.name)}</option>`).join("");
+ const copy=dialog.querySelector('input[name="transferAction"][value="copy"]');if(copy)copy.checked=true;
+ const sum=dialog.querySelector('input[name="transferMode"][value="sum"]');if(sum)sum.checked=true;
+ closeEditCollection();
+ updateTransferInventoryPreview();
+ dialog.showModal();
+}
+function transferInventorySelection(){
+ const dialog=$("#transferInventoryDialog");
+ return {
+   sourceId:$("#transferSourceCollectionId")?.value||"",
+   destinationId:$("#transferDestinationCollection")?.value||"",
+   action:dialog?.querySelector('input[name="transferAction"]:checked')?.value||"copy",
+   mode:dialog?.querySelector('input[name="transferMode"]:checked')?.value||"sum"
+ };
+}
+function updateTransferInventoryPreview(){
+ const box=$("#transferInventoryPreview");if(!box)return;
+ const {sourceId,destinationId,action,mode}=transferInventorySelection();
+ const source=projects[sourceId],destination=projects[destinationId];
+ if(!source||!destination){box.innerHTML="<strong>Selecciona una colección destino.</strong>";return;}
+ const src=inventorySummary(source),dst=inventorySummary(destination);
+ let resultUnits=src.units;
+ if(mode==="sum")resultUnits=dst.units+src.units;
+ const actionLabel=action==="move"?"Mover":"Copiar";
+ const modeLabel=mode==="replace"?"Reemplazar":"Sumar";
+ box.innerHTML=`<strong>Resumen antes de confirmar</strong><div class="transfer-preview-grid"><span>Operación<b>${actionLabel}</b></span><span>Aplicación<b>${modeLabel}</b></span><span>Origen<b>${src.units} unidades</b></span><span>Destino tras operación<b>${resultUnits} unidades</b></span></div>${action==="move"?'<p class="transfer-preview-warning">Al mover, el inventario del origen quedará a cero después de completar el traspaso.</p>':""}${mode==="replace"?'<p class="transfer-preview-warning">Reemplazar eliminará el inventario que tenga actualmente la colección destino y usará la misma estructura y cantidades del origen.</p>':""}`;
+}
+function zeroProjectInventory(project){
+ Object.values(project?.inventory||{}).forEach(stickers=>Object.keys(stickers||{}).forEach(code=>stickers[code]=0));
+}
+function addInventories(destinationInventory,sourceInventory){
+ const result=structuredClone(destinationInventory||{});
+ Object.entries(sourceInventory||{}).forEach(([team,stickers])=>{
+   if(!result[team])result[team]={};
+   Object.entries(stickers||{}).forEach(([code,raw])=>{
+     result[team][code]=Math.max(0,Number(result[team][code])||0)+Math.max(0,Number(raw)||0);
+   });
+ });
+ return result;
+}
+function registerTransferHistory(project,beforeInventory,source="traspaso-inventario"){
+ const at=new Date().toISOString();
+ project.history=Array.isArray(project.history)?project.history:[];
+ project.pendingSync=project.pendingSync&&typeof project.pendingSync==="object"?project.pendingSync:{};
+ const teams=new Set([...Object.keys(beforeInventory||{}),...Object.keys(project.inventory||{})]);
+ teams.forEach(team=>{
+   const codes=new Set([...Object.keys(beforeInventory?.[team]||{}),...Object.keys(project.inventory?.[team]||{})]);
+   codes.forEach(code=>{
+     const previous=Math.max(0,Number(beforeInventory?.[team]?.[code])||0),next=Math.max(0,Number(project.inventory?.[team]?.[code])||0);
+     if(previous===next)return;
+     project.history.push({id:crypto.randomUUID?.()||String(Date.now()+Math.random()),team,code,previous,next,delta:next-previous,at,source});
+     const key=syncKey(team,code),existing=project.pendingSync[key];
+     project.pendingSync[key]={team,code,firstPrevious:existing?existing.firstPrevious:previous,latestValue:next,updatedAt:at,source};
+   });
+ });
+ project.history=project.history.slice(-300);project.updatedAt=at;
+}
+function executeTransferInventory(){
+ const {sourceId,destinationId,action,mode}=transferInventorySelection();
+ const source=projects[sourceId],destination=projects[destinationId];
+ if(!source||!destination||sourceId===destinationId){showToast("Selecciona una colección destino válida");return;}
+ if(sourceId===activeProjectId)commitProjectState();
+ const src=inventorySummary(source),dst=inventorySummary(destination);
+ const actionLabel=action==="move"?"MOVER":"COPIAR",modeLabel=mode==="replace"?"REEMPLAZAR":"SUMAR";
+ const message=`${actionLabel} inventario\n\nOrigen: ${source.name}\nDestino: ${destination.name}\nUnidades origen: ${src.units}\nUnidades actuales destino: ${dst.units}\nModo: ${modeLabel}\n\n${action==="move"?"El origen quedará a cero.\n":""}${mode==="replace"?"El inventario actual del destino será reemplazado.\n":""}\n¿Confirmar la operación?`;
+ if(!confirm(message))return;
+ createAutomaticBackup("antes-de-traspasar-inventario");
+ const beforeSource=structuredClone(source.inventory||{}),beforeDestination=structuredClone(destination.inventory||{});
+ destination.inventory=mode==="replace"?structuredClone(source.inventory||{}):addInventories(destination.inventory,source.inventory);
+ ensureProjectInventorySchema(destination);ensureProjectTeamOrder(destination);
+ if(action==="move")zeroProjectInventory(source);
+ registerTransferHistory(destination,beforeDestination,"traspaso-inventario-destino");
+ if(action==="move")registerTransferHistory(source,beforeSource,"traspaso-inventario-origen");
+ persistProjects();
+ if(activeProjectId===sourceId||activeProjectId===destinationId)loadProjectState();
+ renderAll();renderProjectsList();renderCollections();closeTransferInventory();
+ navigator.vibrate?.([25,30,25]);
+ showToast(`${action==="move"?"Inventario movido":"Inventario copiado"} a ${destination.name}`);
+}
+
 function renderProjectsList(){
  const list=$("#projectsList");
  if(!list)return;
@@ -3041,6 +3140,12 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("#completeOneAlbumButton")?.addEventListener("click",completeOneAlbumEditedCollection);
  $("#addOneToAllButton")?.addEventListener("click",()=>adjustAllEditedCollection(1));
  $("#removeOneFromAllButton")?.addEventListener("click",()=>adjustAllEditedCollection(-1));
+ $("#transferInventoryButton")?.addEventListener("click",openTransferInventory);
+ $("#closeTransferInventoryDialog")?.addEventListener("click",closeTransferInventory);
+ $("#transferInventoryForm")?.addEventListener("submit",event=>{event.preventDefault();executeTransferInventory()});
+ $("#transferDestinationCollection")?.addEventListener("change",updateTransferInventoryPreview);
+ $("#transferInventoryDialog")?.addEventListener("change",event=>{if(event.target.matches('input[name="transferAction"],input[name="transferMode"]'))updateTransferInventoryPreview()});
+ $("#transferInventoryDialog")?.addEventListener("click",event=>{if(event.target===$("#transferInventoryDialog"))closeTransferInventory()});
  $("#exportCollectionAlbumButton")?.addEventListener("click",exportEditedCollectionAlbum);
  $("#deleteCollectionButton")?.addEventListener("click",deleteEditedCollection);
  $("#editCollectionDialog")?.addEventListener("click",event=>{if(event.target===$("#editCollectionDialog"))closeEditCollection()});
