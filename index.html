@@ -560,9 +560,31 @@
     <button id="closeCreateProjectDialog">✕</button>
   </div>
 
+  <fieldset class="collection-type-picker">
+    <legend>¿Qué colección quieres crear?</legend>
+    <label class="collection-type-option collection-type-worldcup">
+      <input type="radio" name="newCollectionType" value="world-cup-2026" checked>
+      <span class="collection-type-icon">26</span>
+      <span><strong>World Cup 2026</strong><small>Panini · Mundial</small></span>
+      <b>✓</b>
+    </label>
+    <label class="collection-type-option collection-type-ligaeste">
+      <input type="radio" name="newCollectionType" value="liga-este-2026-27">
+      <span class="collection-type-icon">LE</span>
+      <span><strong>Liga Este 2026/27</strong><small>Panini · LaLiga EA Sports</small></span>
+      <b>✓</b>
+    </label>
+    <label class="collection-type-option collection-type-megacracks is-coming">
+      <input type="radio" name="newCollectionType" value="megacracks-2026-27" disabled>
+      <span class="collection-type-icon">MC</span>
+      <span><strong>Megacracks 2026/27</strong><small>Checklist en preparación</small></span>
+      <em>Próximamente</em>
+    </label>
+  </fieldset>
+
   <label class="project-field">
     <span>Nombre</span>
-    <input id="newProjectName" type="text" placeholder="Ej. Mundial 2026 · 2 álbumes">
+    <input id="newProjectName" type="text" placeholder="Ej. Liga Este 26/27 · Principal">
   </label>
 
   <label class="project-field">

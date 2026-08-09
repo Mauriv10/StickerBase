@@ -5360,3 +5360,25 @@ body.collection-theme-megacracks .compact-home-titlebar{border-left:4px solid #1
 .collection-card-worldcup .collection-album-icon{background:linear-gradient(145deg,#e9f3ff,#fff)!important;color:#1473e6!important}
 .collection-card-ligaeste .collection-progress-fill{background:#7a35d3!important}
 .collection-card-megacracks .collection-progress-fill{background:#111827!important}
+
+/* Build 704.11.1 · selector de colección + identidad Liga Este */
+.collection-type-picker{border:0;padding:0;margin:0 0 18px;display:grid;gap:10px}
+.collection-type-picker legend{font-size:.8rem;font-weight:800;letter-spacing:.03em;color:#64748b;margin-bottom:8px}
+.collection-type-option{position:relative;display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:12px;padding:12px 14px;border:1px solid #dbe1ea;border-radius:16px;background:#fff;cursor:pointer;transition:.18s ease}
+.collection-type-option input{position:absolute;opacity:0;pointer-events:none}
+.collection-type-option .collection-type-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-weight:950;font-size:.9rem;background:#edf2f7;color:#1f2937}
+.collection-type-option strong,.collection-type-option small{display:block}.collection-type-option strong{font-size:.95rem}.collection-type-option small{margin-top:3px;color:#64748b;font-size:.76rem}
+.collection-type-option>b{opacity:0;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:var(--collection-accent,#2563eb);color:#fff}
+.collection-type-option:has(input:checked){border-color:var(--picker-accent,#2563eb);box-shadow:0 0 0 2px color-mix(in srgb,var(--picker-accent,#2563eb) 16%,transparent);background:color-mix(in srgb,var(--picker-accent,#2563eb) 4%,white)}
+.collection-type-option:has(input:checked)>b{opacity:1;background:var(--picker-accent,#2563eb)}
+.collection-type-worldcup{--picker-accent:#2563eb}.collection-type-ligaeste{--picker-accent:#7c3aed}.collection-type-megacracks{--picker-accent:#111827}
+.collection-type-ligaeste .collection-type-icon{background:linear-gradient(145deg,#6d28d9,#a855f7);color:#fef3c7;box-shadow:inset 0 0 0 1px rgba(255,215,0,.35)}
+.collection-type-worldcup .collection-type-icon{background:linear-gradient(145deg,#0f4c81,#2e86c1);color:#fff}
+.collection-type-megacracks .collection-type-icon{background:linear-gradient(145deg,#111827,#4b5563);color:#fff}
+.collection-type-option.is-coming em{font-size:.66rem;font-style:normal;font-weight:800;padding:5px 7px;border-radius:999px;background:#eef2f7;color:#64748b}
+.collection-type-chip{display:inline-flex;align-items:center;width:max-content;margin:2px 0 4px;padding:3px 7px;border-radius:999px;font-size:.61rem;font-weight:900;letter-spacing:.045em;color:#5b21b6;background:#f3e8ff}
+.collection-card-worldcup .collection-type-chip{color:#1d4ed8;background:#dbeafe}.collection-card-megacracks .collection-type-chip{color:#111827;background:#e5e7eb}
+body.collection-theme-ligaeste .collection-team-insert{border-color:#d8b4fe;background:linear-gradient(180deg,#fff 0%,#faf5ff 100%)}
+body.collection-theme-ligaeste .collection-team-insert .collection-team-header{background:linear-gradient(90deg,#f3e8ff,#fffbeb)}
+body.collection-theme-ligaeste .collection-team-insert .collection-team-title strong{color:#5b21b6}
+.disabled-option{opacity:.45;pointer-events:none}

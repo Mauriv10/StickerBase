@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.0";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.1";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -11,6 +11,52 @@ const COLLECTION_DEFINITIONS={
   "liga-este-2026-27":{label:"LIGA ESTE 2026/27",subtitle:"Panini · LaLiga EA Sports",icon:"LE",theme:"ligaeste"},
   "megacracks-2026-27":{label:"MEGACRACKS 2026/27",subtitle:"25.º aniversario",icon:"MC",theme:"megacracks"}
 };
+
+const LIGA_ESTE_TEAMS={
+ "Deportivo Alavés":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18A","18B","19","20"],
+ "Athletic Club de Bilbao":["01","02","03","04","05","06A","06B","07","08","09A","09B","10","11","12","13","14","15","16","17A","17B","18","19","20"],
+ "Atlético de Madrid":["01","02","03","04","05","06","07","08A","08B","09","10","11","12","13","14A","14B","15","16","17","18","19","20"],
+ "FC Barcelona":["01","02","03","04","05","06A","06B","07","08","09","10","11","12","13","14","15","16","17","18","19","20"],
+ "Real Betis":["01","02","03","04","05A","05B","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20"],
+ "RC Celta de Vigo":["01","02","03","04","05","06","07","08","09A","09B","10","11","12","13","14","15","16","17","18A","18B","19","20"],
+ "Deportivo":["01","02","03","04","05","06","07","08","09A","09B","10","11","12","13","14","15","16","17","18","19","20"],
+ "Elche CF":["01","02","03","04","05","06","07","08","09A","09B","10","11","12","13A","13B","14","15","16","17","18","19","20"],
+ "RCD Espanyol":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20"],
+ "Getafe CF":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20"],
+ "Levante UD":["01","02","03","04","05","06","07","08","09","10","11","12","13","14A","14B","15","16","17","18","19","20"],
+ "Real Madrid CF":["01","02","03","04","05","06","07","08","09","10A","10B","11","12","13","14","15A","15B","16A","16B","17","18","19","20"],
+ "Malaga CF":["01","02","03","04","05","06","07","08","09","10","11","12","13A","13B","14","15","16","17","18","19","20"],
+ "Osasuna":["01","02","03","04","05A","05B","06","07","08","09","10","11","12","13A","13B","14","15","16","17","18","19","20"],
+ "Racing de Santander":["01","02","03","04","05","06","07","08","09A","09B","10","11A","11B","12","13","14","15","16","17","18","19","20"],
+ "Rayo Vallecano":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20"],
+ "Real Sociedad":["01","02","03","04","05","06","07","08","09","10","11","12","13A","13B","14","15","16","17","18","19","20"],
+ "Sevilla":["01","02","03","04","05","06","07","08","09A","09B","10","11","12","13","14","15","16","17","18","19","20"],
+ "Valencia":["01","02","03","04","05","06","07","08A","08B","09","10","11","12","13","14","15","16","17","18","19","20A","20B"],
+ "Villarreal":["01","02","03","04","05","06A","06B","07A","07B","08A","08B","09","10","11","12","13","14","15","16","17","18","19","20"]
+};
+const LIGA_ESTE_INSERTS={
+ "ADN / LALIGA PRIME":Array.from({length:15},(_,i)=>String(i+1).padStart(2,"0")),
+ "LALIGA FANTASY":Array.from({length:9},(_,i)=>String(i+1).padStart(2,"0")),
+ "DRAFT 23":Array.from({length:23},(_,i)=>String(i+1).padStart(2,"0")),
+ "DRAFT 23 KROMIX":Array.from({length:23},(_,i)=>`K${i+1}`),
+ "EXTRA STICKER BRONCE":["01","02","03","04","05"],
+ "EXTRA STICKER PLATA":["01","02","03","04","05"],
+ "EXTRA STICKER ORO":["01","02","03","04","05"]
+};
+const LIGA_ESTE_EXTRA_NAMES=["Lamine Yamal","Mbappé","Nico Williams","Pedri","Oblak"];
+function inventoryFromCodeMap(map){return Object.fromEntries(Object.entries(map).map(([team,codes])=>[team,Object.fromEntries(codes.map(code=>[code,0]))]));}
+function collectionInventoryTemplate(type){
+ if(type==="liga-este-2026-27")return inventoryFromCodeMap({...LIGA_ESTE_TEAMS,...LIGA_ESTE_INSERTS});
+ if(type==="world-cup-2026")return createEmptyInventoryFrom(masterInventories["world-cup-2026-main"]||originalInventory);
+ return {};
+}
+function seedTypeForCollection(type){
+ if(type==="liga-este-2026-27")return "liga-este-2026-27-first-edition";
+ if(type==="megacracks-2026-27")return "megacracks-2026-27-first-edition";
+ return "world-cup-2026-main";
+}
+function isLigaEsteInsertTeam(team){return Object.prototype.hasOwnProperty.call(LIGA_ESTE_INSERTS,team)}
+function collectionTypeLabel(type){return COLLECTION_DEFINITIONS[type]?.label||COLLECTION_DEFINITIONS["world-cup-2026"].label}
 function inferCollectionType(projectOrSeed={}){
  const explicit=projectOrSeed.collectionType;
  if(explicit&&COLLECTION_DEFINITIONS[explicit])return explicit;
@@ -48,7 +94,10 @@ const EXTRA_TEAMS=EXTRA_VARIANTS.map(item=>item.team);
 function isExtraTeam(team){return EXTRA_TEAMS.includes(team)}
 function extraVariantForTeam(team){return EXTRA_VARIANTS.find(item=>item.team===team)||null}
 function extraPlayerName(code){return EXTRA_PLAYERS[Math.max(0,Number(code)-1)]||String(code)}
-function stickerDisplayLabel(team,code){return isExtraTeam(team)?extraPlayerName(code):code}
+function stickerDisplayLabel(team,code){
+ if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"&&team.startsWith("EXTRA STICKER"))return LIGA_ESTE_EXTRA_NAMES[Math.max(0,Number(code)-1)]||code;
+ return isExtraTeam(team)?extraPlayerName(code):code;
+}
 function stickerFeedbackLabel(team,code){return isExtraTeam(team)?`${extraVariantForTeam(team)?.label||"Extra"} · ${extraPlayerName(code)}`:`${team} ${code}`}
 
 const LEGACY_KEYS={
@@ -120,6 +169,8 @@ function teamVisibleForProject(team,project=projects?.[activeProjectId]){
 function currentTeamOrder(){return projectTeamOrder(projects?.[activeProjectId],inventory).filter(team=>teamVisibleForProject(team))}
 function ensureProjectInventorySchema(project){
  if(!project||!project.inventory)return;
+ project.collectionType=inferCollectionType(project);
+ if(project.collectionType!=="world-cup-2026")return;
  // FWC se mostraba antiguamente como 01–20. La app usa ahora los códigos reales 00–19.
  const currentFwc=project.inventory.FWC||{};
  if(Object.prototype.hasOwnProperty.call(currentFwc,"20")&&!Object.prototype.hasOwnProperty.call(currentFwc,"00")){
@@ -165,6 +216,7 @@ function bootstrapProjectsFromSeed(seedData){
  const seedProjects=Array.isArray(seedData?.projects)?seedData.projects:[];
  seedProjects.forEach(seed=>{seed.collectionType=inferCollectionType(seed)});
  masterInventories=Object.fromEntries(seedProjects.map(seed=>[seed.seedType,structuredClone(seed.inventory)]));
+ masterInventories["liga-este-2026-27-first-edition"]=collectionInventoryTemplate("liga-este-2026-27");
  originalInventory=structuredClone(masterInventories["world-cup-2026-main"]||originalInventory);
 
  // Build 700.7: los datos existentes pertenecen al usuario y nunca se sobrescriben
@@ -179,7 +231,10 @@ function bootstrapProjectsFromSeed(seedData){
  localStorage.setItem(MASTER_SEED_KEY,seedData.revision||DATA_REVISION);
 }
 function getMasterInventoryForProject(project){
- return structuredClone(masterInventories[project?.seedType]||originalInventory);
+ const stored=masterInventories[project?.seedType];
+ if(stored)return structuredClone(stored);
+ const template=collectionInventoryTemplate(inferCollectionType(project));
+ return Object.keys(template).length?structuredClone(template):structuredClone(originalInventory);
 }
 function ensureCollectionOrder(){
  const items=Object.values(projects||{});
@@ -209,7 +264,7 @@ function canonicalize(value){
 }
 function comparableProjects(source=projects){
  return Object.fromEntries(Object.entries(source||{}).map(([id,p])=>[id,{
-   id:p.id,name:p.name,target:Number(p.target)||1,seedType:p.seedType||"custom",collectionOrder:Number(p.collectionOrder)||0,
+   id:p.id,name:p.name,target:Number(p.target)||1,seedType:p.seedType||"custom",collectionType:inferCollectionType(p),collectionOrder:Number(p.collectionOrder)||0,
    inventory:p.inventory||{},collectionOptions:p.collectionOptions||{},teamOrder:p.teamOrder||[],selectedTeam:p.selectedTeam||"",
    exchange:p.exchange||{give:{},receive:{}},createdAt:p.createdAt||null
  }]));
@@ -541,7 +596,12 @@ async function loadData(){
 }
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
-function flagHTML(team){const flag=flags[team]||TEAM_FLAG_EMOJI?.[team]||"";return /^(?:\.|\/|https?:|data:)/.test(flag)?`<img src="${flag}" alt="">`:`<span class="inline-flag-emoji" aria-hidden="true">${flag}</span>`}
+function flagHTML(team){
+ const flag=flags[team]||TEAM_FLAG_EMOJI?.[team]||"";
+ if(flag)return /^(?:\.|\/|https?:|data:)/.test(flag)?`<img src="${flag}" alt="">`:`<span class="inline-flag-emoji" aria-hidden="true">${flag}</span>`;
+ if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27")return `<span class="inline-flag-emoji" aria-hidden="true">${isLigaEsteInsertTeam(team)?"✨":"⚽"}</span>`;
+ return '<span class="inline-flag-emoji" aria-hidden="true"></span>';
+}
 function formatTime(iso){return new Date(iso).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})}
 function getTarget(){return Math.max(1,Number(targetInput.value)||5)}
 function keyFor(team,code){return `${team}|||${code}`}
@@ -585,10 +645,11 @@ function saveAll(message="Todo guardado"){
  $("#saveStatus").textContent=message;
  $("#saveDot").textContent="✓";
 }
+function collectionAllTeamsLabel(){return inferCollectionType(projects?.[activeProjectId])==="world-cup-2026"?"Todas las selecciones":"Todos los equipos e inserts";}
 function populateTeams(){
  teamSelect.innerHTML="";
  const allOption=document.createElement("option");
- allOption.value="all";allOption.textContent="Todas las selecciones";
+ allOption.value="all";allOption.textContent=collectionAllTeamsLabel();
  teamSelect.appendChild(allOption);
  currentTeamOrder().forEach(team=>{
    const option=document.createElement("option");
@@ -601,7 +662,7 @@ function populateTeams(){
 function updateCurrentTeamUI(){
  const team=teamSelect.value||"all",flag=$("#currentTeamFlag"),emoji=$("#currentTeamEmoji");
  if(team==="all"){
-   $("#currentTeamName").textContent="Todas las selecciones";
+   $("#currentTeamName").textContent=collectionAllTeamsLabel();
    flag.removeAttribute("src");
    flag.alt="Todas";
    flag.style.display="none";
@@ -615,9 +676,15 @@ function updateCurrentTeamUI(){
    if(emoji){emoji.textContent=team==="Coca-Cola"?"🥤":(extraVariantForTeam(team)?.icon||"✨");emoji.hidden=false;}
    return;
  }
+ const flagSource=flags[team]||"";
+ if(!flagSource){
+   flag.removeAttribute("src");flag.style.display="none";
+   if(emoji){emoji.textContent=isLigaEsteInsertTeam(team)?"✨":"⚽";emoji.hidden=false;}
+   return;
+ }
  if(emoji){emoji.hidden=true;emoji.textContent="";}
  flag.style.display="";
- flag.src=flags[team]||"";
+ flag.src=flagSource;
  flag.alt=team;
 }
 function selectTeam(team){
@@ -1020,7 +1087,9 @@ function filterTeamsByQuery(query){
 }
 
 function paniniDisplayCode(team,internalCode){
- const n=Number(internalCode);
+ const raw=String(internalCode);
+ if(inferCollectionType(projects?.[activeProjectId])!=="world-cup-2026")return raw;
+ const n=Number(raw);
  return String(n).padStart(2,"0");
 }
 
@@ -1367,7 +1436,7 @@ function renderGlobalCollection(){
    const total=Object.values(stickers).reduce((sum,q)=>sum+Number(q||0),0);
    const missing=Object.values(stickers).reduce((sum,q)=>sum+Math.max(0,target-Number(q||0)),0);
    const section=document.createElement("section");
-   section.className=`collection-team${isExtraTeam(team)?" collection-team-extra":""}`;
+   section.className=`collection-team${isExtraTeam(team)?" collection-team-extra":""}${isLigaEsteInsertTeam(team)?" collection-team-insert":""}`;
    section.innerHTML=`<header class="collection-team-header">
      <div class="collection-team-title">${flagHTML(team)}<strong>${isExtraTeam(team)?`Extra Stickers · ${extraVariantForTeam(team).label}`:team}</strong></div>
      <div class="collection-team-summary"><strong>${total} cromos</strong>${missing?`${missing} pendientes`:"Completa"}</div>
@@ -2084,6 +2153,7 @@ function renderCollections(){
       <div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>
       <div class="collection-library-copy">
         <div class="collection-title-line"><h3>${collectionSafeText(p.name)}</h3>${active?'<span class="collection-active-badge">Activa</span>':''}</div>
+        <span class="collection-type-chip">${collectionSafeText(def.label)}</span>
         <span class="collection-brief">${s.progress}% completado · Objetivo ${p.target} ${albumWord(p.target)}</span>
         <div class="collection-progress-track"><div class="collection-progress-fill" style="width:${s.progress}%"></div></div>
       </div>
@@ -2358,18 +2428,32 @@ function createEmptyInventoryFrom(sourceInventory){
    team,Object.fromEntries(Object.keys(stickers||{}).map(code=>[code,0]))
  ]));
 }
+function selectedNewCollectionType(){return document.querySelector('#createProjectDialog input[name="newCollectionType"]:checked')?.value||"world-cup-2026";}
+function refreshCreateProjectSources(){
+ const type=selectedNewCollectionType();
+ const select=$("#sourceProjectSelect");
+ const repeatRadio=document.querySelector('#createProjectDialog input[name="projectSource"][value="repeats"]');
+ const eligible=Object.values(projects).filter(p=>inferCollectionType(p)===type);
+ if(select)select.innerHTML=eligible.map(p=>`<option value="${p.id}">${collectionSafeText(p.name)}</option>`).join("");
+ if(repeatRadio){repeatRadio.disabled=!eligible.length;repeatRadio.closest("label")?.classList.toggle("disabled-option",!eligible.length);}
+ const repeatOptions=$("#repeatOptions");
+ if(!eligible.length&&repeatRadio?.checked){document.querySelector('#createProjectDialog input[name="projectSource"][value="empty"]').checked=true;if(repeatOptions)repeatOptions.hidden=true;}
+ updateTransferPreview();
+}
 function openCreateProject(){
  const dialog=$("#createProjectDialog");
  if(!dialog)return;
  $("#newProjectName").value="";
  $("#newProjectTarget").value="2";
+ const defaultType=inferCollectionType(projects?.[activeProjectId]);
+ const typeRadio=dialog.querySelector(`input[name="newCollectionType"][value="${defaultType}"]`)||dialog.querySelector('input[name="newCollectionType"]');
+ if(typeRadio)typeRadio.checked=true;
  const emptyOption=dialog.querySelector('input[name="projectSource"][value="empty"]');
  if(emptyOption)emptyOption.checked=true;
  const targetMode=dialog.querySelector('input[name="repeatMode"][value="target"]');
  if(targetMode)targetMode.checked=true;
  $("#repeatOptions").hidden=true;
- $("#sourceProjectSelect").innerHTML=Object.values(projects).map(p=>`<option value="${p.id}">${p.name}</option>`).join("");
- updateTransferPreview();
+ refreshCreateProjectSources();
  dialog.showModal();
 }
 function calculateTransfer(source,target,mode){
@@ -2405,16 +2489,18 @@ function createProject(){
  const target=Math.max(1,Number($("#newProjectTarget").value)||1);
  if(!name){alert("Escribe un nombre para la colección.");return}
  const sourceType=dialog.querySelector('input[name="projectSource"]:checked')?.value||"empty";
+ const collectionType=selectedNewCollectionType();
+ if(collectionType==="megacracks-2026-27"){alert("Megacracks 2026/27 estará disponible en la siguiente build, cuando carguemos su checklist completa.");return;}
 
  // Captura el estado más reciente antes de calcular o transferir unidades.
  commitProjectStateLocalOnly();
  const currentProject=projects[activeProjectId];
  let source=null,transfer=null;
- let newInventory=createEmptyInventoryFrom(currentProject?.inventory||originalInventory);
+ let newInventory=collectionInventoryTemplate(collectionType);
 
  if(sourceType==="repeats"){
    source=projects[$("#sourceProjectSelect").value];
-   if(!source){alert("Selecciona una colección de origen.");return}
+   if(!source||inferCollectionType(source)!==collectionType){alert("Selecciona una colección de origen del mismo tipo.");return}
    const mode=dialog.querySelector('input[name="repeatMode"]:checked')?.value||"target";
    transfer=calculateTransfer(source,target,mode);
    if(!transfer.units){alert("La colección elegida no tiene repetidas disponibles para transferir.");return}
@@ -2423,9 +2509,11 @@ function createProject(){
  }
 
  // La operación se prepara completa antes de modificar projects, evitando estados parciales.
- const newProject=defaultProject(name,target,newInventory,source?.seedType||currentProject?.seedType||"custom");
- newProject.collectionType=inferCollectionType(source||currentProject||newProject);
- newProject.collectionOptions=structuredClone(source?.collectionOptions||currentProject?.collectionOptions||{collaborationEnabled:true,extra:{epic:false,bronze:false,silver:false,gold:false}});
+ const newProject=defaultProject(name,target,newInventory,source?.seedType||seedTypeForCollection(collectionType));
+ newProject.collectionType=collectionType;
+ newProject.collectionOptions=collectionType==="world-cup-2026"
+   ? structuredClone(source?.collectionOptions||currentProject?.collectionOptions||{collaborationEnabled:true,extra:{epic:false,bronze:false,silver:false,gold:false}})
+   : {};
  ensureProjectTeamOrder(newProject);
 
  createAutomaticBackup(sourceType==="repeats"?"antes-de-transferir-repetidas":"antes-de-crear-coleccion");
@@ -2458,6 +2546,7 @@ $("#closeProjectsDialog").onclick=()=>$("#projectsDialog").close();
 $("#createProjectButton").onclick=()=>{$("#projectsDialog").close();openCreateProject()};
 $("#closeCreateProjectDialog").onclick=()=>$("#createProjectDialog").close();
 $("#confirmCreateProjectButton").onclick=createProject;
+document.querySelectorAll('#createProjectDialog input[name="newCollectionType"]').forEach(radio=>radio.onchange=refreshCreateProjectSources);
 document.querySelectorAll('#createProjectDialog input[name="projectSource"]').forEach(radio=>radio.onchange=()=>{
  $("#repeatOptions").hidden=radio.value!=="repeats"||!radio.checked;
  updateTransferPreview();
