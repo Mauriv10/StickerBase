@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.9";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.10";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1496,8 +1496,19 @@ function ligaEsteRow(team,code,qty){
  const [name,position]=info,st=stateFor(qty),pending=name==="Pendiente";
  const row=document.createElement("div");row.className=`ligaeste-player-row ${st.kind}${pending?" ligaeste-pending-row":""}`;row.dataset.code=code;
  row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}</span></div><div class="ligaeste-row-stock"><button type="button" class="ligaeste-row-step minus" aria-label="Restar ${collectionSafeText(name)}">−</button><strong>${qty}</strong><button type="button" class="ligaeste-row-step plus" aria-label="Sumar ${collectionSafeText(name)}">+</button></div>`;
- row.querySelector(".minus").onclick=e=>changeQuantity(team,code,-1,e.currentTarget);
- row.querySelector(".plus").onclick=e=>changeQuantity(team,code,1,e.currentTarget);
+ row.querySelector(".minus").onclick=e=>{
+   const previous=Number(inventory?.[team]?.[code])||0;
+   const next=Math.max(0,previous-1);
+   if(next===previous)return;
+   showTopFeedback({type:"negative",title:`${stickerFeedbackLabel(team,code)} eliminado`,detail:`Inventario: x${next}`,key:`liga-minus:${team}:${code}`});
+   changeQuantity(team,code,-1,e.currentTarget);
+ };
+ row.querySelector(".plus").onclick=e=>{
+   const previous=Number(inventory?.[team]?.[code])||0;
+   const next=previous+1;
+   showTopFeedback({type:"positive",title:`${stickerFeedbackLabel(team,code)} añadido`,detail:`Inventario: x${next}`,key:`liga-plus:${team}:${code}`});
+   changeQuantity(team,code,1,e.currentTarget);
+ };
  return row;
 }
 function renderLigaEsteCollection(){
@@ -1715,6 +1726,7 @@ function syncMainSearchSpace(){
  if(!box||!suggestions)return;
  const open=!suggestions.hidden&&suggestions.childElementCount>0;
  box.classList.toggle("has-search-results",open);
+ box.closest(".compact-home-header")?.classList.toggle("search-suggestions-open",open);
 }
 teamSearch.oninput=()=>{
  const q=normalizeTradeName(teamSearch.value);
