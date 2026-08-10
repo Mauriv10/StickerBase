@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.18";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.0";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -105,8 +105,18 @@ const LIGA_ESTE_INSERT_INFO={"ADN / LALIGA PRIME":{"01":["Antony (Betis)","Delan
 function ligaEsteInsertInfo(team,code){return LIGA_ESTE_INSERT_INFO?.[team]?.[code]||null}
 
 function inventoryFromCodeMap(map){return Object.fromEntries(Object.entries(map).map(([team,codes])=>[team,Object.fromEntries(codes.map(code=>[code,0]))]));}
+const MEGACRACKS_TEAMS=globalThis.MEGACRACKS_DATA?.teams||{};
+const MEGACRACKS_ITEM_INFO=globalThis.MEGACRACKS_DATA?.info||{};
+const MEGACRACKS_SPECIALS=globalThis.MEGACRACKS_DATA?.specials||{};
+const MEGACRACKS_SPECIAL_INFO=globalThis.MEGACRACKS_DATA?.specialInfo||{};
+globalThis.MEGACRACKS_ITEM_INFO={...MEGACRACKS_ITEM_INFO,...MEGACRACKS_SPECIAL_INFO};
+function isMegacracksSpecialTeam(team){return Object.prototype.hasOwnProperty.call(MEGACRACKS_SPECIALS,team)}
+function megacracksItemInfo(team,code){return MEGACRACKS_ITEM_INFO?.[team]?.[code]||MEGACRACKS_SPECIAL_INFO?.[team]?.[code]||null}
+function megacracksCrestUrl(team){return LIGA_ESTE_CRESTS[team]||""}
+function megacracksTeamSearchText(team){const source=MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{};return normalizeTradeName([team,...Object.entries(source).flatMap(([code,[name]])=>[code,name])].join(" "))}
 function collectionInventoryTemplate(type){
  if(type==="liga-este-2026-27")return inventoryFromCodeMap({...LIGA_ESTE_TEAMS,...LIGA_ESTE_INSERTS});
+ if(type==="megacracks-2026-27")return inventoryFromCodeMap({...MEGACRACKS_TEAMS,...MEGACRACKS_SPECIALS});
  if(type==="world-cup-2026")return createEmptyInventoryFrom(masterInventories["world-cup-2026-main"]||originalInventory);
  return {};
 }
@@ -150,12 +160,12 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  document.body.classList.add(`collection-theme-${def.theme}`);
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
  const subtitle=document.querySelector(".collection-header-subtitle");if(subtitle)subtitle.textContent=def.subtitle;
- if(teamSearch)teamSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador, club o nº…":"Buscar selección…";
- const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador o club…":"Buscar selección…";
- const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=project.collectionType==="liga-este-2026-27"?"Club":"Selección";
- const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=project.collectionType==="liga-este-2026-27"?"Elegir club":"Elegir selección";
+ if(teamSearch)teamSearch.placeholder=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Buscar jugador, club o nº…":"Buscar selección…";
+ const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Buscar jugador o club…":"Buscar selección…";
+ const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Club":"Selección";
+ const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Elegir club":"Elegir selección";
  const infoSub=$("#appInfoSubtitle");if(infoSub)infoSub.textContent=`Build ${APP_VERSION}`;
- const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo)logo.hidden=project.collectionType!=="liga-este-2026-27";
+ const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo){logo.hidden=project.collectionType==="world-cup-2026";logo.textContent=project.collectionType==="megacracks-2026-27"?"MC\n26/27":"LIGA\nESTE";}
 }
 
 const EXTRA_PLAYERS=[
@@ -276,6 +286,10 @@ function ensureProjectInventorySchema(project){
      if(!project.inventory[team])project.inventory[team]={};
      for(const code of codes)if(!Object.prototype.hasOwnProperty.call(project.inventory[team],code))project.inventory[team][code]=0;
    }
+   return;
+ }
+ if(project.collectionType==="megacracks-2026-27"){
+   for(const [team,codes] of Object.entries({...MEGACRACKS_TEAMS,...MEGACRACKS_SPECIALS})){if(!project.inventory[team])project.inventory[team]={};for(const code of codes)if(!Object.prototype.hasOwnProperty.call(project.inventory[team],code))project.inventory[team][code]=0;}
    return;
  }
  if(project.collectionType!=="world-cup-2026")return;
@@ -705,7 +719,12 @@ async function loadData(){
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
 function flagHTML(team){
- if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){
+ const activeType=inferCollectionType(projects?.[activeProjectId]);
+ if(activeType==="megacracks-2026-27"){
+   if(isMegacracksSpecialTeam(team))return `<span class="megacracks-insert-mark">${collectionSafeText(team).split(" ").map(x=>x[0]).join("").slice(0,3)}</span>`;
+   const crest=megacracksCrestUrl(team);if(crest)return `<span class="ligaeste-crest-wrap"><img class="ligaeste-team-crest" src="${crest}" alt="Escudo de ${collectionSafeText(team)}"></span>`;
+ }
+ if(activeType==="liga-este-2026-27"){
    if(isLigaEsteInsertTeam(team)){
   const badge=LIGA_ESTE_SPECIAL_BADGES[team];
   return badge?`<span class="ligaeste-insert-mark"><img src="${badge}" alt="${collectionSafeText(team)}"></span>`:`<span class="ligaeste-insert-mark" aria-hidden="true">✦</span>`;
@@ -760,7 +779,7 @@ function saveAll(message="Todo guardado"){
  $("#saveStatus").textContent=message;
  $("#saveDot").textContent="✓";
 }
-function collectionAllTeamsLabel(){const type=inferCollectionType(projects?.[activeProjectId]);return type==="world-cup-2026"?"Todas las selecciones":type==="liga-este-2026-27"?"Todos los clubes":"Todos los equipos e inserts";}
+function collectionAllTeamsLabel(){const type=inferCollectionType(projects?.[activeProjectId]);return type==="world-cup-2026"?"Todas las selecciones":"Todos los clubes";}
 function populateTeams(){
  teamSelect.innerHTML="";
  const allOption=document.createElement("option");
@@ -793,9 +812,10 @@ function updateCurrentTeamUI(){
  }
  const flagSource=flags[team]||"";
  if(!flagSource){
-   if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"&&!isLigaEsteInsertTeam(team)){const crest=ligaEsteCrestUrl(team);if(crest){if(emoji){emoji.hidden=true;emoji.textContent="";}flag.style.display="";flag.src=crest;flag.alt=team;return;}}
+   const activeType=inferCollectionType(projects?.[activeProjectId]);
+   if((activeType==="liga-este-2026-27"&&!isLigaEsteInsertTeam(team))||(activeType==="megacracks-2026-27"&&!isMegacracksSpecialTeam(team))){const crest=activeType==="megacracks-2026-27"?megacracksCrestUrl(team):ligaEsteCrestUrl(team);if(crest){if(emoji){emoji.hidden=true;emoji.textContent="";}flag.style.display="";flag.src=crest;flag.alt=team;return;}}
    flag.removeAttribute("src");flag.style.display="none";
-   if(emoji){emoji.textContent=isLigaEsteInsertTeam(team)?"✦":"";emoji.hidden=false;}
+   if(emoji){emoji.textContent=(isLigaEsteInsertTeam(team)||isMegacracksSpecialTeam(team))?"✦":"";emoji.hidden=false;}
    return;
  }
  if(emoji){emoji.hidden=true;emoji.textContent="";}
@@ -815,9 +835,10 @@ function selectTeam(team){
  renderAll();
 }
 function renderTeamList(teams){
- const isLiga=inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27";
+ const activeType=inferCollectionType(projects?.[activeProjectId]);
+ const isLiga=activeType==="liga-este-2026-27"; const isMega=activeType==="megacracks-2026-27";
  const worldButton=`<button class="team-option world-option" data-team="all">
-   <span class="team-option-world-icon">${isLiga?"🏟️":"🌍"}</span><strong>${isLiga?"Todos los clubes":"Todas las selecciones"}</strong>
+   <span class="team-option-world-icon">${isLiga||isMega?"🏟️":"🌍"}</span><strong>${isLiga||isMega?"Todos los clubes":"Todas las selecciones"}</strong>
  </button>`;
  const pinned=["FWC","Coca-Cola",...EXTRA_TEAMS].filter(team=>teams.includes(team));
  const regular=teams.filter(team=>!pinned.includes(team));
@@ -1397,7 +1418,7 @@ function isTradeStar(item){const key=tradeStickerKey(item),prefs=currentTradePre
 function isTradeProtected(item){const key=tradeStickerKey(item),prefs=currentTradePreferences();return Boolean((DEFAULT_TOP_STARS[key]&&!prefs.disabledDefaultProtected[key])||prefs.protected[key])}
 function tradeStarName(item){return DEFAULT_TOP_STARS[tradeStickerKey(item)]||""}
 function tradeStickerCategory(item){
- if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27")return isLigaEsteInsertTeam(item.team)?"special":"normal";
+ const t=inferCollectionType(projects?.[activeProjectId]);if(t==="liga-este-2026-27")return isLigaEsteInsertTeam(item.team)?"special":"normal";if(t==="megacracks-2026-27")return isMegacracksSpecialTeam(item.team)?"special":"normal";
  return item.team==="Coca-Cola"?"collaboration":item.team==="FWC"||(item.team!=="Coca-Cola"&&Number(item.displayCode)===1)?"special":"normal";
 }
 function toggleTradeMark(item,type){
@@ -1531,8 +1552,13 @@ function parseLigaEsteTradeList(rawText){
  });
  return {found,invalid};
 }
+function parseMegacracksTradeList(rawText){
+ const found=[],invalid=[],byKey=new Map(),aliases=currentTeamOrder().map(team=>({team,alias:normalizeTradeName(team)})).sort((a,b)=>b.alias.length-a.alias.length);
+ const add=(team,code,raw,units=1)=>{const stickers=inventory?.[team]||{},exact=Object.keys(stickers).find(c=>String(c).toUpperCase()===String(code).toUpperCase());if(!exact){invalid.push({raw,reason:`Número no válido para ${team}`,suggestion:""});return}const key=`${team}|${exact}`,existing=byKey.get(key);if(existing){existing.requestedUnits+=units;return}const item={team,officialCode:team,internalCode:exact,displayCode:exact,requestedUnits:units};byKey.set(key,item);found.push(item)};
+ String(rawText||"").replace(/\r/g,"").split("\n").forEach(line=>{const original=line.trim();if(!original)return;const q=original.match(/[x×]\s*(\d+)/i),units=q?Math.max(1,Number(q[1])||1):1,clean=original.replace(/[x×]\s*\d+/ig,"").trim(),norm=normalizeTradeName(clean),hit=aliases.find(x=>norm===x.alias||norm.startsWith(x.alias+" "));if(hit){const tail=norm.slice(hit.alias.length).trim(),m=tail.match(/\b([0-9]{1,3}P?|[BG]0?[1-9]|EL0?[1-3])\b/i);if(m){add(hit.team,m[1].toUpperCase(),original,units);return}}let named=[];currentTeamOrder().forEach(team=>Object.entries(MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{}).forEach(([code,[name]])=>{if(normalizeTradeName(name)===norm)named.push({team,code})}));if(named.length===1){add(named[0].team,named[0].code,original,units);return}invalid.push({raw:original,reason:"Club, apartado, número o jugador no reconocido",suggestion:""})});return {found,invalid};
+}
 function parseTradeList(rawText){
- return inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"?parseLigaEsteTradeList(rawText):parseWorldCupTradeList(rawText);
+ const t=inferCollectionType(projects?.[activeProjectId]);return t==="liga-este-2026-27"?parseLigaEsteTradeList(rawText):t==="megacracks-2026-27"?parseMegacracksTradeList(rawText):parseWorldCupTradeList(rawText);
 }
 
 function groupTradeAnalysis(items){const order=currentTeamOrder(),groups={};items.forEach(item=>(groups[item.team]||=[]).push(item));return Object.entries(groups).sort((a,b)=>order.indexOf(a[0])-order.indexOf(b[0]));}
@@ -1580,7 +1606,7 @@ function renderTradeAnalyzerResult(){const input=$("#tradeAnalyzerInput"),result
 function openTradeAnalyzer(){
  const dialog=$("#tradeAnalyzerDialog");if(!dialog)return;
  const area=$("#tradeAnalyzerInput");
- if(area)area.placeholder=inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"?"Ejemplo:\nFC Barcelona 07\nReal Madrid 18A\nDRAFT 23 06\nADN 08":"Ejemplo: ESP15 · Francia 20 · FWC 18";dialog.classList.remove("analyzed","exchange-step");$("#tradeAnalyzerEntry").hidden=false;$("#tradeAnalyzerResult").hidden=true;if(!dialog.open)dialog.showModal();$("#tradeAnalyzerBody")?.scrollTo({top:0,behavior:"auto"});setTimeout(()=>$("#tradeAnalyzerInput")?.focus(),80);}
+ if(area){const t=inferCollectionType(projects?.[activeProjectId]);area.placeholder=t==="liga-este-2026-27"?"Ejemplo:\nFC Barcelona 07\nReal Madrid 18A\nDRAFT 23 06\nADN 08":t==="megacracks-2026-27"?"Ejemplo:\nFC Barcelona 89\nReal Madrid 232\nENJOY 381\nZONA VIP 399":"Ejemplo: ESP15 · Francia 20 · FWC 18";}dialog.classList.remove("analyzed","exchange-step");$("#tradeAnalyzerEntry").hidden=false;$("#tradeAnalyzerResult").hidden=true;if(!dialog.open)dialog.showModal();$("#tradeAnalyzerBody")?.scrollTo({top:0,behavior:"auto"});setTimeout(()=>$("#tradeAnalyzerInput")?.focus(),80);}
 function closeTradeAnalyzer(){const dialog=$("#tradeAnalyzerDialog");if(dialog?.open)dialog.close();}
 
 
@@ -1598,7 +1624,8 @@ function toggleLigaEsteTeam(team){
  p.ui.ligaEsteOpenTeams[team]=!p.ui.ligaEsteOpenTeams[team];persistProjects();renderGlobalCollection();
 }
 function ligaEsteRow(team,code,qty){
- const info=ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code)||[stickerDisplayLabel(team,code),""];
+ const activeType=inferCollectionType(projects?.[activeProjectId]);
+ const info=activeType==="megacracks-2026-27"?(megacracksItemInfo(team,code)||[stickerDisplayLabel(team,code),""]):(ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code)||[stickerDisplayLabel(team,code),""]);
  const [name,position]=info,st=stateFor(qty),pending=name==="Pendiente";
  const exchangeMode=currentView==="exchange";
  const giveQty=getExchangeQty("give",team,code),receiveQty=getExchangeQty("receive",team,code);
@@ -1677,9 +1704,25 @@ function renderLigaEsteCollection(){
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cromos para este filtro.</div>';
 }
 
+
+function megacracksIsOpen(team){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};if(collectionTeamFilter!=="all")return team===collectionTeamFilter;return !!p.ui.megacracksOpenTeams[team]}
+function toggleMegacracksTeam(team){const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};p.ui.megacracksOpenTeams[team]=!p.ui.megacracksOpenTeams[team];persistProjects();renderGlobalCollection()}
+function renderMegacracksCollection(){
+ const list=$("#globalCollectionList");if(!list)return;list.innerHTML="";
+ let teams=currentTeamOrder().filter(team=>!isMegacracksSpecialTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));
+ const specialTeams=currentTeamOrder().filter(team=>isMegacracksSpecialTeam(team));if(collectionSort==="az")teams.sort((a,b)=>a.localeCompare(b,"es"));
+ teams.forEach(team=>{if(collectionTeamFilter!=="all"&&team!==collectionTeamFilter)return;const stickers=inventory[team]||{},entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));if(!entries.length)return;
+ const target=getTarget(),total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0),missing=Object.values(stickers).reduce((a,b)=>a+Math.max(0,target-Number(b||0)),0),open=megacracksIsOpen(team);
+ const section=document.createElement("section");section.className=`ligaeste-team-accordion megacracks-team-accordion${open?" open":""}`;section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards · ${missing?`${missing} pendientes`:"Completo"}</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
+ section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleMegacracksTeam(team);const rows=section.querySelector(".ligaeste-player-list");entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));list.appendChild(section)});
+ if(collectionTeamFilter==="all"&&collectionFilter==="all"&&specialTeams.length){const special=document.createElement("section");special.className="ligaeste-specials-group megacracks-specials-group";special.innerHTML=`<div class="ligaeste-specials-title"><span>◆</span><div><strong>Especiales y paralelas</strong><small>Élite · Enjoy · Zona VIP · Master Rookie · Stars on 25 · Special One</small></div></div>`;specialTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`${flagHTML(team)}<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special)}
+ if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cards para este filtro.</div>';
+}
 function renderGlobalCollection(){
  updateShareCollectionButton();
- if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){renderLigaEsteCollection();return;}
+ const activeCollectionType=inferCollectionType(projects?.[activeProjectId]);
+ if(activeCollectionType==="liga-este-2026-27"){renderLigaEsteCollection();return;}
+ if(activeCollectionType==="megacracks-2026-27"){renderMegacracksCollection();return;}
  const list=$("#globalCollectionList");
  if(!list)return;
  list.innerHTML="";
@@ -1731,7 +1774,7 @@ function calculateProjectStatistics(){
  const specialProgress={};
  currentTeamOrder().map(team=>[team,inventory[team]]).forEach(([team,stickers])=>{
    let teamComplete=true;
-   const isLigaInsert=collectionType==="liga-este-2026-27"&&isLigaEsteInsertTeam(team);
+   const isLigaInsert=collectionType==="liga-este-2026-27"&&isLigaEsteInsertTeam(team);const isMegaInsert=collectionType==="megacracks-2026-27"&&isMegacracksSpecialTeam(team);
    let specialOwned=0,specialTotal=0;
    Object.entries(stickers).forEach(([code,raw])=>{
      const qty=Number(raw)||0;
@@ -1740,8 +1783,8 @@ function calculateProjectStatistics(){
      missing+=unitMissing;
      repeats+=Math.max(0,qty-target);
      if(qty<target)teamComplete=false;
-     if(collectionType==="liga-este-2026-27"){
-       if(isLigaInsert){
+     if(collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27"){
+       if(isLigaInsert||isMegaInsert){
          specialTotal++;
          if(qty>=target)specialOwned++;
        }else{
@@ -1754,9 +1797,9 @@ function calculateProjectStatistics(){
    });
    if(teamComplete){
      complete++;
-     if(collectionType==="liga-este-2026-27"&&!isLigaInsert)normalComplete++;
+     if((collectionType==="liga-este-2026-27"&&!isLigaInsert)||(collectionType==="megacracks-2026-27"&&!isMegaInsert))normalComplete++;
    }
-   if(isLigaInsert)specialProgress[team]={owned:specialOwned,total:specialTotal};
+   if(isLigaInsert||isMegaInsert)specialProgress[team]={owned:specialOwned,total:specialTotal};
  });
  const required=currentTeamOrder().reduce((sum,team)=>sum+Object.keys(inventory[team]||{}).length,0)*target;
  const useful=Math.max(0,total-mathExcessForProgress());
@@ -1770,18 +1813,18 @@ function mathExcessForProgress(){
 }
 function renderStatistics(){
  const s=calculateProjectStatistics();
- const isLiga=s.collectionType==="liga-este-2026-27";
+ const isLiga=s.collectionType==="liga-este-2026-27";const isMega=s.collectionType==="megacracks-2026-27";
  const values={
    statsTotalStickers:`${s.total.toLocaleString("es-ES")} cromos`,
-   statsMissingUnits:(isLiga?s.normalMissing:s.missing).toLocaleString("es-ES"),
+   statsMissingUnits:((isLiga||isMega)?s.normalMissing:s.missing).toLocaleString("es-ES"),
    statsRepeatUnits:s.repeats.toLocaleString("es-ES"),
    statsShinyTotal:s.shiny.toLocaleString("es-ES"),
-   statsCompleteTeams:String(isLiga?s.normalComplete:s.complete),
+   statsCompleteTeams:String((isLiga||isMega)?s.normalComplete:s.complete),
    statsProgress:`${s.progress}%`,
    statsFwcTotal:s.fwc.toLocaleString("es-ES"),
    statsBadgesTotal:s.badges.toLocaleString("es-ES"),
    statsCollaborationTotal:s.collaboration.toLocaleString("es-ES"),
-   statsCompleteTeamsText:`${isLiga?s.normalComplete:s.complete} ${isLiga?"clubes completos":"selecciones completas"}`
+   statsCompleteTeamsText:`${(isLiga||isMega)?s.normalComplete:s.complete} ${(isLiga||isMega)?"clubes completos":"selecciones completas"}`
  };
  Object.entries(values).forEach(([id,value])=>{const node=$("#"+id);if(node)node.textContent=value});
  const ring=$("#statsProgressRing");
@@ -1790,11 +1833,11 @@ function renderStatistics(){
  const genericGrid=document.querySelector(".visual-stats-grid");
  const shinyBreakdown=document.querySelector(".shiny-breakdown");
  const custom=$("#collectionSpecificStats");
- if(isLiga&&custom){
+ if((isLiga||isMega)&&custom){
    if(genericGrid)genericGrid.hidden=true;
    if(shinyBreakdown)shinyBreakdown.hidden=true;
    custom.hidden=false;
-   const specials=Object.keys(LIGA_ESTE_INSERTS);
+   const specials=isMega?Object.keys(MEGACRACKS_SPECIALS):Object.keys(LIGA_ESTE_INSERTS);
    custom.innerHTML=`<div class="collection-stats-summary-grid">
      <article class="collection-stat-card total"><span>▦</span><div><small>Cromos que tienes</small><strong>${s.total.toLocaleString("es-ES")}</strong><em>unidades totales</em></div></article>
      <article class="collection-stat-card missing"><span>−</span><div><small>Me faltan</small><strong>${s.normalMissing.toLocaleString("es-ES")}</strong><em>solo cromos de clubes</em></div></article>
@@ -1804,7 +1847,7 @@ function renderStatistics(){
    <div class="ligaeste-special-stat-grid">
      ${specials.map(team=>{
        const p=s.specialProgress[team]||{owned:0,total:Object.keys(inventory?.[team]||{}).length};
-       const badge=LIGA_ESTE_SPECIAL_BADGES[team]||"";
+       const badge=isMega?"":(LIGA_ESTE_SPECIAL_BADGES[team]||"");
        return `<article class="ligaeste-special-stat-card">
          ${badge?`<img src="${badge}" alt="">`:""}
          <div><strong>${collectionSafeText(team)}</strong><span>${p.owned}/${p.total}</span></div>
@@ -1923,10 +1966,10 @@ teamSearch.oninput=()=>{
  const q=normalizeTradeName(teamSearch.value);
  if(!q){suggestions.hidden=true;syncMainSearchSpace();return}
  const matches=filterTeamsByQuery(q).slice(0,8);
- const isLiga=inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27";
- const worldMatch=!isLiga&&["todo","todos","mundo","global","selecciones"].some(word=>word.includes(q)||q.includes(word));
+ const searchType=inferCollectionType(projects?.[activeProjectId]);const isLiga=searchType==="liga-este-2026-27";const isMega=searchType==="megacracks-2026-27";
+ const worldMatch=!isLiga&&!isMega&&["todo","todos","mundo","global","selecciones"].some(word=>word.includes(q)||q.includes(word));
  suggestions.innerHTML=(worldMatch?`<button class="suggestion" data-team="all"><span>🌍</span><strong>Todas las selecciones</strong></button>`:"")
-   +matches.map(team=>{const hit=isLiga?Object.entries(LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{}).find(([code,[name,pos]])=>normalizeTradeName(`${code} ${name} ${pos}`).includes(q)):null;return `<button class="suggestion" data-team="${team}">${flagHTML(team)}<strong>${team}</strong><small>${hit?`${hit[0]} · ${hit[1][0]}`:(TEAM_TO_PANINI_CODE[team]||"")}</small></button>`}).join("");
+   +matches.map(team=>{const source=isLiga?(LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{}):isMega?(MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{}):{};const hit=(isLiga||isMega)?Object.entries(source).find(([code,[name,pos]])=>normalizeTradeName(`${code} ${name} ${pos||""}`).includes(q)):null;return `<button class="suggestion" data-team="${team}">${flagHTML(team)}<strong>${team}</strong><small>${hit?`${hit[0]} · ${hit[1][0]}`:(TEAM_TO_PANINI_CODE[team]||"")}</small></button>`}).join("");
  suggestions.hidden=!(matches.length||worldMatch);
  syncMainSearchSpace();
  suggestions.querySelectorAll("button").forEach(button=>button.onclick=()=>selectTeam(button.dataset.team));
@@ -2836,7 +2879,6 @@ function createProject(){
  if(!name){alert("Escribe un nombre para la colección.");return}
  const sourceType=dialog.querySelector('input[name="projectSource"]:checked')?.value||"empty";
  const collectionType=selectedNewCollectionType();
- if(collectionType==="megacracks-2026-27"){alert("Megacracks 2026/27 estará disponible en la siguiente build, cuando carguemos su checklist completa.");return;}
 
  // Captura el estado más reciente antes de calcular o transferir unidades.
  commitProjectStateLocalOnly();
@@ -3296,7 +3338,7 @@ function renderCollectionModuleSettings(){
  </section>
  <section class="collection-settings-family ${type==="megacracks-2026-27"?"is-active":""}">
    <header><span>⚡</span><div><strong>Megacracks 2026/27</strong><small>Se habilitará con su checklist</small></div></header>
-   <div class="collection-settings-inactive">Próxima colección.</div>
+   <div class="collection-settings-status active">✓ 20 clubes y especiales/paralelas de primera edición activos</div>
  </section>`;
  $("#toggleCollaborationCollection")?.addEventListener("change",event=>{
    currentCollectionOptions().collaborationEnabled=event.currentTarget.checked;

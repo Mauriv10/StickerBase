@@ -5909,3 +5909,23 @@ body.collection-theme-ligaeste .app-scroll,
 body.collection-theme-megacracks .app-scroll{
   border-radius:0!important;
 }
+
+/* Build 704.12.0 · Megacracks 2026/27 */
+body.collection-theme-megacracks{--mega-black:#090a0c;--mega-silver:#c8cdd4}
+body.collection-theme-megacracks .compact-home-titlebar{background:linear-gradient(115deg,#050607 0%,#171a1f 52%,#343942 100%)!important;border-color:#aeb4bd!important;color:#fff!important}
+body.collection-theme-megacracks .compact-home-titlebar:after{border-color:#d8dde4!important}
+body.collection-theme-megacracks #ligaEsteHeaderLogo{background:linear-gradient(145deg,#050607,#30343a)!important;border-color:#d8dde4!important;color:#fff!important;white-space:pre-line!important}
+body.collection-theme-megacracks .bottom-app-nav{background:linear-gradient(180deg,#1a1d21,#070809)!important;border-top-color:#5b6068!important}
+body.collection-theme-megacracks .bottom-nav-button.active{color:#fff!important}
+body.collection-theme-megacracks .bottom-nav-button.active .bottom-nav-icon{background:#d8dde4!important;color:#111!important}
+body.collection-theme-megacracks .collection-filter-button.active{background:#1b1d21!important;color:#fff!important;border-color:#1b1d21!important}
+body.collection-theme-megacracks .ligaeste-team-accordion{border-color:#d9dde2!important}
+body.collection-theme-megacracks .ligaeste-team-toggle{background:linear-gradient(90deg,#fff,#f4f5f6)!important}
+body.collection-theme-megacracks .ligaeste-row-step.plus{background:#22262b!important;color:#fff!important}
+body.collection-theme-megacracks .ligaeste-specials-group{background:linear-gradient(145deg,#0b0c0e,#262a30)!important;color:#fff!important;border-color:#858b94!important}
+body.collection-theme-megacracks .ligaeste-special-shortcut{background:#fff!important;color:#17191d!important;border-color:#cfd3d9!important}
+body.collection-theme-megacracks .megacracks-insert-mark{width:44px;height:44px;min-width:44px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(145deg,#050607,#454b54);border:1px solid #cbd0d7;color:#fff;font-size:10px;font-weight:950}
+body.collection-theme-megacracks .collection-stat-card.total>span{background:#e8eaed;color:#17191d}
+body.collection-theme-megacracks .ligaeste-special-stat-card span{color:#25292f}
+body.collection-theme-megacracks .collection-filter-button[data-collection-filter="shiny"],body.collection-theme-megacracks .collection-filter-button[data-collection-filter="collaboration"]{display:none!important}
+body.collection-theme-megacracks .collection-filter-bar{grid-template-columns:repeat(3,minmax(0,1fr))!important}
