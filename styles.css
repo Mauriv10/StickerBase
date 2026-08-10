@@ -6018,3 +6018,8 @@ body.collection-theme-ligaeste #currentTeamEmoji{display:inline-grid!important;p
 body.collection-theme-megacracks #currentTeamEmoji[hidden],body.collection-theme-ligaeste #currentTeamEmoji[hidden]{display:none!important}
 body.collection-theme-megacracks #currentTeamEmoji .megacracks-special-badge,
 body.collection-theme-ligaeste #currentTeamEmoji .ligaeste-insert-mark{width:44px!important;height:44px!important;min-width:44px!important;margin:0!important}
+/* StickerBase brand · 704.12.9 */
+.app-splash{background:radial-gradient(circle at 50% 28%,#14263c 0,#0b111a 42%,#06090e 100%);color:#f7f9fc}
+.stickerbase-splash-logo{width:112px;height:112px;border-radius:28px;box-shadow:0 22px 55px rgba(0,0,0,.34);margin:auto}
+.stickerbase-wordmark{font-size:2.45rem!important;letter-spacing:-.055em;margin:12px 0 20px!important}.stickerbase-wordmark span{color:#36a9f5}.app-splash .splash-kicker{color:#a9b7c8}.app-splash p{color:#a9b7c8}.app-splash .splash-spinner{border-color:#26384c;border-top-color:#36a9f5}
+.stickerbase-auth-logo{width:86px;height:86px;border-radius:23px;display:block;margin:0 auto 18px;box-shadow:0 14px 34px rgba(15,30,50,.18)}

@@ -15,7 +15,7 @@ Esta versión añade la pantalla de acceso y mantiene intacto el inventario loca
 
 En **Authentication → URL Configuration**:
 
-- Site URL: `https://mauriv10.github.io/wc26/`
+- Site URL: `https://mauriv10.github.io/StickerBase/`
 - Añade la misma dirección en Redirect URLs.
 
 ## 3. Proveedores
