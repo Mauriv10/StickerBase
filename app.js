@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.5";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.6";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -165,7 +165,7 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Club":"Selección";
  const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Elegir club":"Elegir selección";
  const infoSub=$("#appInfoSubtitle");if(infoSub)infoSub.textContent=`Build ${APP_VERSION}`;
- const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo){logo.hidden=project.collectionType==="world-cup-2026";logo.textContent=project.collectionType==="megacracks-2026-27"?"MC\n26/27":"LIGA\nESTE";}
+ const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo){logo.hidden=project.collectionType==="world-cup-2026";logo.textContent=project.collectionType==="megacracks-2026-27"?"Mega\nCracks":"LIGA\nESTE";}
 }
 
 const EXTRA_PLAYERS=[
@@ -1729,7 +1729,7 @@ function renderLigaEsteCollection(){
  });
  if(collectionTeamFilter==="all"&&collectionFilter==="all"&&insertTeams.length){
    const special=document.createElement("section");special.className="ligaeste-specials-group";special.innerHTML=`<div class="ligaeste-specials-title"><span>✦</span><div><strong>Especiales e inserts</strong><small>ADN · Fantasy · Draft 23 · Kromix · Extra Stickers</small></div></div>`;
-   insertTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special);
+   insertTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`${flagHTML(team)}<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special);
  }
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cromos para este filtro.</div>';
 }
