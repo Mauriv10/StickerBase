@@ -1,3 +1,7 @@
+## 704.12.10
+- Corregidos `start_url` y `scope` de la PWA a `/StickerBase/` tras renombrar el repositorio de GitHub Pages.
+- Caché/versionado actualizado para forzar la nueva instalación.
+
 # Build 704.11.17
 
 - Liga Este: cabecera fija compacta rediseñada; solo el área central hace scroll.

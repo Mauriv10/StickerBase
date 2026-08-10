@@ -6,7 +6,7 @@ PWA para gestionar colecciones de cromos, intercambios e inventarios con sincron
 Build **701.3.2 · Estabilidad y limpieza**.
 
 ## Publicación
-Sube el contenido de este ZIP a la raíz del repositorio `wc26`. GitHub Pages servirá la aplicación desde esa misma raíz.
+Sube el contenido de este ZIP a la raíz del repositorio `StickerBase`. GitHub Pages servirá la aplicación desde esa misma raíz.
 
 ## Configuración
 - `app-config.js`: versión visible y nombre de caché.
