@@ -5881,3 +5881,11 @@ body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row .ligae
  body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row .ligaeste-exchange-step{width:35px!important;min-width:35px!important;max-width:35px!important;font-size:12px!important}
 }
 \n\n/* Build 704.11.15 · chrome fijo real para Liga Este / Megacracks */\nbody.collection-theme-ligaeste .compact-home-titlebar,\nbody.collection-theme-megacracks .compact-home-titlebar{\n  position:relative!important;\n  inset:auto!important;\n  top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;\n  flex:0 0 calc(88px + env(safe-area-inset-top))!important;\n  width:100%!important;\n  height:calc(88px + env(safe-area-inset-top))!important;\n  z-index:120!important;\n  transform:none!important;\n  -webkit-transform:none!important;\n}\nbody.collection-theme-ligaeste .app-header,\nbody.collection-theme-megacracks .app-header{\n  padding:14px 14px 16px!important;\n}\nbody.collection-theme-ligaeste .app-scroll,\nbody.collection-theme-megacracks .app-scroll{\n  flex:1 1 auto!important;\n  min-height:0!important;\n  overflow-y:auto!important;\n  overscroll-behavior-y:contain!important;\n}\n/* En estas colecciones los tabs Todos / Pedir / Entregar viajan con el contenido. */\nbody.collection-theme-ligaeste .collection-tabs-sticky,\nbody.collection-theme-megacracks .collection-tabs-sticky{\n  position:relative!important;\n  top:auto!important;\n  z-index:auto!important;\n}\n@media(min-width:520px){\n body.collection-theme-ligaeste .compact-home-titlebar,\n body.collection-theme-megacracks .compact-home-titlebar{\n   flex-basis:calc(94px + env(safe-area-inset-top))!important;\n   height:calc(94px + env(safe-area-inset-top))!important;\n }\n body.collection-theme-ligaeste .app-header,\n body.collection-theme-megacracks .app-header{padding-top:14px!important}\n}\n
+
+/* Build 704.11.16 · cabecera premium con esquinas inferiores redondeadas */
+body.collection-theme-ligaeste .compact-home-titlebar,
+body.collection-theme-megacracks .compact-home-titlebar{
+  border-radius:0 0 22px 22px!important;
+  overflow:hidden!important;
+  box-shadow:0 8px 24px rgba(37,8,69,.24)!important;
+}
