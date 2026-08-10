@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.14";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.15";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -127,9 +127,23 @@ function inferCollectionType(projectOrSeed={}){
  return "world-cup-2026";
 }
 function collectionDefinition(project=projects?.[activeProjectId]){return COLLECTION_DEFINITIONS[inferCollectionType(project)]||COLLECTION_DEFINITIONS["world-cup-2026"]}
+function syncCollectionChrome(collectionType){
+ const shell=document.querySelector("#appShell");
+ const scroll=document.querySelector("#appScroll");
+ const header=document.querySelector(".app-header");
+ const titlebar=document.querySelector(".compact-home-titlebar");
+ if(!shell||!scroll||!header||!titlebar)return;
+ const detached=collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27";
+ if(detached){
+   if(titlebar.parentElement!==shell)shell.insertBefore(titlebar,scroll);
+ }else if(titlebar.parentElement!==header){
+   header.insertBefore(titlebar,header.firstChild);
+ }
+}
 function applyCollectionIdentity(project=projects?.[activeProjectId]){
  if(!project)return;
  project.collectionType=inferCollectionType(project);
+ syncCollectionChrome(project.collectionType);
  const def=collectionDefinition(project);
  document.body.dataset.collectionType=project.collectionType;
  document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks");
