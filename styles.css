@@ -5889,3 +5889,23 @@ body.collection-theme-megacracks .compact-home-titlebar{
   overflow:hidden!important;
   box-shadow:0 8px 24px rgba(37,8,69,.24)!important;
 }
+
+
+/* Build 704.11.17 · curvas inferiores visibles en cabecera premium */
+body.collection-theme-ligaeste .app-shell,
+body.collection-theme-megacracks .app-shell{
+  background:linear-gradient(180deg,#eef6ff 0%,#f7f8fb 38%,#f7f8fb 100%)!important;
+}
+body.collection-theme-ligaeste .compact-home-titlebar,
+body.collection-theme-megacracks .compact-home-titlebar{
+  border-radius:0 0 26px 26px!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round 0 0 26px 26px)!important;
+  -webkit-clip-path:inset(0 round 0 0 26px 26px)!important;
+  box-shadow:0 10px 24px rgba(37,8,69,.22)!important;
+}
+/* pequeño aire visual para que la curva no se funda con el contenido */
+body.collection-theme-ligaeste .app-scroll,
+body.collection-theme-megacracks .app-scroll{
+  border-radius:0!important;
+}
