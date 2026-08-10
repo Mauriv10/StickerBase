@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.3";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.4";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -719,8 +719,26 @@ async function loadData(){
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
 function megacracksSpecialBadgeHTML(team){
- const map={"ÉLITE":["E","elite"],"ÉLITE POWER":["EP","power"],"ENJOY":["EN","enjoy"],"ENJOY POWER":["EN+","power"],"ZONA VIP":["VIP","vip"],"ZONA VIP POWER":["VIP+","power"],"MASTER ROOKIE":["MR","rookie"],"STARS ON 25":["25","stars"],"SPECIAL ONE BLACK":["1","black"],"SPECIAL ONE GOLD":["1","gold"],"EDICIONES LIMITADAS":["EL","limited"]};
- const [label,kind]=map[team]||[collectionSafeText(team).slice(0,3),"default"]; return `<span class="megacracks-special-badge ${kind}" aria-hidden="true"><i>${label}</i></span>`;
+ const kind={
+  "ÉLITE":"elite","ÉLITE POWER":"elite-power","ENJOY":"enjoy","ENJOY POWER":"enjoy-power",
+  "ZONA VIP":"vip","ZONA VIP POWER":"vip-power","MASTER ROOKIE":"rookie","STARS ON 25":"stars",
+  "SPECIAL ONE BLACK":"black","SPECIAL ONE GOLD":"gold","EDICIONES LIMITADAS":"limited"
+ }[team]||"default";
+ const icons={
+  elite:`<svg viewBox="0 0 48 48"><path d="M24 5l5.5 11.2L42 18l-9 8.8 2.2 12.4L24 33.3l-11.2 5.9L15 26.8 6 18l12.5-1.8z"/></svg>`,
+  "elite-power":`<svg viewBox="0 0 48 48"><path d="M28 3L10 27h12l-2 18 18-25H26z"/></svg>`,
+  enjoy:`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15"/><path d="M16 26c2.7 6 13.3 6 16 0M17 19h.1M31 19h.1"/></svg>`,
+  "enjoy-power":`<svg viewBox="0 0 48 48"><path d="M28 3L11 25h11l-2 19 17-24H26z"/><path d="M13 10l4 4M35 10l-4 4"/></svg>`,
+  vip:`<svg viewBox="0 0 48 48"><path d="M8 17l8 7 8-13 8 13 8-7-4 20H12z"/><path d="M13 40h22"/></svg>`,
+  "vip-power":`<svg viewBox="0 0 48 48"><path d="M7 18l9 6 8-13 8 13 9-6-5 19H12z"/><path d="M27 20l-7 10h6l-1 8 8-12h-6z"/></svg>`,
+  rookie:`<svg viewBox="0 0 48 48"><path d="M24 5l6 9 11 3-7 9 .5 12L24 34l-10.5 4 .5-12-7-9 11-3z"/><path d="M19 22h10M24 17v10"/></svg>`,
+  stars:`<svg viewBox="0 0 48 48"><path d="M15 9l2.5 5 5.5.8-4 3.9 1 5.5-5-2.6-5 2.6 1-5.5-4-3.9 5.5-.8zM33 24l2.2 4.5 5 .7-3.6 3.5.8 5-4.4-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z"/><circle cx="29" cy="11" r="3"/></svg>`,
+  black:`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16"/><path d="M24 13l3.5 7 7.5 1-5.5 5.4 1.4 7.6-6.9-3.6-6.9 3.6 1.4-7.6L13 21l7.5-1z"/></svg>`,
+  gold:`<svg viewBox="0 0 48 48"><path d="M24 5l5 10 11 1.6-8 7.8 1.9 11L24 30.2l-9.9 5.2 1.9-11-8-7.8L19 15z"/><circle cx="24" cy="24" r="5"/></svg>`,
+  limited:`<svg viewBox="0 0 48 48"><path d="M9 14h30v22H9z"/><path d="M15 14v22M33 14v22M20 20h8M20 26h8M20 32h5"/></svg>`,
+  default:`<svg viewBox="0 0 48 48"><path d="M24 7l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/></svg>`
+ };
+ return `<span class="megacracks-special-badge ${kind}" aria-hidden="true">${icons[kind]||icons.default}</span>`;
 }
 function flagHTML(team){
  const activeType=inferCollectionType(projects?.[activeProjectId]);
