@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.2";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.3";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -718,11 +718,15 @@ async function loadData(){
 }
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
+function megacracksSpecialBadgeHTML(team){
+ const map={"ÉLITE":["E","elite"],"ÉLITE POWER":["EP","power"],"ENJOY":["EN","enjoy"],"ENJOY POWER":["EN+","power"],"ZONA VIP":["VIP","vip"],"ZONA VIP POWER":["VIP+","power"],"MASTER ROOKIE":["MR","rookie"],"STARS ON 25":["25","stars"],"SPECIAL ONE BLACK":["1","black"],"SPECIAL ONE GOLD":["1","gold"],"EDICIONES LIMITADAS":["EL","limited"]};
+ const [label,kind]=map[team]||[collectionSafeText(team).slice(0,3),"default"]; return `<span class="megacracks-special-badge ${kind}" aria-hidden="true"><i>${label}</i></span>`;
+}
 function flagHTML(team){
  const activeType=inferCollectionType(projects?.[activeProjectId]);
  if(activeType==="megacracks-2026-27"){
-   if(isMegacracksSpecialTeam(team))return `<span class="megacracks-insert-mark">${collectionSafeText(team).split(" ").map(x=>x[0]).join("").slice(0,3)}</span>`;
-   const crest=megacracksCrestUrl(team);if(crest)return `<span class="ligaeste-crest-wrap"><img class="ligaeste-team-crest" src="${crest}" alt="Escudo de ${collectionSafeText(team)}"></span>`;
+   if(isMegacracksSpecialTeam(team))return megacracksSpecialBadgeHTML(team);
+   const crest=megacracksCrestUrl(team);if(crest)return `<span class="ligaeste-crest-wrap"><span class="ligaeste-crest-fallback">${collectionSafeText(team).slice(0,2).toUpperCase()}</span><img class="ligaeste-team-crest" src="${crest}" alt="Escudo de ${collectionSafeText(team)}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none';this.previousElementSibling.style.display='grid'"></span>`;
  }
  if(activeType==="liga-este-2026-27"){
    if(isLigaEsteInsertTeam(team)){
@@ -1848,8 +1852,8 @@ function renderStatistics(){
      ${specials.map(team=>{
        const p=s.specialProgress[team]||{owned:0,total:Object.keys(inventory?.[team]||{}).length};
        const badge=isMega?"":(LIGA_ESTE_SPECIAL_BADGES[team]||"");
-       return `<article class="ligaeste-special-stat-card">
-         ${badge?`<img src="${badge}" alt="">`:""}
+       return `<article class="ligaeste-special-stat-card${isMega?" megacracks-special-stat-card":""}">
+         ${isMega?megacracksSpecialBadgeHTML(team):(badge?`<img src="${badge}" alt="">`:"")}
          <div><strong>${collectionSafeText(team)}</strong><span>${p.owned}/${p.total}</span></div>
        </article>`;
      }).join("")}
