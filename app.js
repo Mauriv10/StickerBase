@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.11";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.12";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1574,14 +1574,27 @@ function ligaEsteRow(team,code,qty){
  if(exchangeMode){
    row.querySelector(".give").onclick=e=>{
      const current=getExchangeQty("give",team,code);
-     if(current>=qty){showToast(`No puedes marcar más de x${qty} para dar`);return;}
+     const stock=Number(inventory?.[team]?.[code])||0;
+     if(stock<=0){
+       showActionFeedback(e.currentTarget,"minus","SIN STOCK");
+       showTopFeedback({type:"negative",title:`${name} · Sin stock para dar`,detail:"Añade al menos una unidad al inventario antes de marcarla para dar.",key:`liga-give-empty:${team}:${code}`});
+       showToast("No tienes stock de este cromo para dar");
+       return;
+     }
+     if(current>=stock){
+       showActionFeedback(e.currentTarget,"minus","MÁXIMO");
+       showTopFeedback({type:"negative",title:`${name} · Máximo disponible`,detail:`Tienes x${stock} y ya has marcado x${current} para dar.`,key:`liga-give-max:${team}:${code}`});
+       return;
+     }
      setExchangeQty("give",team,code,current+1);
+     showActionFeedback(e.currentTarget,"give","DAR ✓");
      showTopFeedback({type:"exchange",title:`${name} · ${team}`,detail:`Preparado para dar · x${current+1}`,key:`liga-give:${team}:${code}`});
      saveAll("Intercambio preparado");renderAll();
    };
    row.querySelector(".receive").onclick=e=>{
      const current=getExchangeQty("receive",team,code);
      setExchangeQty("receive",team,code,current+1);
+     showActionFeedback(e.currentTarget,"receive","RECIBIR ✓");
      showTopFeedback({type:"exchange",title:`${name} · ${team}`,detail:`Preparado para recibir · x${current+1}`,key:`liga-receive:${team}:${code}`});
      saveAll("Intercambio preparado");renderAll();
    };
