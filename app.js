@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.13";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.14";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -140,7 +140,7 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=project.collectionType==="liga-este-2026-27"?"Buscar jugador o club…":"Buscar selección…";
  const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=project.collectionType==="liga-este-2026-27"?"Club":"Selección";
  const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=project.collectionType==="liga-este-2026-27"?"Elegir club":"Elegir selección";
- const infoSub=document.querySelector(".info-group .settings-group-title small");if(infoSub)infoSub.textContent=collectionTypeLabel(project.collectionType);
+ const infoSub=$("#appInfoSubtitle");if(infoSub)infoSub.textContent=`Build ${APP_VERSION}`;
  const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo)logo.hidden=project.collectionType!=="liga-este-2026-27";
 }
 
@@ -1568,7 +1568,7 @@ function ligaEsteRow(team,code,qty){
  row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}</span></div>
  <div class="ligaeste-row-stock ${exchangeMode?"exchange":""}">
  ${exchangeMode
-   ? `<button type="button" class="ligaeste-exchange-step give">DAR${giveQty?`<small>✓x${giveQty}</small>`:""}</button><button type="button" class="ligaeste-exchange-step receive">RECIBIR${receiveQty?`<small>✓x${receiveQty}</small>`:""}</button>`
+   ? `<button type="button" class="ligaeste-exchange-step give" aria-label="Dar una unidad">−1${giveQty?`<small>✓x${giveQty}</small>`:""}</button><button type="button" class="ligaeste-exchange-step receive" aria-label="Recibir una unidad">+1${receiveQty?`<small>✓x${receiveQty}</small>`:""}</button>`
    : `<button type="button" class="ligaeste-row-step minus" aria-label="Restar ${collectionSafeText(name)}">−</button><strong>${qty}</strong><button type="button" class="ligaeste-row-step plus" aria-label="Sumar ${collectionSafeText(name)}">+</button>`}
  </div>`;
  if(exchangeMode){
@@ -1587,14 +1587,14 @@ function ligaEsteRow(team,code,qty){
        return;
      }
      setExchangeQty("give",team,code,current+1);
-     showActionFeedback(e.currentTarget,"give","DAR ✓");
+     showActionFeedback(e.currentTarget,"give","−1 ✓");
      showTopFeedback({type:"exchange",title:`${name} · ${team}`,detail:`Preparado para dar · x${current+1}`,key:`liga-give:${team}:${code}`});
      saveAll("Intercambio preparado");renderAll();
    };
    row.querySelector(".receive").onclick=e=>{
      const current=getExchangeQty("receive",team,code);
      setExchangeQty("receive",team,code,current+1);
-     showActionFeedback(e.currentTarget,"receive","RECIBIR ✓");
+     showActionFeedback(e.currentTarget,"receive","+1 ✓");
      showTopFeedback({type:"exchange",title:`${name} · ${team}`,detail:`Preparado para recibir · x${current+1}`,key:`liga-receive:${team}:${code}`});
      saveAll("Intercambio preparado");renderAll();
    };
@@ -3319,6 +3319,8 @@ function setupSettingsCenter(){
  if(!dialog)return;
  const versionNode=$("#appInfoVersion");
  if(versionNode)versionNode.textContent=`Build ${APP_VERSION} · Multicolección`;
+ const versionSubtitle=$("#appInfoSubtitle");
+ if(versionSubtitle)versionSubtitle.textContent=`Build ${APP_VERSION}`;
 
  const projectBar=document.querySelector(".project-bar");
  const syncCard=document.querySelector(".sync-card");
