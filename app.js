@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.4";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.5";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -822,7 +822,7 @@ function updateCurrentTeamUI(){
    flag.removeAttribute("src");
    flag.alt="Todas";
    flag.style.display="none";
-   if(emoji){emoji.hidden=true;emoji.textContent="";}
+   if(emoji){emoji.hidden=true;emoji.textContent="";emoji.innerHTML="";}
    return;
  }
  $("#currentTeamName").textContent=team;
@@ -835,9 +835,16 @@ function updateCurrentTeamUI(){
  const flagSource=flags[team]||"";
  if(!flagSource){
    const activeType=inferCollectionType(projects?.[activeProjectId]);
-   if((activeType==="liga-este-2026-27"&&!isLigaEsteInsertTeam(team))||(activeType==="megacracks-2026-27"&&!isMegacracksSpecialTeam(team))){const crest=activeType==="megacracks-2026-27"?megacracksCrestUrl(team):ligaEsteCrestUrl(team);if(crest){if(emoji){emoji.hidden=true;emoji.textContent="";}flag.style.display="";flag.src=crest;flag.alt=team;return;}}
+   if((activeType==="liga-este-2026-27"&&!isLigaEsteInsertTeam(team))||(activeType==="megacracks-2026-27"&&!isMegacracksSpecialTeam(team))){const crest=activeType==="megacracks-2026-27"?megacracksCrestUrl(team):ligaEsteCrestUrl(team);if(crest){if(emoji){emoji.hidden=true;emoji.textContent="";emoji.innerHTML="";}flag.style.display="";flag.src=crest;flag.alt=team;return;}}
    flag.removeAttribute("src");flag.style.display="none";
-   if(emoji){emoji.textContent=(isLigaEsteInsertTeam(team)||isMegacracksSpecialTeam(team))?"✦":"";emoji.hidden=false;}
+   if(emoji){
+     if(activeType==="megacracks-2026-27"&&isMegacracksSpecialTeam(team))emoji.innerHTML=megacracksSpecialBadgeHTML(team);
+     else if(activeType==="liga-este-2026-27"&&isLigaEsteInsertTeam(team)){
+       const badge=LIGA_ESTE_SPECIAL_BADGES[team];
+       emoji.innerHTML=badge?`<span class="ligaeste-insert-mark"><img src="${badge}" alt=""></span>`:"✦";
+     }else emoji.textContent="";
+     emoji.hidden=false;
+   }
    return;
  }
  if(emoji){emoji.hidden=true;emoji.textContent="";}
@@ -1642,6 +1649,7 @@ function ligaEsteIsOpen(team){
  return !!p.ui.ligaEsteOpenTeams[team];
 }
 function toggleLigaEsteTeam(team){
+ if(collectionTeamFilter!=="all"&&isLigaEsteInsertTeam(team)){selectTeam("all");return;}
  const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.ligaEsteOpenTeams=p.ui.ligaEsteOpenTeams||{};
  p.ui.ligaEsteOpenTeams[team]=!p.ui.ligaEsteOpenTeams[team];persistProjects();renderGlobalCollection();
 }
@@ -1728,7 +1736,7 @@ function renderLigaEsteCollection(){
 
 
 function megacracksIsOpen(team){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};if(collectionTeamFilter!=="all")return team===collectionTeamFilter;return !!p.ui.megacracksOpenTeams[team]}
-function toggleMegacracksTeam(team){const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};p.ui.megacracksOpenTeams[team]=!p.ui.megacracksOpenTeams[team];persistProjects();renderGlobalCollection()}
+function toggleMegacracksTeam(team){if(collectionTeamFilter!=="all"&&isMegacracksSpecialTeam(team)){selectTeam("all");return;}const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};p.ui.megacracksOpenTeams[team]=!p.ui.megacracksOpenTeams[team];persistProjects();renderGlobalCollection()}
 function renderMegacracksCollection(){
  const list=$("#globalCollectionList");if(!list)return;list.innerHTML="";
  let teams=currentTeamOrder().filter(team=>!isMegacracksSpecialTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));

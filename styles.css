@@ -5993,3 +5993,28 @@ body.collection-theme-megacracks .megacracks-special-stat-card .megacracks-speci
 @media(max-width:380px){
  body.collection-theme-megacracks .compact-home-titlebar h1{font-size:25px!important}
 }
+
+/* Build 704.12.5 · selector sticky + icono especial seleccionado */
+body.collection-theme-megacracks #teamDialog .team-list,
+body.collection-theme-ligaeste #teamDialog .team-list{
+ position:relative!important;isolation:isolate!important;padding:4px 8px 12px!important;
+}
+body.collection-theme-megacracks #teamDialog .team-option,
+body.collection-theme-ligaeste #teamDialog .team-option{position:relative!important;z-index:1!important}
+body.collection-theme-megacracks #teamDialog .team-option.world-option,
+body.collection-theme-ligaeste #teamDialog .team-option.world-option{
+ position:sticky!important;top:0!important;z-index:500!important;isolation:isolate!important;
+ margin:0 0 16px!important;background:#edf5ff!important;border:1px solid #d8e8fb!important;
+ overflow:hidden!important;
+ box-shadow:0 -16px 0 16px #fff,0 12px 0 8px #fff,0 16px 24px rgba(25,35,48,.12)!important;
+}
+body.collection-theme-megacracks #teamDialog .team-option:not(.world-option),
+body.collection-theme-ligaeste #teamDialog .team-option:not(.world-option){z-index:1!important}
+body.collection-theme-megacracks #teamDialog .team-option:not(.world-option) .ligaeste-team-crest,
+body.collection-theme-ligaeste #teamDialog .team-option:not(.world-option) .ligaeste-team-crest{z-index:1!important}
+/* El selector superior puede contener el badge real del especial */
+body.collection-theme-megacracks #currentTeamEmoji,
+body.collection-theme-ligaeste #currentTeamEmoji{display:inline-grid!important;place-items:center!important;width:52px!important;height:52px!important;min-width:52px!important;background:#fff!important;border-radius:13px!important;overflow:visible!important}
+body.collection-theme-megacracks #currentTeamEmoji[hidden],body.collection-theme-ligaeste #currentTeamEmoji[hidden]{display:none!important}
+body.collection-theme-megacracks #currentTeamEmoji .megacracks-special-badge,
+body.collection-theme-ligaeste #currentTeamEmoji .ligaeste-insert-mark{width:44px!important;height:44px!important;min-width:44px!important;margin:0!important}
