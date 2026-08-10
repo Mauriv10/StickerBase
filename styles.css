@@ -5832,3 +5832,24 @@ body.collection-theme-ligaeste .premium-search.has-search-results .search-wrap{
 body.collection-theme-ligaeste .top-feedback-capsule{
   z-index:200000!important;
 }
+
+/* Build 704.11.11 · estadísticas, intercambios y ajustes por colección */
+.collection-specific-stats{display:grid;gap:14px;margin:14px 0 20px}
+.collection-stats-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.collection-stat-card{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid #ebe7f0;border-radius:16px;padding:14px;box-shadow:0 8px 22px rgba(45,30,62,.06)}
+.collection-stat-card>span{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:900;font-size:18px}
+.collection-stat-card.total>span{background:#eee7ff;color:#6d28d9}.collection-stat-card.missing>span{background:#fff0ef;color:#d8392f}.collection-stat-card.repeats>span{background:#e9f9ef;color:#1b9a50}
+.collection-stat-card div{display:grid;gap:2px}.collection-stat-card small{font-weight:800;color:#6f6876}.collection-stat-card strong{font-size:24px}.collection-stat-card em{font-style:normal;font-size:11px;color:#98919e}
+.ligaeste-special-stat-title{display:flex;justify-content:space-between;align-items:end;margin-top:4px}.ligaeste-special-stat-title strong{font-size:20px}.ligaeste-special-stat-title small{color:#8b8492}
+.ligaeste-special-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ligaeste-special-stat-card{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e9e3ef;border-radius:15px;padding:11px}
+.ligaeste-special-stat-card img{width:42px;height:42px;border-radius:10px;object-fit:cover}.ligaeste-special-stat-card div{min-width:0;display:grid;gap:3px}.ligaeste-special-stat-card strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ligaeste-special-stat-card span{font-size:20px;font-weight:900;color:#6d28d9}
+body.collection-theme-ligaeste .ligaeste-row-stock.exchange{grid-template-columns:1fr 1fr;gap:5px;min-width:128px}
+.ligaeste-exchange-step{min-height:32px;border:0;border-radius:8px;padding:4px 7px;font-size:10px;font-weight:900;display:grid;place-items:center}
+.ligaeste-exchange-step.give{background:#fff0ef;color:#c7352c}.ligaeste-exchange-step.receive{background:#eee7ff;color:#6522c9}
+.ligaeste-exchange-step small{font-size:9px}
+.collection-settings-family{border:1px solid #ebe7f0;border-radius:15px;background:#fff;margin:10px 0;overflow:hidden}
+.collection-settings-family>header{display:flex;gap:11px;align-items:center;padding:13px 14px;background:#faf9fb}.collection-settings-family>header>span{font-size:22px}.collection-settings-family>header div{display:grid}.collection-settings-family>header small{color:#8b8492;margin-top:2px}
+.collection-settings-family.is-active{border-color:#cdb7f5;box-shadow:0 0 0 2px rgba(109,40,217,.06)}
+.collection-settings-inactive,.collection-settings-status{padding:12px 14px;color:#8b8492;font-size:12px}.collection-settings-status.active{color:#5b1fb4;font-weight:800;background:#f7f2ff}
+@media(max-width:520px){.collection-stats-summary-grid{grid-template-columns:1fr}.ligaeste-special-stat-grid{grid-template-columns:1fr 1fr}}
