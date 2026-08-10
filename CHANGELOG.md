@@ -1,4 +1,4 @@
-# Build 704.11.12
+# Build 704.11.13
 
 - Liga Este: cabecera fija compacta rediseñada; solo el área central hace scroll.
 - Selector general renombrado a «Todos los clubes».
@@ -7,7 +7,7 @@
 - Al seleccionar un insert se muestra su listado vertical con stock, igual que un club.
 - Brillantes y Colaboración permanecen ocultos en Liga Este.
 
-## 704.11.12 — Liga Este: identidad completa y clubes
+## 704.11.13 — Liga Este: identidad completa y clubes
 
 - Cabecera morada/dorada reforzada con insignia Liga Este 26/27.
 - Terminología contextual: Club, Elegir club y Todos los clubes.

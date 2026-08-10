@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.12";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.13";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2041,17 +2041,29 @@ function groupedExchange(type){
  Object.values(groups).forEach(items=>items.sort((a,b)=>Number(a.code)-Number(b.code)));
  return groups;
 }
+function exchangeItemDisplay(team,code){
+ const type=inferCollectionType(projects?.[activeProjectId]);
+ if(type==="liga-este-2026-27"){
+   const info=ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code);
+   return {code:String(code),name:info?.[0]||stickerDisplayLabel(team,code)};
+ }
+ if(type==="megacracks-2026-27"){
+   const info=globalThis.MEGACRACKS_ITEM_INFO?.[team]?.[code];
+   return {code:String(code),name:info?.[0]||info?.name||stickerDisplayLabel(team,code)};
+ }
+ return {code:String(code),name:""};
+}
 function renderExchangeList(){
  const groups=groupedExchange(exchangeListType);
  const teams=currentTeamOrder().filter(team=>groups[team]);
  if(!teams.length){$("#exchangeList").innerHTML="<p>No has marcado ningún cromo en esta lista.</p>";return}
  $("#exchangeList").innerHTML=teams.map(team=>`<section class="exchange-team-group">
    <div class="exchange-team-title">${flagHTML(team)}<span>${team}</span></div>
-   ${groups[team].map(item=>`<div class="exchange-item">
-     <strong>${item.code}</strong>
+   ${groups[team].map(item=>{const display=exchangeItemDisplay(team,item.code);return `<div class="exchange-item">
+     <div class="exchange-item-label"><strong>${collectionSafeText(display.code)}</strong>${display.name?`<span>${collectionSafeText(display.name)}</span>`:""}</div>
      <div class="exchange-item-controls"><button data-action="minus" data-team="${team}" data-code="${item.code}">−</button><b>x${item.qty}</b><button data-action="plus" data-team="${team}" data-code="${item.code}">+</button></div>
      <button class="exchange-remove" data-action="remove" data-team="${team}" data-code="${item.code}">Quitar</button>
-   </div>`).join("")}
+   </div>`}).join("")}
  </section>`).join("");
  $("#exchangeList").querySelectorAll("button").forEach(button=>button.onclick=()=>{
    const {team,code,action}=button.dataset,current=getExchangeQty(exchangeListType,team,code);
