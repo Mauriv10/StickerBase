@@ -6023,3 +6023,13 @@ body.collection-theme-ligaeste #currentTeamEmoji .ligaeste-insert-mark{width:44p
 .stickerbase-splash-logo{width:112px;height:112px;border-radius:28px;box-shadow:0 22px 55px rgba(0,0,0,.34);margin:auto}
 .stickerbase-wordmark{font-size:2.45rem!important;letter-spacing:-.055em;margin:12px 0 20px!important}.stickerbase-wordmark span{color:#36a9f5}.app-splash .splash-kicker{color:#a9b7c8}.app-splash p{color:#a9b7c8}.app-splash .splash-spinner{border-color:#26384c;border-top-color:#36a9f5}
 .stickerbase-auth-logo{width:86px;height:86px;border-radius:23px;display:block;margin:0 auto 18px;box-shadow:0 14px 34px rgba(15,30,50,.18)}
+
+/* Build 704.12.11 · Megacracks: Todos / Pedir / Entregar acompaña al contenido */
+body.collection-theme-megacracks .collection-tabs-sticky,
+body.collection-theme-megacracks #collectionStickyControls{
+  position:static!important;
+  top:auto!important;
+  inset:auto!important;
+  z-index:auto!important;
+  transform:none!important;
+}

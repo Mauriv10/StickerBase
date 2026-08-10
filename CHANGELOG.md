@@ -1,3 +1,6 @@
+## 704.12.11
+- Megacracks: la barra «Todos / Pedir / Entregar» deja de ser fija y se desplaza con el contenido, igual que en Liga Este.
+
 ## 704.12.10
 - Corregidos `start_url` y `scope` de la PWA a `/StickerBase/` tras renombrar el repositorio de GitHub Pages.
 - Caché/versionado actualizado para forzar la nueva instalación.
