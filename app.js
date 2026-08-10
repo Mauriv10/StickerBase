@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.17";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.11.18";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -27,8 +27,8 @@ const LIGA_ESTE_TEAMS={
  "Real Madrid CF":["01","02","03","04","05","06","07","08","09","10A","10B","11","12","13","14","15A","15B","16A","16B","17","18","19","20"],
  "Malaga CF":["01","02","03","04","05","06","07","08","09","10","11","12","13A","13B","14","15","16","17","18","19","20"],
  "Osasuna":["01","02","03","04","05A","05B","06","07","08","09","10","11","12","13A","13B","14","15","16","17","18","19","20"],
- "Racing de Santander":["01","02","03","04","05","06","07","08","09A","09B","10","11A","11B","12","13","14","15","16","17","18","19","20"],
- "Rayo Vallecano":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20"],
+ "Racing de Santander":["01","02","03","04","05","06","07","08","09A","09B","10","11","12","13","14","15","16","17","18","19","20"],
+ "Rayo Vallecano":["01","02","03","04","05","06","07","08","09","10","11A","11B","12","13","14","15","16","17","18","19","20"],
  "Real Sociedad":["01","02","03","04","05","06","07","08","09","10","11","12","13A","13B","14","15","16","17","18","19","20"],
  "Sevilla":["01","02","03","04","05","06","07","08","09A","09B","10","11","12","13","14","15","16","17","18","19","20"],
  "Valencia":["01","02","03","04","05","06","07","08A","08B","09","10","11","12","13","14","15","16","17","18","19","20A","20B"],
@@ -49,8 +49,8 @@ const LIGA_ESTE_TEAM_INFO={
  "Real Madrid CF":{"01":["Escudo","Escudo"],"02":["José Mourinho","Entrenador"],"03":["Courtois","Portero"],"04":["Lunin","Portero"],"05":["Trent","Defensa"],"06":["Militao","Defensa"],"07":["Asencio","Defensa"],"08":["Rüdiger","Defensa"],"09":["Huijsen","Defensa"],"10A":["Carreras","Defensa"],"10B":["Mendy","Defensa"],"11":["Tchouaméni","Medio"],"12":["Fede Valverde","Medio"],"13":["Camavinga","Medio"],"14":["Bellingham","Medio"],"15A":["Güler","Medio"],"15B":["Thiago Pitarch","Medio"],"16A":["Mastantuono","Medio"],"16B":["Brahim Díaz","Delantero"],"17":["Gonzalo","Delantero"],"18":["Rodrygo","Delantero"],"19":["Vinícius","Delantero"],"20":["Mbappé","Delantero"]},
  "Malaga CF":{"01":["Escudo","Escudo"],"02":["Juan Franisco Funes","Entrenador"],"03":["Alfonso Herrero","Portero"],"04":["Carlos López","Portero"],"05":["Puga","Defensa"],"06":["Murillo","Defensa"],"07":["Pendiente","Pendiente"],"08":["Einar Galilea","Defensa"],"09":["Rafita","Defensa"],"10":["Pendiente","Pendiente"],"11":["Izan Mérino","Medio"],"12":["Dani Lorenzo","Medio"],"13A":["Rafa Rodríguez","Medio"],"13B":["Juanpe","Medio"],"14":["Dotor","Medio"],"15":["Aarón Ochoa","Medio"],"16":["Larrubia","Delantero"],"17":["Lobete","Delantero"],"18":["Adrián Niño","Delantero"],"19":["Joaquín","Delantero"],"20":["Chupe","Delantero"]},
  "Osasuna":{"01":["Escudo","Escudo"],"02":["Luis Miguel Ramis","Entrenador"],"03":["Sergio Herrera","Portero"],"04":["Aitor Fernández","Portero"],"05A":["Rosier","Defensa"],"05B":["Arguibide","Defensa"],"06":["Boyomo","Defensa"],"07":["Herrando","Defensa"],"08":["Catena","Defensa"],"09":["Abel Bretones","Defensa"],"10":["Osambela","Medio"],"11":["Torró","Medio"],"12":["Moncayola","Medio"],"13A":["Moi Gómez","Medio"],"13B":["Iker Muñoz","Medio"],"14":["Rubén García","Medio"],"15":["Aimar Oroz","Medio"],"16":["Iker Benito","Medio"],"17":["Raúl Moro","Delantero"],"18":["Raúl García","Delantero"],"19":["Kike Barja","Delantero"],"20":["Budimir","Delantero"]},
- "Racing de Santander":{"01":["Escudo","Escudo"],"02":["José Alberto López","Entrenador"],"03":["Pendiente","Pendiente"],"04":["Eriksson","Portero"],"05":["Mantilla","Defensa"],"06":["Sangalli","Defensa"],"07":["Facu González","Defensa"],"08":["Javi Castro","Defensa"],"09A":["Manu Hernando","Defensa"],"09B":["Mario García","Defensa"],"10":["Jorge Salinas","Defensa"],"11A":["Maguette","Medio"],"11B":["Nteka","Medio"],"12":["Gustavo Puerta","Medio"],"13":["Íñigo","Medio"],"14":["Aldasoro","Medio"],"15":["Suleiman","Delantero"],"16":["Andrés Martín","Delantero"],"17":["Guliashvili","Delantero"],"18":["Íñigo Vicente","Delantero"],"19":["Arana","Delantero"],"20":["Villalibre","Delantero"]},
- "Rayo Vallecano":{"01":["Escudo","Escudo"],"02":["Beñat San José","Entrenador"],"03":["Batalla","Portero"],"04":["Cárdenas","Portero"],"05":["Ratiu","Defensa"],"06":["Balliu","Defensa"],"07":["Nobel Mendy","Defensa"],"08":["Lejeune","Defensa"],"09":["Luiz Felipe","Defensa"],"10":["Pep Chavarría","Defensa"],"11":["Pedro Díaz","Medio"],"12":["Pathé Ciss","Medio"],"13":["Óscar Valentín","Medio"],"14":["Unai López","Medio"],"15":["Isi","Medio"],"16":["De Frutos","Delantero"],"17":["Fran Pérez","Delantero"],"18":["Álvaro García","Delantero"],"19":["Camello","Delantero"],"20":["Alemao","Delantero"]},
+ "Racing de Santander":{"01":["Escudo","Escudo"],"02":["José Alberto López","Entrenador"],"03":["Pendiente","Pendiente"],"04":["Eriksson","Portero"],"05":["Mantilla","Defensa"],"06":["Sangalli","Defensa"],"07":["Facu González","Defensa"],"08":["Javi Castro","Defensa"],"09A":["Manu Hernando","Defensa"],"09B":["Mario García","Defensa"],"10":["Jorge Salinas","Defensa"],"11":["Maguette","Medio"],"12":["Gustavo Puerta","Medio"],"13":["Íñigo","Medio"],"14":["Aldasoro","Medio"],"15":["Suleiman","Delantero"],"16":["Andrés Martín","Delantero"],"17":["Guliashvili","Delantero"],"18":["Íñigo Vicente","Delantero"],"19":["Arana","Delantero"],"20":["Villalibre","Delantero"]},
+ "Rayo Vallecano":{"01":["Escudo","Escudo"],"02":["Beñat San José","Entrenador"],"03":["Batalla","Portero"],"04":["Cárdenas","Portero"],"05":["Ratiu","Defensa"],"06":["Balliu","Defensa"],"07":["Nobel Mendy","Defensa"],"08":["Lejeune","Defensa"],"09":["Luiz Felipe","Defensa"],"10":["Pep Chavarría","Defensa"],"11A":["Pedro Díaz","Medio"],"11B":["Nteka","Medio"],"12":["Pathé Ciss","Medio"],"13":["Óscar Valentín","Medio"],"14":["Unai López","Medio"],"15":["Isi","Medio"],"16":["De Frutos","Delantero"],"17":["Fran Pérez","Delantero"],"18":["Álvaro García","Delantero"],"19":["Camello","Delantero"],"20":["Alemao","Delantero"]},
  "Real Sociedad":{"01":["Escudo","Escudo"],"02":["Pellegrino Matarazzo","Entrenador"],"03":["Remiro","Portero"],"04":["Marrero","Portero"],"05":["Aramburu","Defensa"],"06":["Zubeldia","Defensa"],"07":["Jon Martín","Defensa"],"08":["Sergio Gómez","Defensa"],"09":["Aihen Muñoz","Defensa"],"10":["Gorrotxategi","Medio"],"11":["Pablo Marín","Medio"],"12":["Turrientes","Medio"],"13A":["Yangel Herrera","Medio"],"13B":["Pendiente","Pendiente"],"14":["Carlos Soler","Medio"],"15":["Sucic","Medio"],"16":["Barrenetxea","Delantero"],"17":["Kubo","Delantero"],"18":["Guedes","Delantero"],"19":["Oskarsson","Delantero"],"20":["Oyarzabal","Delantero"]},
  "Sevilla":{"01":["Escudo","Escudo"],"02":["Luis García","Entrenador"],"03":["Vlachodimos","Portero"],"04":["Pendiente","Pendiente"],"05":["Carmona","Defensa"],"06":["Juanlu","Defensa"],"07":["Kike Salas","Defensa"],"08":["Nianzou","Defensa"],"09A":["Castrín","Defensa"],"09B":["Marcao","Defensa"],"10":["Suazo","Defensa"],"11":["Oso","Medio"],"12":["Agoumé","Medio"],"13":["Pendiente","Pendiente"],"14":["Sow","Medio"],"15":["Vargas","Medio"],"16":["Manu Bueno","Medio"],"17":["Peque","Delantero"],"18":["Ejuke","Delantero"],"19":["Akor Adams","Delantero"],"20":["Isaac Romero","Delantero"]},
  "Valencia":{"01":["Escudo","Escudo"],"02":["Carlos Corberán","Entrenador"],"03":["Dimitrievski","Portero"],"04":["Rivero","Portero"],"05":["Foulquier","Defensa"],"06":["Copete","Defensa"],"07":["Tárrega","Defensa"],"08A":["Cömert","Defensa"],"08B":["Diakhaby","Defensa"],"09":["Gayà","Defensa"],"10":["Jesús Vázquez","Defensa"],"11":["Pepelu","Medio"],"12":["Guido Rodríguez","Medio"],"13":["Javi Guerra","Medio"],"14":["Luis Rioja","Medio"],"15":["Ugrinic","Medio"],"16":["André Almeida","Medio"],"17":["Hugo Duro","Delantero"],"18":["Diego López","Delantero"],"19":["Ramazani","Delantero"],"20A":["Sadiq","Delantero"],"20B":["Lucas Beltrán","Delantero"]},
@@ -254,6 +254,30 @@ function currentTeamOrder(){return projectTeamOrder(projects?.[activeProjectId],
 function ensureProjectInventorySchema(project){
  if(!project||!project.inventory)return;
  project.collectionType=inferCollectionType(project);
+ if(project.collectionType==="liga-este-2026-27"){
+   // 704.11.18: corrige la asignación del nº 11 preservando el inventario existente.
+   const racing=project.inventory["Racing de Santander"]||{};
+   const rayo=project.inventory["Rayo Vallecano"]||{};
+   const hasOldRacing=Object.prototype.hasOwnProperty.call(racing,"11A")||Object.prototype.hasOwnProperty.call(racing,"11B");
+   const hasOldRayo=Object.prototype.hasOwnProperty.call(rayo,"11");
+   if(hasOldRacing||hasOldRayo){
+     if(hasOldRacing){
+       racing["11"]=(Number(racing["11"])||0)+(Number(racing["11A"])||0);
+       rayo["11B"]=(Number(rayo["11B"])||0)+(Number(racing["11B"])||0);
+       delete racing["11A"]; delete racing["11B"];
+     }
+     if(hasOldRayo){
+       rayo["11A"]=(Number(rayo["11A"])||0)+(Number(rayo["11"])||0);
+       delete rayo["11"];
+     }
+   }
+   // Completa únicamente claves inexistentes; nunca reinicia cantidades guardadas.
+   for(const [team,codes] of Object.entries(LIGA_ESTE_TEAMS)){
+     if(!project.inventory[team])project.inventory[team]={};
+     for(const code of codes)if(!Object.prototype.hasOwnProperty.call(project.inventory[team],code))project.inventory[team][code]=0;
+   }
+   return;
+ }
  if(project.collectionType!=="world-cup-2026")return;
  // FWC se mostraba antiguamente como 01–20. La app usa ahora los códigos reales 00–19.
  const currentFwc=project.inventory.FWC||{};
