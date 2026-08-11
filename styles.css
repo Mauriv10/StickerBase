@@ -6084,3 +6084,16 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 .trade-qr-gallery h3{margin:0 0 5px;font-size:18px}.trade-qr-gallery p{margin:0;color:#6f7680;line-height:1.4}
 .trade-qr-gallery button{grid-column:1/-1;width:100%;min-height:46px;margin-top:9px;border-radius:12px}.trade-qr-gallery small{grid-column:1/-1;min-height:16px;color:#6e7885;font-weight:700;text-align:center}
 @media(max-width:600px){.trade-protection-row .ligaeste-crest-wrap,.trade-protection-row .megacracks-special-badge,.trade-protection-row .ligaeste-insert-mark{width:42px!important;height:42px!important;min-width:42px!important}.trade-protection-row img.ligaeste-team-crest{width:38px!important;height:38px!important;max-width:38px!important;max-height:38px!important}.trade-qr-gallery{padding:13px}}
+
+/* Build 704.12.16 · Analizar lista: resultados visibles y estado de stock */
+.trade-detected-list{display:grid;gap:10px;margin:14px 0}
+.trade-detected-item{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e0e6ee;border-radius:14px;background:#fff}
+.trade-detected-icon{width:44px;height:44px;display:grid;place-items:center;overflow:visible}
+.trade-detected-icon .ligaeste-crest-wrap,.trade-detected-icon .megacracks-special-badge{width:40px!important;height:40px!important;min-width:40px!important}
+.trade-detected-icon .ligaeste-team-crest{width:36px!important;height:36px!important;max-width:36px!important;max-height:36px!important;object-fit:contain!important}
+.trade-detected-copy{min-width:0;display:grid;gap:2px}.trade-detected-copy strong{font-size:.94rem;color:#172131;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trade-detected-copy small{font-size:.76rem;color:#778393;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade-detected-stock{font-size:.74rem;font-weight:800}.trade-detected-stock.available{color:#138a52}.trade-detected-stock.unavailable{color:#c43b35}
+.trade-detected-owned{font-weight:900;color:#4e5b6b;font-size:.9rem}
+.trade-no-offer{margin:12px 0;padding:12px 14px;border-radius:14px;background:#fff4ef;color:#a83e32;font-size:.86rem;font-weight:700}
+.trade-main-action:disabled{opacity:.48;filter:grayscale(.25);cursor:not-allowed}
+@media(prefers-color-scheme:dark){.trade-detected-item{background:#111b28;border-color:#2c3a4d}.trade-detected-copy strong{color:#f3f6fa}.trade-detected-copy small{color:#9eacbd}.trade-detected-owned{color:#d1dae5}.trade-no-offer{background:#35201c;color:#ffb0a7}}

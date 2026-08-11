@@ -1,8 +1,8 @@
-## 704.12.15
-- Comparar mediante QR: sustituido "Copiar enlace" por "Descargar QR".
-- El QR se genera como PNG con identidad StickerBase y nombre de la colección.
-- En dispositivos compatibles se abre la hoja de compartir para poder guardar la imagen en Fotos; en el resto se descarga el PNG.
-- Añadido feedback visual al generar/guardar el QR.
+## 704.12.16
+- Analizar lista muestra ahora todas las cards detectadas, con jugador, apartado, número y stock.
+- Las coincidencias sin stock siguen apareciendo y se marcan como no disponibles para ofrecer.
+- Mejorado el reconocimiento jugador + categoría especial (ej.: `lamine gold`, `yamal gold`, `lamine special one gold`).
+- Los botones de copiar/preparar explican su estado cuando no hay unidades disponibles.
 
 ## 704.12.14
 - Favoritos y protegidos: escudos de clubes completos, sin recorte de bandera.

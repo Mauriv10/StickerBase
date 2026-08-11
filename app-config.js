@@ -1,6 +1,6 @@
 globalThis.WC26_CONFIG = {
-  version: "704.12.15",
-  cacheName: "wc26-build-704-12-15",
+  version: "704.12.16",
+  cacheName: "wc26-build-704-12-16",
   versionUrl: "./version.json",
   updateCheckIntervalMs: 15 * 60 * 1000
 };
