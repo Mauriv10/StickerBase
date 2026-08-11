@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.13";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.14";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3451,8 +3451,13 @@ $("#openQrCompareButton")?.addEventListener("click",openQrCompare);
 $("#closeQrCompareDialog")?.addEventListener("click",closeQrCompare);
 $("#startQrCompareScanner")?.addEventListener("click",startQrScanner);
 $("#qrCompareDialog")?.addEventListener("close",stopQrScanner);
-$("#compareQrPasteButton")?.addEventListener("click",()=>{const value=$("#qrComparePaste")?.value.trim();if(value)showQrComparison(value);else showToast("Pega primero el código o enlace de StickerBase")});
-$("#copyQrCompareLink")?.addEventListener("click",async()=>{try{await copyShareText(qrCompareUrl());showToast("Enlace de comparación copiado ✓")}catch{showToast("No se pudo copiar")}});
+$("#copyQrCompareLink")?.addEventListener("click",async event=>{
+ const button=event.currentTarget,original=button.textContent;
+ try{await copyShareText(qrCompareUrl());button.textContent="Copiado ✓";button.classList.add("is-success");if(navigator.vibrate)navigator.vibrate(18);showToast("Enlace de comparación copiado ✓");setTimeout(()=>{button.textContent=original;button.classList.remove("is-success")},1400)}
+ catch{button.textContent="Error al copiar";button.classList.add("is-error");showToast("No se pudo copiar");setTimeout(()=>{button.textContent=original;button.classList.remove("is-error")},1400)}
+});
+$("#pickQrCompareImage")?.addEventListener("click",()=>$("#qrCompareImageInput")?.click());
+$("#qrCompareImageInput")?.addEventListener("change",event=>{const file=event.currentTarget.files?.[0];if(file)readQrCompareImage(file);event.currentTarget.value=""});
 
 
 const QR_COLLECTION_CODE={"world-cup-2026":"W","liga-este-2026-27":"L","megacracks-2026-27":"M"};
@@ -3491,8 +3496,25 @@ async function startQrScanner(){
  if(!("BarcodeDetector" in window)){showToast("En este iPhone usa la app Cámara: escanea el QR y abre el enlace de StickerBase.");return;}
  try{const formats=await BarcodeDetector.getSupportedFormats();if(!formats.includes("qr_code"))throw new Error();const detector=new BarcodeDetector({formats:["qr_code"]}),video=$("#qrCompareVideo");qrCompareStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});video.srcObject=qrCompareStream;video.hidden=false;await video.play();const scan=async()=>{if(!qrCompareStream)return;try{const codes=await detector.detect(video);if(codes[0]?.rawValue){showQrComparison(codes[0].rawValue);return}}catch{}qrCompareScanTimer=requestAnimationFrame(scan)};scan();}catch{stopQrScanner();showToast("No se pudo abrir el lector. Usa la Cámara del móvil y abre el enlace del QR.");}
 }
+async function qrImageSource(file){
+ if("createImageBitmap" in window){try{return await createImageBitmap(file)}catch{}}
+ return await new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("No se pudo abrir la imagen"))};img.src=url});
+}
+async function decodeQrFromImageFile(file){
+ const source=await qrImageSource(file),width=source.naturalWidth||source.width,height=source.naturalHeight||source.height;if(!width||!height)throw new Error("Imagen no válida");
+ const maxSide=1800,scale=Math.min(1,maxSide/Math.max(width,height)),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(source,0,0,canvas.width,canvas.height);if(source.close)try{source.close()}catch{}
+ if("BarcodeDetector" in window){try{const formats=await BarcodeDetector.getSupportedFormats();if(formats.includes("qr_code")){const codes=await new BarcodeDetector({formats:["qr_code"]}).detect(canvas);if(codes[0]?.rawValue)return codes[0].rawValue}}catch{}}
+ if(typeof globalThis.jsQR==="function"){const image=ctx.getImageData(0,0,canvas.width,canvas.height),result=globalThis.jsQR(image.data,image.width,image.height,{inversionAttempts:"attemptBoth"});if(result?.data)return result.data}
+ throw new Error("No se ha encontrado ningún QR legible en la captura");
+}
+async function readQrCompareImage(file){
+ const button=$("#pickQrCompareImage"),status=$("#qrCompareImageStatus"),original=button?.textContent||"Elegir captura";if(button){button.disabled=true;button.textContent="Analizando…"}if(status)status.textContent="Buscando el QR en la imagen…";
+ try{const raw=await decodeQrFromImageFile(file);if(status)status.textContent="QR detectado ✓";if(button){button.textContent="QR detectado ✓";button.classList.add("is-success")}showQrComparison(raw);showToast("QR de la captura leído correctamente ✓");}
+ catch(error){if(status)status.textContent=error.message||"No se pudo leer el QR";if(button){button.textContent="Probar otra captura";button.classList.add("is-error")}showToast(error.message||"No se pudo leer el QR de la imagen");}
+ finally{if(button){button.disabled=false;setTimeout(()=>{button.textContent=original;button.classList.remove("is-success","is-error")},1800)}}
+}
 function openQrCompare(){
- const dialog=$("#qrCompareDialog");if(!dialog)return;$("#qrCompareIntro").hidden=false;$("#qrCompareResult").hidden=true;$("#qrComparePaste").value="";stopQrScanner();const url=qrCompareUrl();renderQrMatrix($("#qrCompareCode"),url);$("#qrCompareCollection").textContent=collectionTypeLabel(inferCollectionType(projects?.[activeProjectId]));if(!dialog.open)dialog.showModal();
+ const dialog=$("#qrCompareDialog");if(!dialog)return;$("#qrCompareIntro").hidden=false;$("#qrCompareResult").hidden=true;const status=$("#qrCompareImageStatus");if(status)status.textContent="";stopQrScanner();const url=qrCompareUrl();renderQrMatrix($("#qrCompareCode"),url);$("#qrCompareCollection").textContent=collectionTypeLabel(inferCollectionType(projects?.[activeProjectId]));if(!dialog.open)dialog.showModal();
 }
 function closeQrCompare(){stopQrScanner();$("#qrCompareDialog")?.close();}
 function handleIncomingQrCompare(){const url=new URL(location.href),payload=url.searchParams.get("sbcompare");if(!payload)return;url.searchParams.delete("sbcompare");history.replaceState({},"",url.toString());setTimeout(()=>{openQrCompare();showQrComparison(payload)},180);}

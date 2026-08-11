@@ -6063,3 +6063,24 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 .trade-qr-paste{margin-top:12px;background:#fff;border:1px solid #dfe4ea;border-radius:16px;padding:12px}.trade-qr-paste summary{font-weight:800;cursor:pointer}.trade-qr-paste textarea{width:100%;margin:10px 0 8px;border:1px solid #d8dde4;border-radius:12px;padding:10px;resize:none}.trade-qr-paste button{width:100%;min-height:42px}
 .trade-qr-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}.trade-qr-summary>div{background:#fff;border:1px solid #dfe4ea;border-radius:16px;padding:14px}.trade-qr-summary span{display:block;color:#747b85;font-size:11px;font-weight:800}.trade-qr-summary strong{font-size:28px;color:#111820}.trade-qr-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}.trade-qr-columns>section{background:#fff;border:1px solid #dfe4ea;border-radius:18px;padding:12px}.trade-qr-columns h3{margin:0 0 10px}.trade-qr-team{border-top:1px solid #edf0f3;padding:9px 0}.trade-qr-team:first-of-type{border-top:0}.trade-qr-team header{display:flex;align-items:center;gap:8px;margin-bottom:6px}.trade-qr-team header .flag,.trade-qr-team header .ligaeste-crest-wrap,.trade-qr-team header .megacracks-special-badge{transform:scale(.72);transform-origin:left center;margin-right:-8px}.trade-qr-team>div{display:flex;justify-content:space-between;gap:8px;padding:4px 2px;font-size:12px}.trade-qr-team>div>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.trade-qr-empty{padding:14px;color:#7a818b;text-align:center}.trade-protection-row>div:first-child>span{min-width:0}.trade-protection-row>div:first-child strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:600px){.trade-qr-dialog{width:calc(100vw - 16px);border-radius:24px}.trade-qr-body{padding:13px}.trade-qr-own{grid-template-columns:125px 1fr;gap:12px;padding:12px}.trade-qr-code{width:125px;height:125px}.trade-qr-own h3{font-size:17px}.trade-qr-columns{grid-template-columns:1fr}.trade-qr-summary strong{font-size:24px}}
+
+
+/* Build 704.12.14 · Favoritos: escudos completos + QR desde Fotos */
+.trade-protection-row .ligaeste-crest-wrap{
+ width:44px!important;height:44px!important;min-width:44px!important;flex:0 0 44px!important;
+ display:inline-grid!important;place-items:center!important;position:relative!important;overflow:visible!important;
+ background:#fff!important;border-radius:10px!important;
+}
+.trade-protection-row img.ligaeste-team-crest{
+ width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important;
+ object-fit:contain!important;object-position:center!important;border-radius:8px!important;background:#fff!important;
+}
+.trade-protection-row .ligaeste-crest-fallback{position:absolute!important;inset:2px!important;display:grid;place-items:center;border-radius:8px;background:#eef0f3;color:#333840;font-size:10px;font-weight:900}
+.trade-protection-row .megacracks-special-badge,.trade-protection-row .ligaeste-insert-mark{width:44px!important;height:44px!important;min-width:44px!important;flex:0 0 44px!important}
+.trade-qr-own button{transition:transform .12s ease,background-color .18s ease,color .18s ease;border-color .18s ease}
+.trade-qr-own button:active,.trade-qr-gallery button:active{transform:scale(.97)}
+.trade-qr-gallery{margin-top:14px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:4px 12px;align-items:center;padding:16px;background:#fff;border:1px solid #dfe4ea;border-radius:20px}
+.trade-qr-gallery-icon{grid-row:1/3;width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:#edf5ff;color:#1479c9;font-size:25px;font-weight:900}
+.trade-qr-gallery h3{margin:0 0 5px;font-size:18px}.trade-qr-gallery p{margin:0;color:#6f7680;line-height:1.4}
+.trade-qr-gallery button{grid-column:1/-1;width:100%;min-height:46px;margin-top:9px;border-radius:12px}.trade-qr-gallery small{grid-column:1/-1;min-height:16px;color:#6e7885;font-weight:700;text-align:center}
+@media(max-width:600px){.trade-protection-row .ligaeste-crest-wrap,.trade-protection-row .megacracks-special-badge,.trade-protection-row .ligaeste-insert-mark{width:42px!important;height:42px!important;min-width:42px!important}.trade-protection-row img.ligaeste-team-crest{width:38px!important;height:38px!important;max-width:38px!important;max-height:38px!important}.trade-qr-gallery{padding:13px}}

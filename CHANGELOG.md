@@ -1,3 +1,9 @@
+## 704.12.14
+- Favoritos y protegidos: escudos de clubes completos, sin recorte de bandera.
+- QR: feedback visual al copiar el enlace.
+- QR: sustituida la entrada manual por importación de una captura desde Fotos/galería.
+- QR: lectura de imágenes mediante BarcodeDetector cuando está disponible y jsQR como respaldo.
+
 ## 704.12.13
 - Analizar lista reforzado en Liga Este y Megacracks: admite club + números, jugador, número único, cantidades, rangos, abreviaturas y formatos mixtos.
 - Favoritos y protegidos habilitados correctamente para Liga Este y Megacracks, incluyendo nombres de jugadores en el gestor.
