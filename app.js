@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.17";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.18";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1644,24 +1644,47 @@ function renderBalancedTrade(box,available,normalNeeded,specialNeeded,collaborat
  const exactItems=(available||[]).map(item=>({...item,selectedUnits:Math.max(1,Math.min(Number(item.available)||1,Number(item.requestedUnits)||1))})),delivered=exactItems.reduce((sum,item)=>sum+(item.selectedUnits||1),0);
  const canApply=Array.isArray(receivedItems)&&receivedItems.length>0;
  const receivedUnits=canApply?receivedItems.reduce((sum,item)=>sum+Math.max(1,Number(item.selectedUnits||item.requestedUnits)||1),0):(Number(normalNeeded)||0)+(Number(specialNeeded)||0)+(Number(collaborationNeeded)||0);
- box.innerHTML=`${canApply?`<div class="trade-receive-summary"><div class="trade-clean-status"><strong>Vas a recibir · ${receivedUnits}</strong></div><div class="balanced-sticker-list">${renderBalancedStickerList(receivedItems.map(item=>({...item,selectedUnits:Math.max(1,Number(item.requestedUnits)||1)})))}</div></div>`:""}<div class="trade-clean-status"><strong>Vas a entregar · ${delivered}</strong></div>${exactItems.length?`<div class="balanced-sticker-list">${renderBalancedStickerList(exactItems)}</div><button id="copyBalancedTrade" class="primary trade-main-action" type="button">Copiar intercambio</button><button id="completeAssistantTrade" class="trade-main-action complete-trade-action" type="button" ${canApply?"":"disabled"}>Completar intercambio</button>${canApply?"":`<p class="trade-clean-note">Para actualizar el inventario automáticamente, pega la lista exacta que vas a recibir.</p>`}`:`<p class="trade-clean-note">No has seleccionado ningún cromo para entregar.</p>`}`;
+ box.innerHTML=`${canApply?`<div class="trade-receive-summary"><div class="trade-clean-status"><strong>Vas a recibir · ${receivedUnits}</strong></div><div class="balanced-sticker-list">${renderBalancedStickerList(receivedItems.map(item=>({...item,selectedUnits:Math.max(1,Number(item.selectedUnits||item.requestedUnits)||1)})))}</div></div>`:""}<div class="trade-clean-status"><strong>Vas a entregar · ${delivered}</strong></div>${exactItems.length?`<div class="balanced-sticker-list">${renderBalancedStickerList(exactItems)}</div><button id="copyBalancedTrade" class="primary trade-main-action" type="button">Copiar intercambio</button><button id="completeAssistantTrade" class="trade-main-action complete-trade-action" type="button" ${canApply?"":"disabled"}>Completar intercambio</button>${canApply?"":`<p class="trade-clean-note">Para actualizar el inventario automáticamente, pega la lista exacta que vas a recibir.</p>`}`:`<p class="trade-clean-note">No has seleccionado ningún cromo para entregar.</p>`}`;
  $("#copyBalancedTrade")?.addEventListener("click",async event=>{const fb=actionFeedback(event.currentTarget,{busy:"Copiando…",done:"Copiado ✓"});try{await copyShareText(tradeCopyLines(exactItems,true).join("\n"));fb.success();}catch{fb.fail("Error");}});
  $("#completeAssistantTrade")?.addEventListener("click",event=>applyAssistantTrade(receivedItems,exactItems,event.currentTarget));
 }
 function tradeAmbiguousGroups(items){
  const groups=new Map();for(const item of items){const key=tradeSourceKey(item);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(item);}return [...groups.entries()].filter(([,rows])=>rows.length>1);
 }
+function receiveSelectionForSource(source){
+ let bucket=tradeReceiveSelection.get(source);
+ if(!(bucket instanceof Map)){bucket=new Map();tradeReceiveSelection.set(source,bucket);}
+ return bucket;
+}
+function receivedChoiceQty(source,key){return Math.max(0,Number(receiveSelectionForSource(source).get(key))||0)}
+function setReceivedChoiceQty(source,key,qty){
+ const bucket=receiveSelectionForSource(source),next=Math.max(0,Number(qty)||0);
+ if(next)bucket.set(key,next);else bucket.delete(key);
+ if(!bucket.size)tradeReceiveSelection.delete(source);
+ return next;
+}
 function resolveReceivedTradeItems(parsed){
  const groups=new Map();for(const item of parsed.found){const key=tradeSourceKey(item);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(item);}
  const selected=[],ambiguous=[];
- for(const [source,rows] of groups){if(rows.length===1){selected.push(rows[0]);continue;}const wanted=tradeReceiveSelection.get(source),hit=rows.find(item=>tradeStickerKey(item)===wanted);if(hit)selected.push(hit);else ambiguous.push({source,rows});}
+ for(const [source,rows] of groups){
+   if(rows.length===1){selected.push({...rows[0],selectedUnits:Math.max(1,Number(rows[0].requestedUnits)||1)});continue;}
+   const bucket=tradeReceiveSelection.get(source),chosen=[];
+   if(bucket instanceof Map){for(const item of rows){const qty=Math.max(0,Number(bucket.get(tradeStickerKey(item)))||0);if(qty)chosen.push({...item,selectedUnits:qty,requestedUnits:qty});}}
+   if(chosen.length)selected.push(...chosen);else ambiguous.push({source,rows});
+ }
  return {selected,ambiguous};
 }
 function renderReceiveAmbiguities(root,groups){
  if(!groups.length){root.innerHTML="";return;}
  const type=inferCollectionType(projects?.[activeProjectId]);
- root.innerHTML=`<div class="trade-ambiguity-box"><strong>Elige la versión exacta que vas a recibir</strong><p>Hay nombres que coinciden con varias cards. StickerBase no elegirá por ti.</p>${groups.map(group=>`<section><small>${escapeTradeHtml(group.source)}</small>${group.rows.map(item=>`<button type="button" class="trade-choice-card" data-source="${escapeTradeHtml(group.source)}" data-key="${escapeTradeHtml(tradeStickerKey(item))}"><span>${flagHTML(item.team)}</span><b>${escapeTradeHtml(type==="world-cup-2026"?`${item.team} ${item.displayCode}`:clubTradeNameForItem(type,item))}</b><em>${escapeTradeHtml(item.team)} · ${escapeTradeHtml(item.displayCode)}</em></button>`).join("")}</section>`).join("")}</div>`;
- root.querySelectorAll(".trade-choice-card").forEach(button=>button.addEventListener("click",()=>{tradeReceiveSelection.set(button.dataset.source,button.dataset.key);button.closest("section")?.querySelectorAll(".trade-choice-card").forEach(x=>x.classList.toggle("selected",x===button));showToast("Versión seleccionada ✓");}));
+ root.innerHTML=`<div class="trade-ambiguity-box"><strong>Elige qué versiones vas a recibir</strong><p>Puedes seleccionar varias cards y repetir una misma versión. Usa − / + para indicar la cantidad exacta.</p>${groups.map(group=>`<section data-receive-source="${escapeTradeHtml(group.source)}"><small>${escapeTradeHtml(group.source)}</small>${group.rows.map(item=>{const key=tradeStickerKey(item),qty=receivedChoiceQty(group.source,key);return `<article class="trade-choice-card${qty?" selected":""}" data-source="${escapeTradeHtml(group.source)}" data-key="${escapeTradeHtml(key)}"><span class="trade-choice-icon">${flagHTML(item.team)}</span><div class="trade-choice-copy"><b>${escapeTradeHtml(type==="world-cup-2026"?`${item.team} ${item.displayCode}`:clubTradeNameForItem(type,item))}</b><em>${escapeTradeHtml(item.team)} · ${escapeTradeHtml(item.displayCode)}</em></div><div class="trade-choice-qty"><button type="button" data-choice-step="minus" aria-label="Restar unidad">−</button><output>${qty}</output><button type="button" class="primary" data-choice-step="plus" aria-label="Sumar unidad">+</button></div></article>`}).join("")}</section>`).join("")}<button type="button" id="confirmReceiveChoices" class="primary trade-main-action">Continuar con la selección</button></div>`;
+ root.querySelectorAll(".trade-choice-card").forEach(card=>{
+   const source=card.dataset.source,key=card.dataset.key,output=card.querySelector("output");
+   const update=delta=>{const next=setReceivedChoiceQty(source,key,receivedChoiceQty(source,key)+delta);output.textContent=String(next);card.classList.toggle("selected",next>0);if(navigator.vibrate)navigator.vibrate(8);};
+   card.querySelector('[data-choice-step="minus"]')?.addEventListener("click",()=>update(-1));
+   card.querySelector('[data-choice-step="plus"]')?.addEventListener("click",()=>update(1));
+ });
+ $("#confirmReceiveChoices")?.addEventListener("click",()=>{const missing=groups.some(group=>{const bucket=tradeReceiveSelection.get(group.source);return !(bucket instanceof Map)||![...bucket.values()].some(q=>Number(q)>0)});if(missing){showToast("Selecciona al menos una versión de cada coincidencia");return;}$("#generateBalancedTrade")?.click();});
 }
 function renderExchangeStep(available){
  const result=$("#tradeAnalyzerResult"),dialog=$("#tradeAnalyzerDialog");dialog?.classList.add("exchange-step");
@@ -1671,7 +1694,7 @@ function renderExchangeStep(available){
  const countState={normal:0,special:0,collaboration:0};
  const renderCount=(kind)=>{const out=$(kind==="normal"?"#tradeReceiveNormalCount":kind==="special"?"#tradeReceiveSpecialCount":"#tradeReceiveCollaborationCount");if(out)out.textContent=String(countState[kind]);};
  result.querySelectorAll(".trade-count-stepper").forEach(stepper=>{stepper.querySelectorAll("[data-count-action]").forEach(button=>button.addEventListener("click",()=>{const kind=stepper.dataset.countKind;const delta=button.dataset.countAction==="increase"?1:-1;countState[kind]=Math.max(0,countState[kind]+delta);renderCount(kind);if(navigator.vibrate)navigator.vibrate(8);}));});
- $("#generateBalancedTrade")?.addEventListener("click",event=>{const fb=actionFeedback(event.currentTarget,{busy:"Generando…",done:"Generado ✓"});let normalNeeded=0,specialNeeded=0,collaborationNeeded=0,receivedItems=null;const errors=$("#receivedListErrors");if(!$("#tradeReceiveListPanel").hidden){const received=parseTradeList($("#tradeReceiveList").value),resolved=resolveReceivedTradeItems(received);if(resolved.ambiguous.length){renderReceiveAmbiguities(errors,resolved.ambiguous);fb.fail("Elige la versión");return;}receivedItems=resolved.selected;normalNeeded=receivedItems.filter(x=>tradeStickerCategory(x)==="normal").reduce((sum,x)=>sum+Math.max(1,Number(x.requestedUnits)||1),0);specialNeeded=receivedItems.filter(x=>tradeStickerCategory(x)==="special").reduce((sum,x)=>sum+Math.max(1,Number(x.requestedUnits)||1),0);collaborationNeeded=receivedItems.filter(x=>tradeStickerCategory(x)==="collaboration").reduce((sum,x)=>sum+Math.max(1,Number(x.requestedUnits)||1),0);if(received.invalid.length){errors.innerHTML=`<details class="trade-ignored-lines"><summary>${received.invalid.length} ${received.invalid.length===1?"línea ignorada":"líneas ignoradas"}</summary>${renderInvalidLines(received.invalid)}</details>`;wireInvalidCorrections(errors);}else errors.innerHTML="";}else{normalNeeded=countState.normal;specialNeeded=countState.special;collaborationNeeded=countState.collaboration;receivedItems=null;errors.innerHTML="";}if(!normalNeeded&&!specialNeeded&&!collaborationNeeded){fb.fail("No hay cromos válidos");return;}renderBalancedTrade($("#balancedTradeResult"),available,normalNeeded,specialNeeded,collaborationNeeded,null,receivedItems);requestAnimationFrame(()=>{const body=$("#tradeAnalyzerBody"),target=$("#balancedTradeResult");if(body&&target)body.scrollTo({top:Math.max(0,target.offsetTop-16),behavior:"auto"});});fb.success();});
+ $("#generateBalancedTrade")?.addEventListener("click",event=>{const fb=actionFeedback(event.currentTarget,{busy:"Generando…",done:"Generado ✓"});let normalNeeded=0,specialNeeded=0,collaborationNeeded=0,receivedItems=null;const errors=$("#receivedListErrors");if(!$("#tradeReceiveListPanel").hidden){const received=parseTradeList($("#tradeReceiveList").value),resolved=resolveReceivedTradeItems(received);if(resolved.ambiguous.length){renderReceiveAmbiguities(errors,resolved.ambiguous);fb.fail("Elige la versión");return;}receivedItems=resolved.selected;normalNeeded=receivedItems.filter(x=>tradeStickerCategory(x)==="normal").reduce((sum,x)=>sum+Math.max(1,Number(x.selectedUnits||x.requestedUnits)||1),0);specialNeeded=receivedItems.filter(x=>tradeStickerCategory(x)==="special").reduce((sum,x)=>sum+Math.max(1,Number(x.selectedUnits||x.requestedUnits)||1),0);collaborationNeeded=receivedItems.filter(x=>tradeStickerCategory(x)==="collaboration").reduce((sum,x)=>sum+Math.max(1,Number(x.selectedUnits||x.requestedUnits)||1),0);if(received.invalid.length){errors.innerHTML=`<details class="trade-ignored-lines"><summary>${received.invalid.length} ${received.invalid.length===1?"línea ignorada":"líneas ignoradas"}</summary>${renderInvalidLines(received.invalid)}</details>`;wireInvalidCorrections(errors);}else errors.innerHTML="";}else{normalNeeded=countState.normal;specialNeeded=countState.special;collaborationNeeded=countState.collaboration;receivedItems=null;errors.innerHTML="";}if(!normalNeeded&&!specialNeeded&&!collaborationNeeded){fb.fail("No hay cromos válidos");return;}renderBalancedTrade($("#balancedTradeResult"),available,normalNeeded,specialNeeded,collaborationNeeded,null,receivedItems);requestAnimationFrame(()=>{const body=$("#tradeAnalyzerBody"),target=$("#balancedTradeResult");if(body&&target)body.scrollTo({top:Math.max(0,target.offsetTop-16),behavior:"auto"});});fb.success();});
 }
 function renderTradeDetectedItems(items,selectable=false,selectedKeys=new Set()){
  const type=inferCollectionType(projects?.[activeProjectId]);
