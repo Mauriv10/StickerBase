@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.11";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.12";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -289,6 +289,21 @@ function ensureProjectInventorySchema(project){
    return;
  }
  if(project.collectionType==="megacracks-2026-27"){
+   project.migrations=project.migrations||{};
+   // 704.12.12 · Levante: Carlos Espí pasa de 214 a 215. Movemos el stock una sola vez.
+   if(!project.migrations.megacracksLevanteEspi215){
+     const levante=project.inventory["Levante UD"]||{};
+     const oldQty=Number(levante["214"])||0;
+     if(oldQty>0){levante["215"]=(Number(levante["215"])||0)+oldQty;levante["214"]=0;}
+     // Renombre de la categoría manteniendo cualquier inventario de EL existente.
+     if(project.inventory["EDICIONES LIMITADAS"]){
+       const previous=project.inventory["EDICIONES LIMITADAS"];
+       const target=project.inventory["LIMITED EDITION"]||(project.inventory["LIMITED EDITION"]={});
+       Object.entries(previous).forEach(([code,qty])=>target[code]=(Number(target[code])||0)+(Number(qty)||0));
+       delete project.inventory["EDICIONES LIMITADAS"];
+     }
+     project.migrations.megacracksLevanteEspi215=true;
+   }
    for(const [team,codes] of Object.entries({...MEGACRACKS_TEAMS,...MEGACRACKS_SPECIALS})){if(!project.inventory[team])project.inventory[team]={};for(const code of codes)if(!Object.prototype.hasOwnProperty.call(project.inventory[team],code))project.inventory[team][code]=0;}
    return;
  }
@@ -339,6 +354,7 @@ function bootstrapProjectsFromSeed(seedData){
  seedProjects.forEach(seed=>{seed.collectionType=inferCollectionType(seed)});
  masterInventories=Object.fromEntries(seedProjects.map(seed=>[seed.seedType,structuredClone(seed.inventory)]));
  masterInventories["liga-este-2026-27-first-edition"]=collectionInventoryTemplate("liga-este-2026-27");
+ masterInventories["megacracks-2026-27-first-edition"]=collectionInventoryTemplate("megacracks-2026-27");
  originalInventory=structuredClone(masterInventories["world-cup-2026-main"]||originalInventory);
 
  // Build 700.7: los datos existentes pertenecen al usuario y nunca se sobrescriben
@@ -722,7 +738,7 @@ function megacracksSpecialBadgeHTML(team){
  const kind={
   "ÉLITE":"elite","ÉLITE POWER":"elite-power","ENJOY":"enjoy","ENJOY POWER":"enjoy-power",
   "ZONA VIP":"vip","ZONA VIP POWER":"vip-power","MASTER ROOKIE":"rookie","STARS ON 25":"stars",
-  "SPECIAL ONE BLACK":"black","SPECIAL ONE GOLD":"gold","EDICIONES LIMITADAS":"limited"
+  "SPECIAL ONE BLACK":"black","SPECIAL ONE GOLD":"gold","LIMITED EDITION":"limited"
  }[team]||"default";
  const icons={
   elite:`<svg viewBox="0 0 48 48"><path d="M24 5l5.5 11.2L42 18l-9 8.8 2.2 12.4L24 33.3l-11.2 5.9L15 26.8 6 18l12.5-1.8z"/></svg>`,
@@ -1244,7 +1260,9 @@ function normalizeTradeName(value){return String(value||"").normalize("NFD").rep
 const PANINI_NORMALIZED_NAME_TO_CODE=(()=>{const map={};Object.keys(PANINI_TEAM_CODES).forEach(code=>{map[normalizeTradeName(code)]=code;});Object.entries(PANINI_TEAM_NAME_ALIASES).forEach(([code,names])=>names.forEach(name=>map[normalizeTradeName(name)]=code));return map;})();
 const PANINI_SORTED_NAME_ALIASES=Object.keys(PANINI_NORMALIZED_NAME_TO_CODE).sort((a,b)=>b.length-a.length);
 function teamSearchText(team){
- if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"&&!isLigaEsteInsertTeam(team))return ligaEsteTeamSearchText(team);
+ const activeType=inferCollectionType(projects?.[activeProjectId]);
+ if(activeType==="liga-este-2026-27")return ligaEsteTeamSearchText(team);
+ if(activeType==="megacracks-2026-27")return megacracksTeamSearchText(team);
  const code=TEAM_TO_PANINI_CODE[team]||team;
  const aliases=PANINI_TEAM_NAME_ALIASES[code]||[];
  return normalizeTradeName([team,code,...aliases].join(" "));

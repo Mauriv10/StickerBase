@@ -6033,3 +6033,23 @@ body.collection-theme-megacracks #collectionStickyControls{
   z-index:auto!important;
   transform:none!important;
 }
+
+
+/* Build 704.12.12 · Megacracks buscador: escudos completos */
+body.collection-theme-megacracks #searchSuggestions .ligaeste-crest-wrap{
+ width:44px!important;height:44px!important;min-width:44px!important;flex:0 0 44px!important;
+ display:inline-grid!important;place-items:center!important;position:relative!important;overflow:visible!important;
+ background:#fff!important;border-radius:10px!important;
+}
+body.collection-theme-megacracks #searchSuggestions .ligaeste-team-crest{
+ width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important;
+ object-fit:contain!important;object-position:center!important;display:block!important;visibility:visible!important;opacity:1!important;
+ background:#fff!important;border-radius:8px!important;box-shadow:none!important;
+}
+body.collection-theme-megacracks #searchSuggestions .ligaeste-crest-fallback{
+ position:absolute!important;inset:2px!important;z-index:1!important;display:grid;place-items:center;
+ border-radius:8px;background:#eef0f3;color:#333840;font-size:10px;font-weight:900;
+}
+body.collection-theme-megacracks #searchSuggestions .suggestion{min-height:58px!important;padding:8px 12px!important;overflow:visible!important;}
+body.collection-theme-megacracks #searchSuggestions .suggestion>strong{min-width:0!important;}
+body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-left:auto!important;white-space:nowrap!important;}

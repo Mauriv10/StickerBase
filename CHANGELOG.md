@@ -1,3 +1,9 @@
+## 704.12.12
+- Megacracks: Carlos Espí corregido al nº 215; 214 pasa a Pendiente, migrando el stock existente una sola vez.
+- Buscador Megacracks ampliado a club, jugador y número; escudos completos en resultados.
+- Orden oficial de especiales ajustado: Enjoy, Enjoy Power, Zona VIP, Zona VIP Power, Master Rookie, Stars on 25, Élite, Élite Power, Special One Black, Special One Gold y Limited Edition.
+- Ediciones Limitadas pasa a mostrarse como Limited Edition conservando inventario existente.
+
 ## 704.12.11
 - Megacracks: la barra «Todos / Pedir / Entregar» deja de ser fija y se desplaza con el contenido, igual que en Liga Este.
 
