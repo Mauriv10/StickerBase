@@ -1,4 +1,10 @@
-## 704.12.16
+## 704.12.17
+- Analizar lista: las coincidencias ambiguas ya no se eligen automáticamente; el usuario selecciona la versión exacta que da y recibe.
+- Añadidos alias en español como `Oro` para Special One Gold.
+- El resumen final muestra nombre del futbolista, apartado y número tanto para entregar como para recibir.
+- Las cantidades recibidas se aplican correctamente al inventario.
+
+## 704.12.17
 - Analizar lista muestra ahora todas las cards detectadas, con jugador, apartado, número y stock.
 - Las coincidencias sin stock siguen apareciendo y se marcan como no disponibles para ofrecer.
 - Mejorado el reconocimiento jugador + categoría especial (ej.: `lamine gold`, `yamal gold`, `lamine special one gold`).
