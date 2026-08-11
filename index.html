@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="StickerBase">
-  <title>StickerBase · Build 704.12.15</title>
+  <title>StickerBase · Build 704.12.14</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="canonical" href="https://mauriv10.github.io/StickerBase/">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/stickerbase-180.png">
@@ -421,11 +421,21 @@
       <summary class="settings-group-title"><span class="settings-glyph blue">▦</span><div><strong>Colecciones visibles</strong><small>Organización y módulos por colección</small></div><span class="settings-chevron">›</span></summary>
       <div class="settings-group-content"><div id="collectionModuleSettings" class="collection-module-settings"></div></div>
     </details>
+
+    <details class="settings-group settings-accordion">
+      <summary class="settings-group-title"><span class="settings-glyph blue">↗</span><div><strong>Compartir StickerBase</strong><small>Invita a otro coleccionista mediante QR</small></div><span class="settings-chevron">›</span></summary>
+      <div class="settings-group-content">
+        <div class="share-stickerbase-settings-card">
+          <div><strong>Enseña tu QR</strong><small>La otra persona solo tiene que escanearlo para abrir StickerBase.</small></div>
+          <button id="openShareStickerBase" class="primary" type="button">Mostrar QR</button>
+        </div>
+      </div>
+    </details>
 <details class="settings-group settings-accordion info-group">
-      <summary class="settings-group-title"><span class="settings-glyph gray">i</span><div><strong>Información</strong><small id="appInfoSubtitle">Build 704.12.15</small></div><span class="settings-chevron">›</span></summary>
+      <summary class="settings-group-title"><span class="settings-glyph gray">i</span><div><strong>Información</strong><small id="appInfoSubtitle">Build 704.12.14</small></div><span class="settings-chevron">›</span></summary>
       <div class="settings-group-content">
         <div class="settings-info-list">
-          <div><span>Versión</span><strong id="appInfoVersion">Build 704.12.15 · Multicolección</strong></div>
+          <div><span>Versión</span><strong id="appInfoVersion">Build 704.12.14 · Multicolección</strong></div>
           <div><span>Modo</span><strong>Disponible offline</strong></div>
         </div>
       </div>
@@ -434,6 +444,26 @@
 </dialog>
 
 
+
+
+<dialog id="shareStickerBaseDialog" class="share-stickerbase-dialog">
+  <div class="share-stickerbase-header">
+    <div class="share-stickerbase-brand"><span class="share-stickerbase-mark">★</span><div><strong>Sticker<span>Base</span></strong><small>TU COLECCIÓN, SIEMPRE AL DÍA</small></div></div>
+    <button id="closeShareStickerBase" type="button" aria-label="Cerrar">✕</button>
+  </div>
+  <div class="share-stickerbase-body">
+    <span class="share-stickerbase-kicker">COMPARTE STICKERBASE</span>
+    <h2>Escanea y empieza a coleccionar</h2>
+    <p>Abre la cámara de tu móvil y apunta a este QR. No necesitas buscar StickerBase en ninguna tienda.</p>
+    <div id="shareStickerBaseQr" class="share-stickerbase-qr"></div>
+    <strong class="share-stickerbase-url">mauriv10.github.io/StickerBase/</strong>
+    <div class="share-stickerbase-actions">
+      <button id="nativeShareStickerBase" type="button" class="primary">Compartir enlace</button>
+      <button id="downloadShareStickerBaseQr" type="button" class="secondary">Guardar QR</button>
+    </div>
+    <small class="share-stickerbase-note">En iPhone: Safari → Compartir → Añadir a pantalla de inicio. En Android: Chrome → Instalar aplicación.</small>
+  </div>
+</dialog>
 
 </body>
 </html> 
@@ -786,7 +816,7 @@
   <div class="trade-qr-body">
     <section id="qrCompareIntro">
       <div class="trade-qr-collection"><span>COLECCIÓN ACTUAL</span><strong id="qrCompareCollection"></strong></div>
-      <div class="trade-qr-own"><div id="qrCompareCode" class="trade-qr-code"></div><div><h3>Mi QR</h3><p>Guarda el QR como imagen para enviárselo a otra persona, o deja que lo escanee directamente.</p><button id="downloadQrCompare" type="button" class="secondary">Descargar QR</button></div></div>
+      <div class="trade-qr-own"><div id="qrCompareCode" class="trade-qr-code"></div><div><h3>Mi QR</h3><p>Haz una captura de esta pantalla y envíasela a la otra persona, o deja que lo escanee directamente.</p><button id="copyQrCompareLink" type="button" class="secondary">Copiar enlace</button></div></div>
       <div class="trade-qr-scan"><h3>Escanear en directo</h3><p>Usa la cámara para leer el QR que muestra la otra persona.</p><button id="startQrCompareScanner" type="button" class="primary">Abrir cámara</button><video id="qrCompareVideo" playsinline muted hidden></video></div>
       <div class="trade-qr-gallery"><div class="trade-qr-gallery-icon">▧</div><div><h3>Importar captura desde Fotos</h3><p>Si te han enviado una captura del QR, selecciónala desde tu galería y StickerBase la analizará automáticamente.</p></div><input id="qrCompareImageInput" type="file" accept="image/*" hidden><button id="pickQrCompareImage" type="button" class="secondary">Elegir captura</button><small id="qrCompareImageStatus" aria-live="polite"></small></div>
     </section>

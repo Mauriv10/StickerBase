@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.20";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.21";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3641,6 +3641,68 @@ async function downloadQrCompareImage(event){
  finally{if(button){setTimeout(()=>{button.disabled=false;button.textContent=original;button.classList.remove("is-success","is-error")},1500)}}
 }
 function renderQrMatrix(container,text){if(!container||!globalThis.StickerBaseQRCode)return;const matrix=StickerBaseQRCode.matrix(text,"M"),n=matrix.length,quiet=4,size=n+quiet*2,svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox",`0 0 ${size} ${size}`);svg.setAttribute("role","img");svg.setAttribute("aria-label","QR de comparación StickerBase");svg.classList.add("trade-qr-svg");const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("width",size);bg.setAttribute("height",size);bg.setAttribute("fill","white");svg.appendChild(bg);matrix.forEach((row,y)=>row.forEach((dark,x)=>{if(!dark)return;const r=document.createElementNS(svg.namespaceURI,"rect");r.setAttribute("x",x+quiet);r.setAttribute("y",y+quiet);r.setAttribute("width",1);r.setAttribute("height",1);r.setAttribute("fill","#071018");svg.appendChild(r)}));container.replaceChildren(svg);}
+
+const STICKERBASE_PUBLIC_URL="https://mauriv10.github.io/StickerBase/";
+function openShareStickerBase(){
+ const dialog=$("#shareStickerBaseDialog");if(!dialog)return;
+ renderQrMatrix($("#shareStickerBaseQr"),STICKERBASE_PUBLIC_URL);
+ if($("#settingsDialog")?.open)$("#settingsDialog").close();
+ if(!dialog.open)dialog.showModal();
+}
+function closeShareStickerBase(){$("#shareStickerBaseDialog")?.close();}
+async function nativeShareStickerBase(){
+ const button=$("#nativeShareStickerBase"),original=button?.textContent||"Compartir enlace";
+ try{
+   if(button){button.disabled=true;button.textContent="Preparando…";}
+   const data={title:"StickerBase",text:"Prueba StickerBase · Tu colección, siempre al día",url:STICKERBASE_PUBLIC_URL};
+   if(navigator.share)await navigator.share(data);
+   else{
+     await navigator.clipboard.writeText(STICKERBASE_PUBLIC_URL);
+     showToast("Enlace de StickerBase copiado ✓");
+   }
+   if(button)button.textContent="Compartido ✓";
+ }catch(error){
+   if(error?.name!=="AbortError")showToast("No se pudo compartir StickerBase");
+ }finally{
+   if(button){button.disabled=false;setTimeout(()=>button.textContent=original,1400);}
+ }
+}
+async function downloadShareStickerBaseQr(){
+ const container=$("#shareStickerBaseQr"),svg=container?.querySelector("svg"),button=$("#downloadShareStickerBaseQr");
+ if(!svg)return;
+ const original=button?.textContent||"Guardar QR";
+ try{
+   if(button){button.disabled=true;button.textContent="Generando…";}
+   const xml=new XMLSerializer().serializeToString(svg);
+   const img=new Image();
+   const src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(xml);
+   await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=src;});
+   const size=1200,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;
+   const ctx=canvas.getContext("2d");ctx.fillStyle="#ffffff";ctx.fillRect(0,0,size,size);
+   ctx.drawImage(img,0,0,size,size);
+   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png",1));
+   if(!blob)throw new Error("No se pudo generar el QR");
+   const file=new File([blob],"StickerBase-QR.png",{type:"image/png"});
+   if(navigator.canShare?.({files:[file]})&&navigator.share){
+     await navigator.share({files:[file],title:"StickerBase",text:"Escanea este QR para probar StickerBase"});
+   }else{
+     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+   }
+   if(button)button.textContent="QR listo ✓";
+   showToast("QR de StickerBase listo ✓");
+ }catch(error){
+   if(error?.name!=="AbortError")showToast(error.message||"No se pudo guardar el QR");
+ }finally{
+   if(button){button.disabled=false;setTimeout(()=>button.textContent=original,1500);}
+ }
+}
+$("#openShareStickerBase")?.addEventListener("click",openShareStickerBase);
+$("#closeShareStickerBase")?.addEventListener("click",closeShareStickerBase);
+$("#nativeShareStickerBase")?.addEventListener("click",nativeShareStickerBase);
+$("#downloadShareStickerBaseQr")?.addEventListener("click",downloadShareStickerBaseQr);
+$("#shareStickerBaseDialog")?.addEventListener("click",event=>{if(event.target===event.currentTarget)closeShareStickerBase();});
+
+
 function qrCompareItemLabel(team,code){const type=inferCollectionType(projects?.[activeProjectId]);if(type==="liga-este-2026-27")return ligaEsteStickerInfo(team,code)?.[0]||ligaEsteInsertInfo(team,code)?.[0]||code;if(type==="megacracks-2026-27")return megacracksItemInfo(team,code)?.[0]||code;return `${TEAM_TO_PANINI_CODE[team]||team}${paniniDisplayCode(team,code)}`;}
 function compareQrInventory(peer){
  const type=inferCollectionType(projects?.[activeProjectId]);if(peer.type!==type)throw new Error(`Ese QR pertenece a ${collectionTypeLabel(peer.type)}. Abre una colección del mismo tipo.`);

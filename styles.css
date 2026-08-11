@@ -6136,3 +6136,18 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 .trade-detected-item.selected .trade-give-qty output{color:#1479cc}
 @media(max-width:420px){.trade-detected-item .trade-give-qty{grid-column:2/4;grid-template-columns:44px 38px 44px}.trade-detected-item .trade-give-qty button{width:44px;height:40px}}
 @media(prefers-color-scheme:dark){.trade-detected-item.selected .trade-give-qty output{color:#8dcbff}}
+
+/* Build 704.12.21 · Compartir StickerBase */
+.share-stickerbase-settings-card{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;border:1px solid #e0e5eb;border-radius:16px;background:#fff}
+.share-stickerbase-settings-card>div{display:grid;gap:3px;min-width:0}.share-stickerbase-settings-card strong{font-size:14px}.share-stickerbase-settings-card small{font-size:11px;color:#7a828d;line-height:1.35}
+.share-stickerbase-settings-card button{white-space:nowrap}
+.share-stickerbase-dialog{width:min(430px,calc(100vw - 20px));padding:0;border:0;border-radius:28px;background:#f6f8fb;box-shadow:0 28px 90px rgba(0,0,0,.38);overflow:hidden}
+.share-stickerbase-dialog::backdrop{background:rgba(5,10,18,.68);backdrop-filter:blur(9px)}
+.share-stickerbase-header{display:flex;align-items:center;justify-content:space-between;padding:17px 18px;background:linear-gradient(120deg,#071018,#172131);color:#fff}
+.share-stickerbase-brand{display:flex;align-items:center;gap:10px}.share-stickerbase-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#278ee8,#7653ff);font-size:20px}
+.share-stickerbase-brand>div{display:grid}.share-stickerbase-brand strong{font-size:20px;letter-spacing:-.03em}.share-stickerbase-brand strong span{color:#41aef5}.share-stickerbase-brand small{font-size:7px;letter-spacing:.13em;color:#aeb8c4;margin-top:2px}
+.share-stickerbase-header>button{width:38px;height:38px;border:0;border-radius:12px;background:rgba(255,255,255,.09);color:#fff;font-size:18px}
+.share-stickerbase-body{text-align:center;padding:22px 22px 20px}.share-stickerbase-kicker{font-size:9px;font-weight:950;letter-spacing:.16em;color:#268fdf}.share-stickerbase-body h2{font-size:25px;line-height:1.05;margin:7px 0 8px;color:#0b1119}.share-stickerbase-body>p{font-size:12px;line-height:1.45;color:#6d7580;margin:0 auto 17px;max-width:330px}
+.share-stickerbase-qr{width:230px;height:230px;margin:0 auto 10px;padding:10px;background:#fff;border-radius:22px;box-shadow:0 8px 30px rgba(23,37,53,.13);border:1px solid #e5e9ee}.share-stickerbase-qr .trade-qr-svg{width:100%;height:100%}
+.share-stickerbase-url{display:block;font-size:11px;color:#278fdf;margin:7px 0 16px}.share-stickerbase-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.share-stickerbase-actions button{min-height:45px;border-radius:13px;font-weight:850}.share-stickerbase-note{display:block;margin-top:13px;font-size:9px;line-height:1.4;color:#8a929d}
+@media(max-width:390px){.share-stickerbase-qr{width:210px;height:210px}.share-stickerbase-body{padding-left:16px;padding-right:16px}.share-stickerbase-actions{grid-template-columns:1fr}}

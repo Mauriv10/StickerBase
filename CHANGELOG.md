@@ -1,3 +1,8 @@
+## 704.12.21
+- Añadida función Compartir StickerBase en Ajustes.
+- Genera un QR directo a la URL oficial para enseñar a otros coleccionistas.
+- Permite compartir el enlace o guardar/compartir el QR como PNG.
+
 ## 704.12.20
 - Liga Este y Megacracks: los filtros «Me faltan» y «Repetidos» incluyen también especiales, inserts y paralelas.
 - Nuevo formato premium al compartir/copiar listas de Liga Este y Megacracks: clubes y especiales separados, con número, jugador y cantidades.
