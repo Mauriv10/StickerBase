@@ -1,4 +1,4 @@
-## 704.12.18
+## 704.12.19
 - Analizar lista: la selección de cromos a recibir ahora permite multiselección entre coincidencias.
 - Cada versión recibida admite cantidad independiente con controles − / + (x1, x2, x3…).
 - El resumen y la actualización de inventario respetan las cantidades seleccionadas.

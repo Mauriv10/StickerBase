@@ -6085,7 +6085,7 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 .trade-qr-gallery button{grid-column:1/-1;width:100%;min-height:46px;margin-top:9px;border-radius:12px}.trade-qr-gallery small{grid-column:1/-1;min-height:16px;color:#6e7885;font-weight:700;text-align:center}
 @media(max-width:600px){.trade-protection-row .ligaeste-crest-wrap,.trade-protection-row .megacracks-special-badge,.trade-protection-row .ligaeste-insert-mark{width:42px!important;height:42px!important;min-width:42px!important}.trade-protection-row img.ligaeste-team-crest{width:38px!important;height:38px!important;max-width:38px!important;max-height:38px!important}.trade-qr-gallery{padding:13px}}
 
-/* Build 704.12.18 · Analizar lista: resultados visibles y estado de stock */
+/* Build 704.12.19 · Analizar lista: resultados visibles y estado de stock */
 .trade-detected-list{display:grid;gap:10px;margin:14px 0}
 .trade-detected-item{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e0e6ee;border-radius:14px;background:#fff}
 .trade-detected-icon{width:44px;height:44px;display:grid;place-items:center;overflow:visible}
@@ -6098,7 +6098,7 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 .trade-main-action:disabled{opacity:.48;filter:grayscale(.25);cursor:not-allowed}
 @media(prefers-color-scheme:dark){.trade-detected-item{background:#111b28;border-color:#2c3a4d}.trade-detected-copy strong{color:#f3f6fa}.trade-detected-copy small{color:#9eacbd}.trade-detected-owned{color:#d1dae5}.trade-no-offer{background:#35201c;color:#ffb0a7}}
 
-/* Build 704.12.18 · resolución explícita de versiones en Analizar lista */
+/* Build 704.12.19 · resolución explícita de versiones en Analizar lista */
 .trade-detected-item{grid-template-columns:48px minmax(0,1fr) auto!important}
 .trade-detected-item .trade-use-choice{grid-column:2/4;width:100%;min-height:42px;border:1px solid #cbd9e8;border-radius:12px;background:#f4f8fc;color:#1479cc;font-weight:800;font-size:.9rem}
 .trade-detected-item .trade-use-choice.selected,.trade-detected-item.selected{border-color:#2499e8;background:#eef8ff}
@@ -6115,7 +6115,7 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 @media(prefers-color-scheme:dark){.trade-detected-item .trade-use-choice{background:#162536;border-color:#33475d;color:#8dcbff}.trade-detected-item .trade-use-choice.selected{background:#167fd9;color:#fff}.trade-detected-item.selected{background:#10283a}.trade-ambiguity-box{background:#2b2615;border-color:#5e5121;color:#f5e7ba}.trade-choice-card{background:#111b28;border-color:#34455a;color:#f2f6fa}.trade-choice-card.selected{background:#10283a}.trade-choice-card>em,.balanced-sticker-names>small{color:#a8b4c2}.trade-receive-summary{background:#10261a;border-color:#24593a}}
 
 
-/* Build 704.12.18 · multiselección + cantidades en recepción */
+/* Build 704.12.19 · multiselección + cantidades en recepción */
 .trade-choice-card{grid-template-columns:42px minmax(0,1fr) auto!important;gap:8px 10px!important}
 .trade-choice-card>.trade-choice-icon{grid-row:1!important;display:flex;align-items:center;justify-content:center}
 .trade-choice-card>.trade-choice-icon img{width:36px;height:36px;object-fit:contain!important}
@@ -6130,3 +6130,9 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 #confirmReceiveChoices{margin-top:4px}
 @media(max-width:420px){.trade-choice-card{grid-template-columns:40px minmax(0,1fr)!important}.trade-choice-qty{grid-column:2/-1;grid-template-columns:44px 38px 44px;justify-content:start}.trade-choice-qty button{width:44px;height:40px}}
 @media(prefers-color-scheme:dark){.trade-choice-copy em{color:#a8b4c2}.trade-choice-qty button{background:#182433;border-color:#34475b;color:#e7edf4}.trade-choice-qty button.primary{background:#167fd9;border-color:#167fd9;color:#fff}.trade-choice-qty output{color:#e7edf4}.trade-choice-card.selected .trade-choice-qty output{color:#8dcbff}}
+
+/* Build 704.12.19 · cantidades también al entregar */
+.trade-detected-item .trade-give-qty{grid-column:2/4;justify-self:start;margin-top:2px}
+.trade-detected-item.selected .trade-give-qty output{color:#1479cc}
+@media(max-width:420px){.trade-detected-item .trade-give-qty{grid-column:2/4;grid-template-columns:44px 38px 44px}.trade-detected-item .trade-give-qty button{width:44px;height:40px}}
+@media(prefers-color-scheme:dark){.trade-detected-item.selected .trade-give-qty output{color:#8dcbff}}
