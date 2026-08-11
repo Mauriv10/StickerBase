@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.19";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.20";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1314,8 +1314,65 @@ function collectShareGroups(type,projectId=activeProjectId){
  return {groups,totalUnits,totalReferences,project};
 }
 
-function buildShareCollectionText(type,{flags=false,compact=false,projectId=activeProjectId}={}){
+function shareCollectionPlayerName(collectionType,team,code){
+ if(collectionType==="liga-este-2026-27"){
+   const info=ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code);
+   return info?.[0]||String(code);
+ }
+ if(collectionType==="megacracks-2026-27"){
+   const info=megacracksItemInfo(team,code);
+   return info?.[0]||String(code);
+ }
+ return stickerDisplayLabel(team,code);
+}
+function buildPremiumClubShareText(type,{compact=false,projectId=activeProjectId}={}){
  const {groups,totalUnits,totalReferences,project}=collectShareGroups(type,projectId);
+ if(!groups.length)return {text:"",totalUnits:0,totalReferences:0};
+ const collectionType=inferCollectionType(project);
+ const isLiga=collectionType==="liga-este-2026-27";
+ const isMega=collectionType==="megacracks-2026-27";
+ const specialCheck=isLiga?isLigaEsteInsertTeam:isMegacracksSpecialTeam;
+ const collectionName=isLiga?"LIGA ESTE 2026/27":"MEGACRACKS 2026/27";
+ const brandIcon=isLiga?"🟣":"⚫";
+ const stateIcon=type==="missing"?"🔎":type==="repeats"?"🔁":"📚";
+ const stateLabel=type==="missing"?"ME FALTAN":type==="repeats"?"REPETIDOS PARA CAMBIAR":"INVENTARIO";
+ const summary=type==="album"
+   ?`${totalReferences} referencias · ${totalUnits} unidades`
+   :`${totalUnits} cromos · ${totalReferences} referencias`;
+ const clubGroups=groups.filter(group=>!specialCheck(group.team));
+ const specialGroups=groups.filter(group=>specialCheck(group.team));
+ const lines=[`${brandIcon} *StickerBase · ${collectionName}*`,`${stateIcon} *${stateLabel}* · ${summary}`,""];
+ const itemText=(group,item)=>{
+   const code=String(item.code);
+   const name=shareCollectionPlayerName(collectionType,group.team,item.code);
+   const units=type==="album"?item.qty:item.units;
+   return `${code} · ${name}${units>1?` x${units}`:""}`;
+ };
+ if(compact){
+   if(clubGroups.length){lines.push("⚽ *CLUBES*");clubGroups.forEach(group=>lines.push(`*${group.team}*: ${group.items.map(item=>itemText(group,item)).join(" | ")}`));}
+   if(specialGroups.length){if(clubGroups.length)lines.push("");lines.push(isLiga?"✨ *ESPECIALES E INSERTS*":"✨ *ESPECIALES Y PARALELAS*");specialGroups.forEach(group=>lines.push(`*${group.team}*: ${group.items.map(item=>itemText(group,item)).join(" | ")}`));}
+ }else{
+   const appendGroups=(heading,icon,subset)=>{
+     if(!subset.length)return;
+     lines.push(`${icon} *${heading}*`,"");
+     subset.forEach((group,index)=>{
+       lines.push(`*${group.team}*`);
+       group.items.forEach(item=>lines.push(`• ${itemText(group,item)}`));
+       if(index<subset.length-1)lines.push("");
+     });
+   };
+   appendGroups("CLUBES","⚽",clubGroups);
+   if(clubGroups.length&&specialGroups.length)lines.push("");
+   appendGroups(isLiga?"ESPECIALES E INSERTS":"ESPECIALES Y PARALELAS","✨",specialGroups);
+ }
+ lines.push("","────────────","Generado con StickerBase");
+ return {text:lines.join("\n"),totalUnits,totalReferences};
+}
+function buildShareCollectionText(type,{flags=false,compact=false,projectId=activeProjectId}={}){
+ const project=projects?.[projectId]||projects?.[activeProjectId];
+ const collectionType=inferCollectionType(project);
+ if(collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27")return buildPremiumClubShareText(type,{compact,projectId});
+ const {groups,totalUnits,totalReferences}=collectShareGroups(type,projectId);
  if(!groups.length)return {text:"",totalUnits:0,totalReferences:0};
  const projectName=project?.name||"Mundial 2026";
  const missing=type==="missing",album=type==="album";
@@ -1339,7 +1396,6 @@ function buildShareCollectionText(type,{flags=false,compact=false,projectId=acti
  });
  return {text:lines.join("\n"),totalUnits,totalReferences};
 }
-
 function openShareOptions(type=activeShareListType(),projectId=activeProjectId){
  if(!type)return;
  const {totalUnits,totalReferences}=collectShareGroups(type,projectId);
@@ -1352,6 +1408,11 @@ function openShareOptions(type=activeShareListType(),projectId=activeProjectId){
  if(!sheet)return;
  sheet.dataset.type=type;sheet.dataset.projectId=projectId;
  $("#shareOptionsTitle").textContent=type==="album"?"Exportar álbum":type==="missing"?"Compartir cromos que me faltan":"Compartir cromos repetidos";
+ const shareProject=projects?.[projectId]||projects?.[activeProjectId],shareType=inferCollectionType(shareProject),premiumShare=shareType==="liga-este-2026-27"||shareType==="megacracks-2026-27";
+ const shareBtn=sheet.querySelector('[data-share-option="share"] small'),copyBtn=sheet.querySelector('[data-share-option="copy"] small'),compactBtn=sheet.querySelector('[data-share-option="compact"] small');
+ if(shareBtn)shareBtn.textContent=premiumShare?"Formato premium · WhatsApp, Telegram, Mensajes…":"Con banderas · WhatsApp, Telegram, Mensajes…";
+ if(copyBtn)copyBtn.textContent=premiumShare?"Formato premium · nombres, números y apartados":"Sin banderas · ideal para Wallapop o Vinted";
+ if(compactBtn)compactBtn.textContent=premiumShare?"Versión breve · una línea por club o especial":"Sin banderas · una línea por selección";
  sheet.hidden=false;
  requestAnimationFrame(()=>sheet.classList.add("open"));
  document.body.classList.add("share-sheet-open");
@@ -1802,7 +1863,7 @@ function ligaEsteRow(team,code,qty){
 }
 function renderLigaEsteCollection(){
  const list=$("#globalCollectionList");if(!list)return;list.innerHTML="";
- let teams=currentTeamOrder().filter(team=>!isLigaEsteInsertTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));
+ let teams=currentTeamOrder().filter(team=>collectionFilter!=="all"||!isLigaEsteInsertTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));
  const insertTeams=currentTeamOrder().filter(team=>isLigaEsteInsertTeam(team));
  if(collectionSort==="az")teams.sort((a,b)=>a.localeCompare(b,"es"));
  teams.forEach(team=>{
@@ -1829,7 +1890,7 @@ function megacracksIsOpen(team){const p=projects?.[activeProjectId];p.ui=p.ui||{
 function toggleMegacracksTeam(team){if(collectionTeamFilter!=="all"&&isMegacracksSpecialTeam(team)){selectTeam("all");return;}const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};p.ui.megacracksOpenTeams[team]=!p.ui.megacracksOpenTeams[team];persistProjects();renderGlobalCollection()}
 function renderMegacracksCollection(){
  const list=$("#globalCollectionList");if(!list)return;list.innerHTML="";
- let teams=currentTeamOrder().filter(team=>!isMegacracksSpecialTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));
+ let teams=currentTeamOrder().filter(team=>collectionFilter!=="all"||!isMegacracksSpecialTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));
  const specialTeams=currentTeamOrder().filter(team=>isMegacracksSpecialTeam(team));if(collectionSort==="az")teams.sort((a,b)=>a.localeCompare(b,"es"));
  teams.forEach(team=>{if(collectionTeamFilter!=="all"&&team!==collectionTeamFilter)return;const stickers=inventory[team]||{},entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));if(!entries.length)return;
  const target=getTarget(),total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0),missing=Object.values(stickers).reduce((a,b)=>a+Math.max(0,target-Number(b||0)),0),open=megacracksIsOpen(team);

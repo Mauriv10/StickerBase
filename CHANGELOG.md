@@ -1,3 +1,8 @@
+## 704.12.20
+- Liga Este y Megacracks: los filtros «Me faltan» y «Repetidos» incluyen también especiales, inserts y paralelas.
+- Nuevo formato premium al compartir/copiar listas de Liga Este y Megacracks: clubes y especiales separados, con número, jugador y cantidades.
+- El formato compacto mantiene una línea por club/apartado y el Mundial conserva su formato anterior.
+
 ## 704.12.19
 - Analizar lista: la selección de cromos a recibir ahora permite multiselección entre coincidencias.
 - Cada versión recibida admite cantidad independiente con controles − / + (x1, x2, x3…).
