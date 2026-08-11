@@ -1,3 +1,9 @@
+## 704.12.15
+- Comparar mediante QR: sustituido "Copiar enlace" por "Descargar QR".
+- El QR se genera como PNG con identidad StickerBase y nombre de la colección.
+- En dispositivos compatibles se abre la hoja de compartir para poder guardar la imagen en Fotos; en el resto se descarga el PNG.
+- Añadido feedback visual al generar/guardar el QR.
+
 ## 704.12.14
 - Favoritos y protegidos: escudos de clubes completos, sin recorte de bandera.
 - QR: feedback visual al copiar el enlace.

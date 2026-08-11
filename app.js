@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.14";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.15";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3451,11 +3451,7 @@ $("#openQrCompareButton")?.addEventListener("click",openQrCompare);
 $("#closeQrCompareDialog")?.addEventListener("click",closeQrCompare);
 $("#startQrCompareScanner")?.addEventListener("click",startQrScanner);
 $("#qrCompareDialog")?.addEventListener("close",stopQrScanner);
-$("#copyQrCompareLink")?.addEventListener("click",async event=>{
- const button=event.currentTarget,original=button.textContent;
- try{await copyShareText(qrCompareUrl());button.textContent="Copiado ✓";button.classList.add("is-success");if(navigator.vibrate)navigator.vibrate(18);showToast("Enlace de comparación copiado ✓");setTimeout(()=>{button.textContent=original;button.classList.remove("is-success")},1400)}
- catch{button.textContent="Error al copiar";button.classList.add("is-error");showToast("No se pudo copiar");setTimeout(()=>{button.textContent=original;button.classList.remove("is-error")},1400)}
-});
+$("#downloadQrCompare")?.addEventListener("click",downloadQrCompareImage);
 $("#pickQrCompareImage")?.addEventListener("click",()=>$("#qrCompareImageInput")?.click());
 $("#qrCompareImageInput")?.addEventListener("change",event=>{const file=event.currentTarget.files?.[0];if(file)readQrCompareImage(file);event.currentTarget.value=""});
 
@@ -3480,6 +3476,30 @@ function parseQrComparePayload(raw){
  const quantities=layout.map((_,i)=>{const byte=bytes[Math.floor(i/2)]||0;return i%2===0?(byte>>4)&15:byte&15});return {type,target,layout,quantities};
 }
 function qrCompareUrl(){const url=new URL(location.href);url.search="";url.hash="";url.searchParams.set("sbcompare",createQrComparePayload());return url.toString();}
+function qrComparePngBlob(){
+ return new Promise((resolve,reject)=>{try{
+  const text=qrCompareUrl(),matrix=StickerBaseQRCode.matrix(text,"M"),quiet=5,n=matrix.length,total=n+quiet*2;
+  const canvas=document.createElement("canvas"),W=1080,H=1260;canvas.width=W;canvas.height=H;const ctx=canvas.getContext("2d");
+  ctx.fillStyle="#ffffff";ctx.fillRect(0,0,W,H);ctx.fillStyle="#071018";ctx.fillRect(0,0,W,170);
+  ctx.textAlign="center";ctx.fillStyle="#ffffff";ctx.font="700 54px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif";ctx.fillText("StickerBase",W/2,74);
+  ctx.fillStyle="#b8c2cc";ctx.font="600 27px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif";ctx.fillText("COMPARAR COLECCIONES",W/2,124);
+  const label=collectionTypeLabel(inferCollectionType(projects?.[activeProjectId]));ctx.fillStyle="#071018";ctx.font="700 35px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif";ctx.fillText(label,W/2,235);
+  const qrSize=850,module=qrSize/total,x0=(W-qrSize)/2,y0=285;ctx.fillStyle="#fff";ctx.fillRect(x0,y0,qrSize,qrSize);ctx.fillStyle="#071018";
+  matrix.forEach((row,y)=>row.forEach((dark,x)=>{if(dark)ctx.fillRect(x0+(x+quiet)*module,y0+(y+quiet)*module,Math.ceil(module+.25),Math.ceil(module+.25))}));
+  ctx.fillStyle="#59636f";ctx.font="500 27px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif";ctx.fillText("Importa esta imagen desde StickerBase para comparar",W/2,1190);
+  canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("No se pudo generar la imagen")),"image/png",1);
+ }catch(error){reject(error)}});
+}
+async function downloadQrCompareImage(event){
+ const button=event?.currentTarget||$("#downloadQrCompare"),original=button?.textContent||"Descargar QR";if(button){button.disabled=true;button.textContent="Generando…"}
+ try{
+  const blob=await qrComparePngBlob(),file=new File([blob],`StickerBase-QR-${Date.now()}.png`,{type:"image/png"});
+  if(navigator.share&&navigator.canShare?.({files:[file]}))await navigator.share({files:[file],title:"StickerBase · Mi QR"});
+  else{const href=URL.createObjectURL(blob),a=document.createElement("a");a.href=href;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(href),2500)}
+  if(button){button.textContent="QR listo ✓";button.classList.add("is-success")}if(navigator.vibrate)navigator.vibrate(18);showToast("QR preparado para guardar o compartir ✓");
+ }catch(error){if(error?.name!=="AbortError"){if(button){button.textContent="Error";button.classList.add("is-error")}showToast("No se pudo generar el QR")}}
+ finally{if(button){setTimeout(()=>{button.disabled=false;button.textContent=original;button.classList.remove("is-success","is-error")},1500)}}
+}
 function renderQrMatrix(container,text){if(!container||!globalThis.StickerBaseQRCode)return;const matrix=StickerBaseQRCode.matrix(text,"M"),n=matrix.length,quiet=4,size=n+quiet*2,svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox",`0 0 ${size} ${size}`);svg.setAttribute("role","img");svg.setAttribute("aria-label","QR de comparación StickerBase");svg.classList.add("trade-qr-svg");const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("width",size);bg.setAttribute("height",size);bg.setAttribute("fill","white");svg.appendChild(bg);matrix.forEach((row,y)=>row.forEach((dark,x)=>{if(!dark)return;const r=document.createElementNS(svg.namespaceURI,"rect");r.setAttribute("x",x+quiet);r.setAttribute("y",y+quiet);r.setAttribute("width",1);r.setAttribute("height",1);r.setAttribute("fill","#071018");svg.appendChild(r)}));container.replaceChildren(svg);}
 function qrCompareItemLabel(team,code){const type=inferCollectionType(projects?.[activeProjectId]);if(type==="liga-este-2026-27")return ligaEsteStickerInfo(team,code)?.[0]||ligaEsteInsertInfo(team,code)?.[0]||code;if(type==="megacracks-2026-27")return megacracksItemInfo(team,code)?.[0]||code;return `${TEAM_TO_PANINI_CODE[team]||team}${paniniDisplayCode(team,code)}`;}
 function compareQrInventory(peer){
