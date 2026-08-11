@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.12";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.13";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1543,67 +1543,60 @@ function parseWorldCupTradeList(rawText){
  return {found,invalid};
 }
 
-function ligaEsteTradeAliases(){
+function clubTradeAliases(type){
  const aliases=[];
  const add=(alias,team)=>{const n=normalizeTradeName(alias);if(n&&!aliases.some(x=>x.alias===n&&x.team===team))aliases.push({alias:n,team});};
- currentTeamOrder().forEach(team=>{
-   add(team,team);
-   if(!isLigaEsteInsertTeam(team)){
-     add(team.replace(/^FC\s+/i,""),team);add(team.replace(/\s+CF$/i,""),team);add(team.replace(/^RC\s+/i,""),team);add(team.replace(/^RCD\s+/i,""),team);
-     const short={"FC Barcelona":"Barcelona","Real Madrid CF":"Real Madrid","Athletic Club de Bilbao":"Athletic","Atlético de Madrid":"Atlético","Real Betis":"Betis","RC Celta de Vigo":"Celta","RCD Espanyol":"Espanyol","Real Sociedad":"Sociedad","Rayo Vallecano":"Rayo","Racing de Santander":"Racing","Deportivo":"Deportivo","Levante":"Levante","Villarreal":"Villarreal","Valencia":"Valencia","Sevilla":"Sevilla"};
-     if(short[team])add(short[team],team);
-   }
- });
- add("ADN", "ADN / LALIGA PRIME");add("LALIGA PRIME","ADN / LALIGA PRIME");add("PRIME","ADN / LALIGA PRIME");
- add("FANTASY","LALIGA FANTASY");add("DRAFT","DRAFT 23");add("KROMIX","DRAFT 23 KROMIX");
- add("EXTRA BRONCE","EXTRA STICKER BRONCE");add("BRONCE","EXTRA STICKER BRONCE");
- add("EXTRA PLATA","EXTRA STICKER PLATA");add("PLATA","EXTRA STICKER PLATA");
- add("EXTRA ORO","EXTRA STICKER ORO");add("ORO","EXTRA STICKER ORO");
+ const short={
+  "Deportivo Alavés":["Alavés","Alaves","ALA"],"Athletic Club de Bilbao":["Athletic","Bilbao","ATH"],"Atlético de Madrid":["Atlético","Atletico","ATM"],
+  "FC Barcelona":["Barcelona","Barça","Barca","BAR"],"Real Betis":["Betis","BET"],"RC Celta de Vigo":["Celta","CEL"],"Deportivo":["Depor","DEP"],
+  "Elche CF":["Elche","ELC"],"RCD Espanyol":["Espanyol","ESP"],"Getafe CF":["Getafe","GET"],"Levante UD":["Levante","LEV"],"Osasuna":["OSA"],
+  "Racing de Santander":["Racing","Santander","RAC"],"Rayo Vallecano":["Rayo","RAY"],"Real Madrid CF":["Real Madrid","Madrid","RMA","RM"],
+  "Real Sociedad":["Sociedad","RSO"],"Sevilla":["SEV"],"Valencia":["VAL"],"Villarreal":["VIL"]
+ };
+ currentTeamOrder().forEach(team=>{add(team,team);(short[team]||[]).forEach(a=>add(a,team));add(team.replace(/^FC\s+/i,"").replace(/^RC(D)?\s+/i,"").replace(/\s+(CF|UD)$/i,""),team);});
+ if(type==="liga-este-2026-27"){
+  [["ADN","ADN / LALIGA PRIME"],["LALIGA PRIME","ADN / LALIGA PRIME"],["PRIME","ADN / LALIGA PRIME"],["FANTASY","LALIGA FANTASY"],["DRAFT","DRAFT 23"],["KROMIX","DRAFT 23 KROMIX"],["EXTRA BRONCE","EXTRA STICKER BRONCE"],["BRONCE","EXTRA STICKER BRONCE"],["EXTRA PLATA","EXTRA STICKER PLATA"],["PLATA","EXTRA STICKER PLATA"],["EXTRA ORO","EXTRA STICKER ORO"],["ORO","EXTRA STICKER ORO"]].forEach(([a,t])=>add(a,t));
+ }else{
+  [["ENJOY","ENJOY"],["ENJOY POWER","ENJOY POWER"],["ZONA VIP","ZONA VIP"],["VIP","ZONA VIP"],["ZONA VIP POWER","ZONA VIP POWER"],["VIP POWER","ZONA VIP POWER"],["MASTER ROOKIE","MASTER ROOKIE"],["ROOKIE","MASTER ROOKIE"],["STARS ON 25","STARS ON 25"],["STARS 25","STARS ON 25"],["ELITE","ÉLITE"],["ÉLITE","ÉLITE"],["ELITE POWER","ÉLITE POWER"],["ÉLITE POWER","ÉLITE POWER"],["SPECIAL ONE BLACK","SPECIAL ONE BLACK"],["ONE BLACK","SPECIAL ONE BLACK"],["BLACK","SPECIAL ONE BLACK"],["SPECIAL ONE GOLD","SPECIAL ONE GOLD"],["ONE GOLD","SPECIAL ONE GOLD"],["GOLD","SPECIAL ONE GOLD"],["LIMITED EDITION","LIMITED EDITION"],["LIMITED","LIMITED EDITION"],["EDICION LIMITADA","LIMITED EDITION"],["EDICIONES LIMITADAS","LIMITED EDITION"]].forEach(([a,t])=>add(a,t));
+ }
  return aliases.sort((a,b)=>b.alias.length-a.alias.length);
 }
-function parseLigaEsteTradeList(rawText){
- const found=[],invalid=[],byKey=new Map();
- const aliases=ligaEsteTradeAliases();
- const add=(team,code,raw,units=1)=>{
-   const stickers=inventory?.[team]||{};
-   const exact=Object.keys(stickers).find(c=>String(c).toUpperCase()===String(code).toUpperCase());
-   if(!exact){invalid.push({raw,reason:`Número no válido para ${team}`,suggestion:""});return;}
-   const key=`${team}|${exact}`,existing=byKey.get(key);
-   if(existing){existing.requestedUnits+=units;return;}
-   const item={team,officialCode:team,internalCode:exact,displayCode:exact,requestedUnits:units};
-   byKey.set(key,item);found.push(item);
- };
- const allNamed=[];
- currentTeamOrder().forEach(team=>{
-   const info=LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{};
-   Object.entries(info).forEach(([code,[name]])=>{
-     if(name&&name!=="Pendiente")allNamed.push({team,code,name,normalized:normalizeTradeName(name.replace(/\s*\([^)]*\)\s*/g," "))});
-   });
- });
- String(rawText||"").replace(/\r/g,"").split("\n").forEach(line=>{
-   const original=line.trim();if(!original)return;
-   const qMatch=original.match(/[x×]\s*(\d+)/i),units=qMatch?Math.max(1,Number(qMatch[1])||1):1;
-   const clean=original.replace(/[x×]\s*\d+/ig,"").trim();
-   const normalized=normalizeTradeName(clean);
-   let aliasHit=aliases.find(x=>normalized===x.alias||normalized.startsWith(x.alias+" "));
-   if(aliasHit){
-     const tail=normalized.slice(aliasHit.alias.length).trim();
-     const tokens=[...tail.matchAll(/\b(K?\d{1,2}[AB]?)\b/gi)].map(m=>m[1].toUpperCase());
-     if(tokens.length){tokens.forEach(code=>add(aliasHit.team,code,original,units));return;}
-     invalid.push({raw:original,reason:"Falta el número de cromo",suggestion:aliasHit.team});return;
-   }
-   const exactNames=allNamed.filter(x=>x.normalized===normalized);
-   if(exactNames.length===1){add(exactNames[0].team,exactNames[0].code,original,units);return;}
-   if(exactNames.length>1){invalid.push({raw:original,reason:"Ese jugador aparece en varias categorías; añade club/apartado y número",suggestion:""});return;}
-   invalid.push({raw:original,reason:"Club, apartado o jugador no reconocido",suggestion:""});
+function clubTradeInfo(type,team){return type==="liga-este-2026-27"?(LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{}):(MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{});}
+function normalizeClubTradeCode(value){
+ const raw=String(value||"").toUpperCase().replace(/\s+/g,"").replace(/^N[º°]?/i,"");
+ let m=raw.match(/^(EL|B|G)0*(\d+)$/);if(m)return `${m[1]}${Number(m[2])}`;
+ m=raw.match(/^(\d+)([ABP]?)$/);if(m)return `${Number(m[1])}${m[2]}`;
+ return raw;
+}
+function resolveClubTradeCode(team,value){const wanted=normalizeClubTradeCode(value);return Object.keys(inventory?.[team]||{}).find(code=>normalizeClubTradeCode(code)===wanted)||null;}
+function extractClubTradeCodes(team,text){
+ const found=[];const add=v=>{const c=resolveClubTradeCode(team,v);if(c&&!found.includes(c))found.push(c)};
+ String(text||"").toUpperCase().replace(/\b(?:X|×)\s*\d+\b/g," ").replace(/\b\d+\s*(?:X|×)\b/g," ").match(/(?:EL|B|G)?0*\d{1,3}[ABP]?/g)?.forEach(add);
+ for(const m of String(text||"").matchAll(/\b(\d{1,3})\s*[-–—]\s*(\d{1,3})\b/g)){const a=Number(m[1]),b=Number(m[2]);if(Number.isInteger(a)&&Number.isInteger(b)&&Math.abs(b-a)<=40)for(let n=Math.min(a,b);n<=Math.max(a,b);n++)add(String(n));}
+ return found;
+}
+function parseClubTradeList(rawText,type){
+ const found=[],invalid=[],byKey=new Map(),aliases=clubTradeAliases(type),named=[];
+ const add=(team,code,raw,units=1)=>{const exact=resolveClubTradeCode(team,code);if(!exact){invalid.push({raw,reason:`Número no válido para ${team}`,suggestion:""});return false}const key=`${team}|${exact}`,existing=byKey.get(key);if(existing){existing.requestedUnits+=units;return true}const item={team,officialCode:team,internalCode:exact,displayCode:exact,requestedUnits:Math.max(1,Number(units)||1)};byKey.set(key,item);found.push(item);return true};
+ currentTeamOrder().forEach(team=>Object.entries(clubTradeInfo(type,team)).forEach(([code,[name,pos]])=>{if(name&&normalizeTradeName(name)!=="pendiente")named.push({team,code,name,normalized:normalizeTradeName(String(name).replace(/\s*\([^)]*\)\s*/g," ")),pos:normalizeTradeName(pos||"")})}));
+ named.sort((a,b)=>b.normalized.length-a.normalized.length);
+ const ignored=["tengo","busco","necesito","faltan","faltantes","repetidos","repetidas","duplicados","doy","ofrezco","cambio","quiero","lista","mis faltas","mis repetidos","lo que necesito","lo que tengo","para dar","para recibir"];
+ String(rawText||"").replace(/\r/g,"").split(/\n+/).forEach(line=>{
+  const original=line.trim();if(!original)return;
+  let clean=original.replace(/^[•·▪◦*-]\s*/,"").replace(/^\d+[.)]\s+(?=[A-Za-zÁÉÍÓÚÜÑ])/i,"").trim();
+  const suffixQty=clean.match(/(?:^|\s)[x×]\s*(\d+)\s*$/i),prefixQty=clean.match(/^\s*(\d+)\s*[x×]\s+/i);const units=Math.max(1,Number(suffixQty?.[1]||prefixQty?.[1])||1);clean=clean.replace(/(?:^|\s)[x×]\s*\d+\s*$/i,"").replace(/^\s*\d+\s*[x×]\s+/i,"").trim();
+  const norm=normalizeTradeName(clean);if(!norm||ignored.some(x=>norm===x||norm===x+":"))return;
+  const aliasHit=aliases.find(x=>norm===x.alias||norm.startsWith(x.alias+" ")||norm.endsWith(" "+x.alias)||norm.includes(" "+x.alias+" "));
+  if(aliasHit){const codes=extractClubTradeCodes(aliasHit.team,clean);if(codes.length){codes.forEach(code=>add(aliasHit.team,code,original,units));return}const nameHits=named.filter(x=>x.team===aliasHit.team&&(norm===x.normalized||norm.includes(x.normalized)));if(nameHits.length===1){add(nameHits[0].team,nameHits[0].code,original,units);return}invalid.push({raw:original,reason:"Falta un número o jugador reconocible",suggestion:aliasHit.team});return;}
+  const nameHits=named.filter(x=>x.normalized.length>=3&&(norm===x.normalized||norm.includes(x.normalized)));const uniqueNames=[...new Map(nameHits.map(x=>[`${x.team}|${x.code}`,x])).values()];if(uniqueNames.length){uniqueNames.forEach(x=>add(x.team,x.code,original,units));return;}
+  const tokens=String(clean).toUpperCase().match(/(?:EL|B|G)?0*\d{1,3}[ABP]?/g)||[];let resolved=0;for(const token of tokens){const matches=currentTeamOrder().map(team=>({team,code:resolveClubTradeCode(team,token)})).filter(x=>x.code);if(matches.length===1){add(matches[0].team,matches[0].code,original,units);resolved++;}}
+  if(resolved)return;
+  invalid.push({raw:original,reason:type==="megacracks-2026-27"?"Club, especial, número o jugador no reconocido":"Club, apartado, número o jugador no reconocido",suggestion:""});
  });
  return {found,invalid};
 }
-function parseMegacracksTradeList(rawText){
- const found=[],invalid=[],byKey=new Map(),aliases=currentTeamOrder().map(team=>({team,alias:normalizeTradeName(team)})).sort((a,b)=>b.alias.length-a.alias.length);
- const add=(team,code,raw,units=1)=>{const stickers=inventory?.[team]||{},exact=Object.keys(stickers).find(c=>String(c).toUpperCase()===String(code).toUpperCase());if(!exact){invalid.push({raw,reason:`Número no válido para ${team}`,suggestion:""});return}const key=`${team}|${exact}`,existing=byKey.get(key);if(existing){existing.requestedUnits+=units;return}const item={team,officialCode:team,internalCode:exact,displayCode:exact,requestedUnits:units};byKey.set(key,item);found.push(item)};
- String(rawText||"").replace(/\r/g,"").split("\n").forEach(line=>{const original=line.trim();if(!original)return;const q=original.match(/[x×]\s*(\d+)/i),units=q?Math.max(1,Number(q[1])||1):1,clean=original.replace(/[x×]\s*\d+/ig,"").trim(),norm=normalizeTradeName(clean),hit=aliases.find(x=>norm===x.alias||norm.startsWith(x.alias+" "));if(hit){const tail=norm.slice(hit.alias.length).trim(),m=tail.match(/\b([0-9]{1,3}P?|[BG]0?[1-9]|EL0?[1-3])\b/i);if(m){add(hit.team,m[1].toUpperCase(),original,units);return}}let named=[];currentTeamOrder().forEach(team=>Object.entries(MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{}).forEach(([code,[name]])=>{if(normalizeTradeName(name)===norm)named.push({team,code})}));if(named.length===1){add(named[0].team,named[0].code,original,units);return}invalid.push({raw:original,reason:"Club, apartado, número o jugador no reconocido",suggestion:""})});return {found,invalid};
-}
+function parseLigaEsteTradeList(rawText){return parseClubTradeList(rawText,"liga-este-2026-27");}
+function parseMegacracksTradeList(rawText){return parseClubTradeList(rawText,"megacracks-2026-27");}
 function parseTradeList(rawText){
  const t=inferCollectionType(projects?.[activeProjectId]);return t==="liga-este-2026-27"?parseLigaEsteTradeList(rawText):t==="megacracks-2026-27"?parseMegacracksTradeList(rawText):parseWorldCupTradeList(rawText);
 }
@@ -1653,7 +1646,7 @@ function renderTradeAnalyzerResult(){const input=$("#tradeAnalyzerInput"),result
 function openTradeAnalyzer(){
  const dialog=$("#tradeAnalyzerDialog");if(!dialog)return;
  const area=$("#tradeAnalyzerInput");
- if(area){const t=inferCollectionType(projects?.[activeProjectId]);area.placeholder=t==="liga-este-2026-27"?"Ejemplo:\nFC Barcelona 07\nReal Madrid 18A\nDRAFT 23 06\nADN 08":t==="megacracks-2026-27"?"Ejemplo:\nFC Barcelona 89\nReal Madrid 232\nENJOY 381\nZONA VIP 399":"Ejemplo: ESP15 · Francia 20 · FWC 18";}dialog.classList.remove("analyzed","exchange-step");$("#tradeAnalyzerEntry").hidden=false;$("#tradeAnalyzerResult").hidden=true;if(!dialog.open)dialog.showModal();$("#tradeAnalyzerBody")?.scrollTo({top:0,behavior:"auto"});setTimeout(()=>$("#tradeAnalyzerInput")?.focus(),80);}
+ if(area){const t=inferCollectionType(projects?.[activeProjectId]);area.placeholder=t==="liga-este-2026-27"?"Ejemplos:\nBarcelona: 07, 11, 18A\nCubarsí\nDRAFT 23: 06 x2\nADN 08":t==="megacracks-2026-27"?"Ejemplos:\nBarcelona: 78, 79\nCubarsí\n381\nENJOY POWER 383P x2":"Ejemplo: ESP15 · Francia 20 · FWC 18";}dialog.classList.remove("analyzed","exchange-step");$("#tradeAnalyzerEntry").hidden=false;$("#tradeAnalyzerResult").hidden=true;if(!dialog.open)dialog.showModal();$("#tradeAnalyzerBody")?.scrollTo({top:0,behavior:"auto"});setTimeout(()=>$("#tradeAnalyzerInput")?.focus(),80);}
 function closeTradeAnalyzer(){const dialog=$("#tradeAnalyzerDialog");if(dialog?.open)dialog.close();}
 
 
@@ -3340,12 +3333,25 @@ $("#markSyncedButton").onclick=()=>{
 
 function tradeItemFromKey(key){
  const [officialCode,displayCode]=String(key||"").split("|");
+ const type=inferCollectionType(projects?.[activeProjectId]);
+ if(type!=="world-cup-2026"){
+   const team=officialCode,internalCode=Object.keys(inventory?.[team]||{}).find(code=>String(code).toUpperCase()===String(displayCode||"").toUpperCase());
+   if(!team||!internalCode)return null;
+   return {team,officialCode:team,displayCode:internalCode,internalCode};
+ }
  const team=PANINI_TEAM_CODES[officialCode];
  if(!team||!inventory?.[team])return null;
  const internalCode=paniniInternalCode(team,Number(displayCode));
  if(!internalCode)return null;
  return {team,officialCode,displayCode:String(displayCode).padStart(2,"0"),internalCode};
 }
+function tradeItemInfo(item){
+ const type=inferCollectionType(projects?.[activeProjectId]);
+ if(type==="liga-este-2026-27")return ligaEsteStickerInfo(item.team,item.internalCode)||ligaEsteInsertInfo(item.team,item.internalCode)||null;
+ if(type==="megacracks-2026-27")return megacracksItemInfo(item.team,item.internalCode)||null;
+ return null;
+}
+function tradeItemName(item){return tradeStarName(item)||tradeItemInfo(item)?.[0]||`${item.team} ${item.displayCode}`;}
 function setTradeMark(key,type,enabled){
  const prefs=currentTradePreferences(),isDefault=Boolean(DEFAULT_TOP_STARS[key]);
  if(type==="stars"){
@@ -3403,17 +3409,17 @@ function renderCollectionModuleSettings(){
 }
 function updateOptionalCollectionVisibility(){document.body.classList.toggle("collaboration-disabled",!collaborationEnabled())}
 function tradeManagerTeamOptions(){return currentTeamOrder().map(team=>`<option value="${escapeTradeHtml(team)}">${escapeTradeHtml(team)}</option>`).join("")}
-function tradeManagerNumberOptions(team){return Object.keys(inventory?.[team]||{}).sort((a,b)=>Number(a)-Number(b)).map(code=>`<option value="${code}">${paniniDisplayCode(team,code)}</option>`).join("")}
+function tradeManagerNumberOptions(team){return Object.keys(inventory?.[team]||{}).sort((a,b)=>String(a).localeCompare(String(b),"es",{numeric:true})).map(code=>{const item={team,officialCode:TEAM_TO_PANINI_CODE[team]||team,displayCode:paniniDisplayCode(team,code),internalCode:code},name=tradeItemInfo(item)?.[0];return `<option value="${code}">${paniniDisplayCode(team,code)}${name?` · ${escapeTradeHtml(name)}`:""}</option>`}).join("")}
 function renderTradeProtectionManager(){
  const dialog=$("#tradeProtectionManagerDialog"),list=$("#tradeProtectionManagerList");if(!dialog||!list)return;
  const query=normalizeTradeName($("#tradeProtectionSearch")?.value||"");
  const rows=allManagedTradeKeys().map(key=>({key,item:tradeItemFromKey(key)})).filter(x=>x.item).filter(({key,item})=>{
-   const label=DEFAULT_TOP_STARS[key]||`${item.officialCode}${item.displayCode}`;
-   return !query||normalizeTradeName(`${label} ${item.team} ${item.officialCode}${item.displayCode}`).includes(query);
- }).sort((a,b)=>currentTeamOrder().indexOf(a.item.team)-currentTeamOrder().indexOf(b.item.team)||Number(a.item.displayCode)-Number(b.item.displayCode));
+   const label=tradeItemName(item),info=tradeItemInfo(item);
+   return !query||normalizeTradeName(`${label} ${info?.[1]||""} ${item.team} ${item.officialCode} ${item.displayCode}`).includes(query);
+ }).sort((a,b)=>currentTeamOrder().indexOf(a.item.team)-currentTeamOrder().indexOf(b.item.team)||String(a.item.displayCode).localeCompare(String(b.item.displayCode),"es",{numeric:true}));
  list.innerHTML=rows.length?rows.map(({key,item})=>{
-   const star=isTradeStar(item),locked=isTradeProtected(item),name=DEFAULT_TOP_STARS[key]||`${item.team} ${item.displayCode}`;
-   return `<article class="trade-protection-row" data-key="${key}"><div>${flagHTML(item.team)}<span><strong>${escapeTradeHtml(name)}</strong><small>${item.officialCode}${item.displayCode}</small></span></div><div class="trade-protection-actions"><button type="button" data-mark="stars" class="${star?"active":""}" aria-label="Favorito">★</button><button type="button" data-mark="protected" class="${locked?"active":""}" aria-label="Nunca intercambiar">🔒</button><button type="button" data-remove aria-label="Quitar marcas">✕</button></div></article>`;
+   const star=isTradeStar(item),locked=isTradeProtected(item),name=tradeItemName(item);
+   return `<article class="trade-protection-row" data-key="${key}"><div>${flagHTML(item.team)}<span><strong>${escapeTradeHtml(name)}</strong><small>${escapeTradeHtml(item.team)} · ${escapeTradeHtml(item.displayCode)}</small></span></div><div class="trade-protection-actions"><button type="button" data-mark="stars" class="${star?"active":""}" aria-label="Favorito">★</button><button type="button" data-mark="protected" class="${locked?"active":""}" aria-label="Nunca intercambiar">🔒</button><button type="button" data-remove aria-label="Quitar marcas">✕</button></div></article>`;
  }).join(""):'<div class="trade-manager-empty">No hay cromos configurados con esta búsqueda.</div>';
  list.querySelectorAll("[data-mark]").forEach(button=>button.onclick=()=>{const row=button.closest("[data-key]"),key=row.dataset.key,item=tradeItemFromKey(key),type=button.dataset.mark;setTradeMark(key,type,!button.classList.contains("active"));renderTradeProtectionManager();renderTradeProtectionSettings();});
  list.querySelectorAll("[data-remove]").forEach(button=>button.onclick=()=>{const key=button.closest("[data-key]").dataset.key;setTradeMark(key,"stars",false);setTradeMark(key,"protected",false);renderTradeProtectionManager();renderTradeProtectionSettings();});
@@ -3441,7 +3447,55 @@ $("#tradeProtectionSearch")?.addEventListener("input",renderTradeProtectionManag
 $("#addTradeFavorite")?.addEventListener("click",event=>addTradeProtectionFromManager("stars",event.currentTarget));
 $("#addTradeProtected")?.addEventListener("click",event=>addTradeProtectionFromManager("protected",event.currentTarget));
 $("#openTradeProtectionManagerButton")?.addEventListener("click",openTradeProtectionManager);
+$("#openQrCompareButton")?.addEventListener("click",openQrCompare);
+$("#closeQrCompareDialog")?.addEventListener("click",closeQrCompare);
+$("#startQrCompareScanner")?.addEventListener("click",startQrScanner);
+$("#qrCompareDialog")?.addEventListener("close",stopQrScanner);
+$("#compareQrPasteButton")?.addEventListener("click",()=>{const value=$("#qrComparePaste")?.value.trim();if(value)showQrComparison(value);else showToast("Pega primero el código o enlace de StickerBase")});
+$("#copyQrCompareLink")?.addEventListener("click",async()=>{try{await copyShareText(qrCompareUrl());showToast("Enlace de comparación copiado ✓")}catch{showToast("No se pudo copiar")}});
 
+
+const QR_COLLECTION_CODE={"world-cup-2026":"W","liga-este-2026-27":"L","megacracks-2026-27":"M"};
+const QR_CODE_COLLECTION={W:"world-cup-2026",L:"liga-este-2026-27",M:"megacracks-2026-27"};
+let qrCompareStream=null,qrCompareScanTimer=null;
+function qrInventoryLayout(type){const template=collectionInventoryTemplate(type),rows=Object.entries(template).flatMap(([team,stickers])=>Object.keys(stickers).map(code=>[team,code]));if(type==="world-cup-2026")EXTRA_TEAMS.forEach(team=>{for(let n=1;n<=20;n++)rows.push([team,String(n).padStart(2,"0")])});return rows;}
+function bytesToBase64Url(bytes){let binary="";for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");}
+function base64UrlToBytes(text){let raw=String(text||"").replace(/-/g,"+").replace(/_/g,"/");while(raw.length%4)raw+="=";const binary=atob(raw),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;}
+function qrLayoutSignature(layout){let h=2166136261;for(const [team,code] of layout){const text=`${team}|${code};`;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}}return (h>>>0).toString(36);}
+function createQrComparePayload(){
+ const type=inferCollectionType(projects?.[activeProjectId]),layout=qrInventoryLayout(type),bytes=new Uint8Array(Math.ceil(layout.length/2));
+ layout.forEach(([team,code],i)=>{const value=Math.max(0,Math.min(15,Number(inventory?.[team]?.[code])||0)),idx=Math.floor(i/2);if(i%2===0)bytes[idx]=value<<4;else bytes[idx]|=value;});
+ return `SB1.${QR_COLLECTION_CODE[type]}.${Math.max(1,Math.min(15,Number(getTarget())||1))}.${layout.length}.${qrLayoutSignature(layout)}.${bytesToBase64Url(bytes)}`;
+}
+function parseQrComparePayload(raw){
+ let value=String(raw||"").trim();try{const url=new URL(value);value=url.searchParams.get("sbcompare")||value}catch{}
+ const parts=value.split(".");if(parts.length!==6||parts[0]!=="SB1")throw new Error("Código QR de StickerBase no válido.");
+ const type=QR_CODE_COLLECTION[parts[1]],target=Number(parts[2]),length=Number(parts[3]),signature=parts[4],bytes=base64UrlToBytes(parts[5]);if(!type)throw new Error("Colección no reconocida.");
+ const layout=qrInventoryLayout(type);if(layout.length!==length||qrLayoutSignature(layout)!==signature)throw new Error("La otra persona usa una estructura de colección diferente. Actualizad StickerBase y probad de nuevo.");
+ const quantities=layout.map((_,i)=>{const byte=bytes[Math.floor(i/2)]||0;return i%2===0?(byte>>4)&15:byte&15});return {type,target,layout,quantities};
+}
+function qrCompareUrl(){const url=new URL(location.href);url.search="";url.hash="";url.searchParams.set("sbcompare",createQrComparePayload());return url.toString();}
+function renderQrMatrix(container,text){if(!container||!globalThis.StickerBaseQRCode)return;const matrix=StickerBaseQRCode.matrix(text,"M"),n=matrix.length,quiet=4,size=n+quiet*2,svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox",`0 0 ${size} ${size}`);svg.setAttribute("role","img");svg.setAttribute("aria-label","QR de comparación StickerBase");svg.classList.add("trade-qr-svg");const bg=document.createElementNS(svg.namespaceURI,"rect");bg.setAttribute("width",size);bg.setAttribute("height",size);bg.setAttribute("fill","white");svg.appendChild(bg);matrix.forEach((row,y)=>row.forEach((dark,x)=>{if(!dark)return;const r=document.createElementNS(svg.namespaceURI,"rect");r.setAttribute("x",x+quiet);r.setAttribute("y",y+quiet);r.setAttribute("width",1);r.setAttribute("height",1);r.setAttribute("fill","#071018");svg.appendChild(r)}));container.replaceChildren(svg);}
+function qrCompareItemLabel(team,code){const type=inferCollectionType(projects?.[activeProjectId]);if(type==="liga-este-2026-27")return ligaEsteStickerInfo(team,code)?.[0]||ligaEsteInsertInfo(team,code)?.[0]||code;if(type==="megacracks-2026-27")return megacracksItemInfo(team,code)?.[0]||code;return `${TEAM_TO_PANINI_CODE[team]||team}${paniniDisplayCode(team,code)}`;}
+function compareQrInventory(peer){
+ const type=inferCollectionType(projects?.[activeProjectId]);if(peer.type!==type)throw new Error(`Ese QR pertenece a ${collectionTypeLabel(peer.type)}. Abre una colección del mismo tipo.`);
+ const myTarget=Math.max(1,Number(getTarget())||1),give=[],receive=[];peer.layout.forEach(([team,code],i)=>{const mine=Number(inventory?.[team]?.[code])||0,theirs=peer.quantities[i]||0;if(mine>myTarget&&theirs<peer.target)give.push({team,code,units:Math.min(mine-myTarget,peer.target-theirs)});if(theirs>peer.target&&mine<myTarget)receive.push({team,code,units:Math.min(theirs-peer.target,myTarget-mine)});});return {give,receive};
+}
+function renderQrCompareRows(items){if(!items.length)return '<div class="trade-qr-empty">Ninguna coincidencia.</div>';const groups={};items.forEach(item=>(groups[item.team]||=[]).push(item));return Object.entries(groups).map(([team,rows])=>`<section class="trade-qr-team"><header>${flagHTML(team)}<strong>${escapeTradeHtml(team)}</strong></header>${rows.map(item=>`<div><span><b>${escapeTradeHtml(item.code)}</b> · ${escapeTradeHtml(qrCompareItemLabel(item.team,item.code))}</span><strong>x${item.units}</strong></div>`).join("")}</section>`).join("");}
+function showQrComparison(raw){
+ try{const peer=parseQrComparePayload(raw),result=compareQrInventory(peer),root=$("#qrCompareResult");root.hidden=false;root.innerHTML=`<div class="trade-qr-summary"><div><span>Tú puedes darle</span><strong>${result.give.reduce((a,b)=>a+b.units,0)}</strong></div><div><span>Puede darte</span><strong>${result.receive.reduce((a,b)=>a+b.units,0)}</strong></div></div><div class="trade-qr-columns"><section><h3>Para dar</h3>${renderQrCompareRows(result.give)}</section><section><h3>Para recibir</h3>${renderQrCompareRows(result.receive)}</section></div>`;$("#qrCompareIntro").hidden=true;stopQrScanner();
+ }catch(error){showToast(error.message||"No se ha podido leer el QR");}
+}
+function stopQrScanner(){if(qrCompareScanTimer){cancelAnimationFrame(qrCompareScanTimer);qrCompareScanTimer=null}if(qrCompareStream){qrCompareStream.getTracks().forEach(t=>t.stop());qrCompareStream=null}const video=$("#qrCompareVideo");if(video){video.srcObject=null;video.hidden=true}}
+async function startQrScanner(){
+ if(!("BarcodeDetector" in window)){showToast("En este iPhone usa la app Cámara: escanea el QR y abre el enlace de StickerBase.");return;}
+ try{const formats=await BarcodeDetector.getSupportedFormats();if(!formats.includes("qr_code"))throw new Error();const detector=new BarcodeDetector({formats:["qr_code"]}),video=$("#qrCompareVideo");qrCompareStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});video.srcObject=qrCompareStream;video.hidden=false;await video.play();const scan=async()=>{if(!qrCompareStream)return;try{const codes=await detector.detect(video);if(codes[0]?.rawValue){showQrComparison(codes[0].rawValue);return}}catch{}qrCompareScanTimer=requestAnimationFrame(scan)};scan();}catch{stopQrScanner();showToast("No se pudo abrir el lector. Usa la Cámara del móvil y abre el enlace del QR.");}
+}
+function openQrCompare(){
+ const dialog=$("#qrCompareDialog");if(!dialog)return;$("#qrCompareIntro").hidden=false;$("#qrCompareResult").hidden=true;$("#qrComparePaste").value="";stopQrScanner();const url=qrCompareUrl();renderQrMatrix($("#qrCompareCode"),url);$("#qrCompareCollection").textContent=collectionTypeLabel(inferCollectionType(projects?.[activeProjectId]));if(!dialog.open)dialog.showModal();
+}
+function closeQrCompare(){stopQrScanner();$("#qrCompareDialog")?.close();}
+function handleIncomingQrCompare(){const url=new URL(location.href),payload=url.searchParams.get("sbcompare");if(!payload)return;url.searchParams.delete("sbcompare");history.replaceState({},"",url.toString());setTimeout(()=>{openQrCompare();showQrComparison(payload)},180);}
 function setupSettingsCenter(){
  const dialog=$("#settingsDialog");
  if(!dialog)return;
@@ -3698,7 +3752,7 @@ function initialiseAppUpdates(){
 }
 
 initialiseAppUpdates();
-loadData().catch(error=>{console.error(error);hideLoading();document.body.innerHTML="<main class='app-main'><h1>Error al cargar</h1><p>Comprueba que todos los archivos estén subidos.</p></main>"});
+loadData().then(()=>handleIncomingQrCompare()).catch(error=>{console.error(error);hideLoading();document.body.innerHTML="<main class='app-main'><h1>Error al cargar</h1><p>Comprueba que todos los archivos estén subidos.</p></main>"});
 
 
 /* Build 703.2 · formatos de compartir y copiar + recuperación al volver a primer plano */

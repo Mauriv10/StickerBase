@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="StickerBase">
-  <title>StickerBase · Build 704.12.12</title>
+  <title>StickerBase · Build 704.12.13</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="canonical" href="https://mauriv10.github.io/StickerBase/">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/stickerbase-180.png">
@@ -354,13 +354,14 @@
     <button id="openTradeProtectionManagerButton" type="button">Gestionar</button>
   </section>
 
-  <section class="trade-option-card trade-option-upcoming">
+  <section class="trade-option-card trade-option-primary trade-qr-card">
     <div class="trade-option-icon">QR</div>
     <div class="trade-option-copy">
-      <span>PRÓXIMAMENTE</span>
+      <span>DISPONIBLE</span>
       <h3>Comparar mediante QR</h3>
-      <p>Escanea la colección de otra persona para detectar automáticamente intercambios compatibles.</p>
+      <p>Muestra tu QR o escanea el de otra persona para detectar qué podéis intercambiar.</p>
     </div>
+    <button id="openQrCompareButton" type="button">Comparar</button>
   </section>
 </section>
 
@@ -421,10 +422,10 @@
       <div class="settings-group-content"><div id="collectionModuleSettings" class="collection-module-settings"></div></div>
     </details>
 <details class="settings-group settings-accordion info-group">
-      <summary class="settings-group-title"><span class="settings-glyph gray">i</span><div><strong>Información</strong><small id="appInfoSubtitle">Build 704.12.12</small></div><span class="settings-chevron">›</span></summary>
+      <summary class="settings-group-title"><span class="settings-glyph gray">i</span><div><strong>Información</strong><small id="appInfoSubtitle">Build 704.12.13</small></div><span class="settings-chevron">›</span></summary>
       <div class="settings-group-content">
         <div class="settings-info-list">
-          <div><span>Versión</span><strong id="appInfoVersion">Build 704.12.12 · Multicolección</strong></div>
+          <div><span>Versión</span><strong id="appInfoVersion">Build 704.12.13 · Multicolección</strong></div>
           <div><span>Modo</span><strong>Disponible offline</strong></div>
         </div>
       </div>
@@ -769,6 +770,7 @@
 <script src="./app-config.js"></script>
 <script src="./auth.js" defer></script>
 <script src="./megacracks-data.js"></script>
+<script src="./assets/vendor/qrcode-stickerbase.js"></script>
 <script src="./app.js" defer></script>
 
 
@@ -776,6 +778,20 @@
 
 
 
+
+
+<dialog id="qrCompareDialog" class="trade-qr-dialog">
+  <header class="trade-manager-header"><div><span>INTERCAMBIOS</span><h2>Comparar mediante QR</h2></div><button id="closeQrCompareDialog" type="button" aria-label="Cerrar">✕</button></header>
+  <div class="trade-qr-body">
+    <section id="qrCompareIntro">
+      <div class="trade-qr-collection"><span>COLECCIÓN ACTUAL</span><strong id="qrCompareCollection"></strong></div>
+      <div class="trade-qr-own"><div id="qrCompareCode" class="trade-qr-code"></div><div><h3>Mi QR</h3><p>La otra persona puede escanearlo con StickerBase o con la cámara de su móvil.</p><button id="copyQrCompareLink" type="button" class="secondary">Copiar enlace/código</button></div></div>
+      <div class="trade-qr-scan"><h3>Leer el QR de otra persona</h3><p>En dispositivos compatibles puedes usar la cámara desde aquí. En iPhone también puedes escanearlo con la app Cámara y abrir el enlace que aparece.</p><button id="startQrCompareScanner" type="button" class="primary">Abrir cámara</button><video id="qrCompareVideo" playsinline muted hidden></video></div>
+      <details class="trade-qr-paste"><summary>Introducir código manualmente</summary><textarea id="qrComparePaste" rows="3" placeholder="Pega aquí el enlace o código StickerBase"></textarea><button id="compareQrPasteButton" type="button">Comparar</button></details>
+    </section>
+    <section id="qrCompareResult" class="trade-qr-result" hidden></section>
+  </div>
+</dialog>
 
 <dialog id="tradeProtectionManagerDialog" class="trade-protection-manager-dialog">
   <header class="trade-manager-header"><div><span>INTERCAMBIOS</span><h2>Favoritos y protegidos</h2></div><button id="closeTradeProtectionManager" type="button" aria-label="Cerrar">✕</button></header>

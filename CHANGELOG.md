@@ -1,4 +1,10 @@
-## 704.12.12
+## 704.12.13
+- Analizar lista reforzado en Liga Este y Megacracks: admite club + números, jugador, número único, cantidades, rangos, abreviaturas y formatos mixtos.
+- Favoritos y protegidos habilitados correctamente para Liga Este y Megacracks, incluyendo nombres de jugadores en el gestor.
+- Comparar mediante QR habilitado para Mundial, Liga Este y Megacracks, con QR compacto de inventario y comparación automática.
+- El QR puede escanearse dentro de la app cuando el navegador soporta BarcodeDetector o con la cámara del móvil mediante enlace StickerBase.
+
+## 704.12.13
 - Megacracks: Carlos Espí corregido al nº 215; 214 pasa a Pendiente, migrando el stock existente una sola vez.
 - Buscador Megacracks ampliado a club, jugador y número; escudos completos en resultados.
 - Orden oficial de especiales ajustado: Enjoy, Enjoy Power, Zona VIP, Zona VIP Power, Master Rookie, Stars on 25, Élite, Élite Power, Special One Black, Special One Gold y Limited Edition.
