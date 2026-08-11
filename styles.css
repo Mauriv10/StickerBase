@@ -6151,3 +6151,7 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 .share-stickerbase-qr{width:230px;height:230px;margin:0 auto 10px;padding:10px;background:#fff;border-radius:22px;box-shadow:0 8px 30px rgba(23,37,53,.13);border:1px solid #e5e9ee}.share-stickerbase-qr .trade-qr-svg{width:100%;height:100%}
 .share-stickerbase-url{display:block;font-size:11px;color:#278fdf;margin:7px 0 16px}.share-stickerbase-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.share-stickerbase-actions button{min-height:45px;border-radius:13px;font-weight:850}.share-stickerbase-note{display:block;margin-top:13px;font-size:9px;line-height:1.4;color:#8a929d}
 @media(max-width:390px){.share-stickerbase-qr{width:210px;height:210px}.share-stickerbase-body{padding-left:16px;padding-right:16px}.share-stickerbase-actions{grid-template-columns:1fr}}
+
+/* Build 704.12.22 · lector QR en directo compatible con Safari/iOS */
+#qrCompareVideo{display:block;width:100%;max-height:52vh;object-fit:cover;margin-top:12px;border-radius:16px;background:#05080c}
+#qrCompareVideo[hidden]{display:none}

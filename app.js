@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.21";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.22";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3713,10 +3713,44 @@ function showQrComparison(raw){
  try{const peer=parseQrComparePayload(raw),result=compareQrInventory(peer),root=$("#qrCompareResult");root.hidden=false;root.innerHTML=`<div class="trade-qr-summary"><div><span>Tú puedes darle</span><strong>${result.give.reduce((a,b)=>a+b.units,0)}</strong></div><div><span>Puede darte</span><strong>${result.receive.reduce((a,b)=>a+b.units,0)}</strong></div></div><div class="trade-qr-columns"><section><h3>Para dar</h3>${renderQrCompareRows(result.give)}</section><section><h3>Para recibir</h3>${renderQrCompareRows(result.receive)}</section></div>`;$("#qrCompareIntro").hidden=true;stopQrScanner();
  }catch(error){showToast(error.message||"No se ha podido leer el QR");}
 }
-function stopQrScanner(){if(qrCompareScanTimer){cancelAnimationFrame(qrCompareScanTimer);qrCompareScanTimer=null}if(qrCompareStream){qrCompareStream.getTracks().forEach(t=>t.stop());qrCompareStream=null}const video=$("#qrCompareVideo");if(video){video.srcObject=null;video.hidden=true}}
+function stopQrScanner(){if(qrCompareScanTimer){cancelAnimationFrame(qrCompareScanTimer);qrCompareScanTimer=null}if(qrCompareStream){qrCompareStream.getTracks().forEach(t=>t.stop());qrCompareStream=null}const video=$("#qrCompareVideo");if(video){video.srcObject=null;video.hidden=true}const button=$("#startQrCompareScanner");if(button){button.disabled=false;button.textContent="Abrir cámara";button.onclick=null}}
 async function startQrScanner(){
- if(!("BarcodeDetector" in window)){showToast("En este iPhone usa la app Cámara: escanea el QR y abre el enlace de StickerBase.");return;}
- try{const formats=await BarcodeDetector.getSupportedFormats();if(!formats.includes("qr_code"))throw new Error();const detector=new BarcodeDetector({formats:["qr_code"]}),video=$("#qrCompareVideo");qrCompareStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});video.srcObject=qrCompareStream;video.hidden=false;await video.play();const scan=async()=>{if(!qrCompareStream)return;try{const codes=await detector.detect(video);if(codes[0]?.rawValue){showQrComparison(codes[0].rawValue);return}}catch{}qrCompareScanTimer=requestAnimationFrame(scan)};scan();}catch{stopQrScanner();showToast("No se pudo abrir el lector. Usa la Cámara del móvil y abre el enlace del QR.");}
+ const button=$("#startQrCompareScanner"),video=$("#qrCompareVideo"),original=button?.textContent||"Abrir cámara";
+ if(!navigator.mediaDevices?.getUserMedia){showToast("Este navegador no permite acceder a la cámara. Usa «Importar captura desde Fotos».");return;}
+ try{
+  stopQrScanner();
+  if(button){button.disabled=true;button.textContent="Abriendo cámara…";}
+  qrCompareStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
+  video.srcObject=qrCompareStream;video.hidden=false;await video.play();
+  if(button){button.disabled=false;button.textContent="Cerrar cámara";button.onclick=()=>{stopQrScanner();button.textContent=original;button.onclick=null;};}
+  let detector=null;
+  if("BarcodeDetector" in window){try{const formats=await BarcodeDetector.getSupportedFormats();if(formats.includes("qr_code"))detector=new BarcodeDetector({formats:["qr_code"]});}catch{}}
+  const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d",{willReadFrequently:true});
+  let lastDecode=0;
+  const scan=async(now=0)=>{
+   if(!qrCompareStream)return;
+   try{
+    let raw="";
+    if(detector){const codes=await detector.detect(video);raw=codes[0]?.rawValue||"";}
+    else if(typeof globalThis.jsQR==="function"&&video.readyState>=2&&now-lastDecode>180){
+     lastDecode=now;
+     const maxW=720,scale=Math.min(1,maxW/(video.videoWidth||maxW));
+     canvas.width=Math.max(1,Math.round((video.videoWidth||maxW)*scale));canvas.height=Math.max(1,Math.round((video.videoHeight||540)*scale));
+     ctx.drawImage(video,0,0,canvas.width,canvas.height);
+     const image=ctx.getImageData(0,0,canvas.width,canvas.height),result=globalThis.jsQR(image.data,image.width,image.height,{inversionAttempts:"attemptBoth"});
+     raw=result?.data||"";
+    }
+    if(raw){if(button){button.textContent=original;button.onclick=null;}showQrComparison(raw);showToast("QR detectado ✓");return;}
+   }catch{}
+   qrCompareScanTimer=requestAnimationFrame(scan);
+  };
+  qrCompareScanTimer=requestAnimationFrame(scan);
+ }catch(error){
+  stopQrScanner();
+  if(button){button.disabled=false;button.textContent=original;button.onclick=null;}
+  const denied=error?.name==="NotAllowedError"||error?.name==="PermissionDeniedError";
+  showToast(denied?"StickerBase no tiene permiso para usar la cámara. Actívalo en los ajustes de Safari.":"No se pudo abrir la cámara. Puedes importar una captura desde Fotos.");
+ }
 }
 async function qrImageSource(file){
  if("createImageBitmap" in window){try{return await createImageBitmap(file)}catch{}}

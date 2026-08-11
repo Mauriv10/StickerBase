@@ -1,3 +1,8 @@
+## 704.12.22
+- Corregido «Abrir cámara» en Comparar mediante QR en Safari/iPhone.
+- El lector en directo ya no depende exclusivamente de BarcodeDetector: usa jsQR como alternativa sobre el vídeo de la cámara.
+- Añadidos estados de apertura/cierre y mensajes claros para permisos de cámara o incompatibilidad.
+
 ## 704.12.21
 - Añadida función Compartir StickerBase en Ajustes.
 - Genera un QR directo a la URL oficial para enseñar a otros coleccionistas.
