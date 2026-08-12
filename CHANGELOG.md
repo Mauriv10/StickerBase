@@ -1,3 +1,8 @@
+## 704.12.25
+- Megacracks 2026/27 · Levante UD: la referencia 214 pasa de «Pendiente» a Iván Romero.
+- Al dejar de ser «Pendiente», la 214 vuelve automáticamente a contabilizarse en faltantes y estadísticas.
+- No se modifica ninguna cantidad de inventario.
+
 ## 704.12.24
 - Construida sobre la 704.12.23 estable.
 - Liga Este y Megacracks: especiales de «Todos los clubes» funcionan como acordeones.
