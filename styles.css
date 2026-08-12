@@ -6156,9 +6156,7 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 #qrCompareVideo{display:block;width:100%;max-height:52vh;object-fit:cover;margin-top:12px;border-radius:16px;background:#05080c}
 #qrCompareVideo[hidden]{display:none}
 
-/* Build 704.12.24 · especiales en acordeón */
+/* Build 704.12.24 · especiales acordeón + cromos base */
 body.collection-theme-ligaeste .ligaeste-special-accordion,
 body.collection-theme-megacracks .megacracks-special-accordion{margin-top:10px}
-body.collection-theme-ligaeste .ligaeste-special-accordion .ligaeste-team-toggle,
-body.collection-theme-megacracks .megacracks-special-accordion .ligaeste-team-toggle{min-height:62px}
-body.collection-theme-megacracks .megacracks-special-accordion{border-color:#cfd4db!important}
+.collection-stat-card.base>span{background:#eef5ff;color:#1684df}

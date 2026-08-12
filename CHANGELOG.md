@@ -1,3 +1,10 @@
+## 704.12.24
+- Construida sobre la 704.12.23 estable.
+- Liga Este y Megacracks: especiales de «Todos los clubes» funcionan como acordeones.
+- Las referencias «Pendiente» quedan fuera de Me faltan, Repetidos, progreso y estadísticas.
+- Añadida estadística «Cromos base» con formato obtenidos/disponibles, excluyendo «Pendiente».
+- Al sustituir un «Pendiente» por el jugador real en una futura checklist, vuelve a contabilizarse automáticamente.
+
 ## 704.12.23
 - Base: 704.12.22 estable.
 - Corregido exclusivamente el cierre de la cámara del comparador QR.
