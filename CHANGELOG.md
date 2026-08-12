@@ -1,3 +1,9 @@
+## 704.12.25
+- Corregido el versionado visible de index.html, que arrastraba una versión antigua.
+- Añadido cache-busting explícito a los recursos críticos de la aplicación.
+- El service worker se registra con la versión en su URL para forzar la renovación en iOS/GitHub Pages.
+- Mantiene los cambios de 704.12.24: especiales como acordeones y «Pendiente» fuera de faltantes/progreso/estadísticas.
+
 ## 704.12.24
 - Liga Este y Megacracks: especiales de «Todos los clubes» convertidos a acordeones.
 - Las referencias «Pendiente» no cuentan como faltantes ni repetidos.

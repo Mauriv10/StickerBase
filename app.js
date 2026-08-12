@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.24";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.25";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -4019,7 +4019,7 @@ function initialiseAppUpdates(){
 
  window.addEventListener("load",async()=>{
    try{
-     const registration=await navigator.serviceWorker.register("./service-worker.js",{updateViaCache:"none"});
+     const registration=await navigator.serviceWorker.register(`./service-worker.js?v=${encodeURIComponent(PUBLIC_BUILD_VERSION)}`,{updateViaCache:"none"});
      serviceWorkerRegistration=registration;
      // Do not show the banner merely because a worker is waiting. The
      // published version check below is the source of truth.
