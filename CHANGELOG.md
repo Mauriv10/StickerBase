@@ -1,3 +1,10 @@
+## 704.12.23
+- Base: 704.12.22 estable.
+- Corregido exclusivamente el cierre de la cámara del comparador QR.
+- El botón de cámara usa ahora un único listener que alterna abrir/cerrar; se elimina el segundo manejador `onclick` que podía volver a abrir la cámara al intentar cerrarla.
+- Al cerrar se detienen las pistas, se pausa el vídeo y se limpia `srcObject`.
+- Sin cambios en Supabase, sincronización, splash, carga inicial ni datos de colecciones.
+
 ## 704.12.22
 - Corregido «Abrir cámara» en Comparar mediante QR en Safari/iPhone.
 - El lector en directo ya no depende exclusivamente de BarcodeDetector: usa jsQR como alternativa sobre el vídeo de la cámara.
