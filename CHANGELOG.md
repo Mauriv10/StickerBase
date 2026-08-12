@@ -1,7 +1,3 @@
-## 704.12.23
-- Corregido «Cerrar cámara» en Comparar mediante QR: ahora detiene realmente el stream y el escaneo.
-- Eliminado el conflicto de eventos que podía volver a abrir la cámara inmediatamente después de cerrarla.
-
 ## 704.12.22
 - Corregido «Abrir cámara» en Comparar mediante QR en Safari/iPhone.
 - El lector en directo ya no depende exclusivamente de BarcodeDetector: usa jsQR como alternativa sobre el vídeo de la cámara.
