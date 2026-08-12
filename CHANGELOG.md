@@ -1,3 +1,10 @@
+## 704.12.27
+- Corregido el arranque vacío tras el splash: la interfaz ya no se libera antes de que los proyectos locales estén inicializados.
+- Los cuatro JSON estáticos tienen timeout y cache-busting explícito.
+- Si los recursos estáticos fallan pero existe inventario local, StickerBase arranca en modo local sin sobrescribir datos.
+- Los JSON críticos pasan a estrategia network-first en el service worker.
+- Supabase sigue siendo una fase posterior: un fallo de nube no bloquea la navegación local.
+
 ## 704.12.26
 - Corregido bloqueo indefinido en «Cargando tus colecciones…» durante el arranque.
 - La sincronización inicial tiene un límite de espera y, si la red/auth no responde, la app abre con los datos locales sin sobrescribir inventario.

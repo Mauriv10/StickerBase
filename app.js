@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.26";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.27";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -541,7 +541,7 @@ function displayUserName(user){
  return String(raw).trim().split(/\s+/)[0]||"coleccionista";
 }
 function hideAppSplash(){window.WCAuth?.hideSplash?.();const splash=$("#appSplash");if(splash)splash.hidden=true}
-// Build 704.12.26: fail-safe visual de arranque.
+// Build 704.12.27: fail-safe visual de arranque.
 // No modifica inventario ni decide conflictos: únicamente evita que el splash
 // bloquee la interfaz indefinidamente si una petición de red/auth queda colgada.
 let startupSplashFailsafe=null;
@@ -550,8 +550,8 @@ function armStartupSplashFailsafe(){
  startupSplashFailsafe=setTimeout(()=>{
    const authGate=$("#authGate"),onboardingGate=$("#onboardingGate"),conflict=$("#cloudConflictModal");
    const blockingGate=(authGate&&!authGate.hidden)||(onboardingGate&&!onboardingGate.hidden)||(conflict&&!conflict.hidden);
-   if(!blockingGate){
-     console.warn("[StickerBase] Tiempo de arranque agotado; liberando splash y conservando estado local.");
+   if(!blockingGate&&appDataReady){
+     console.warn("[StickerBase] Sincronización lenta; liberando splash con la app local ya inicializada.");
      hideAppSplash();
      setCloudStatus("Trabajando con datos locales · sincronización pendiente","syncing");
    }
@@ -752,26 +752,64 @@ function hideLoading(){
 window.addEventListener("online",updateConnectionStatus);
 window.addEventListener("offline",updateConnectionStatus);
 
+async function fetchStaticJson(path,{timeout=7000}={}){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);
+ try{
+  const response=await fetch(`${path}?v=${encodeURIComponent(PUBLIC_BUILD_VERSION)}`,{cache:"no-store",signal:controller.signal});
+  if(!response.ok)throw new Error(`${path}: HTTP ${response.status}`);
+  return await response.json();
+ }finally{clearTimeout(timer)}
+}
 async function loadData(){
  showLoading("Preparando tus colecciones…");
- const [i,f,g,s]=await Promise.all([
-   fetch("./data/inventory.json"),
-   fetch("./data/flags-v4.json"),
-   fetch("./data/team-groups.json"),
-   fetch("./data/projects-seed.json")
- ]);
- originalInventory=await i.json();flags=await f.json();teamGroups=await g.json();
- const seedData=await s.json();
+
+ // Primero recuperamos la copia local. Nunca mostramos la app hasta que esto esté listo.
  projects=readJSON(PROJECTS_KEY,null);
  activeProjectId=localStorage.getItem(ACTIVE_PROJECT_KEY)||"";
+
+ let inventoryData=null,flagsData=null,groupsData=null,seedData=null;
+ try{
+  [inventoryData,flagsData,groupsData,seedData]=await Promise.all([
+   fetchStaticJson("./data/inventory.json"),
+   fetchStaticJson("./data/flags-v4.json"),
+   fetchStaticJson("./data/team-groups.json"),
+   fetchStaticJson("./data/projects-seed.json")
+  ]);
+ }catch(error){
+  console.error("[StickerBase] Error cargando datos estáticos",error);
+  // Si ya existe una colección local, podemos arrancar sin poner en peligro su inventario.
+  if(projects&&Object.keys(projects).length){
+   inventoryData={};
+   flagsData={};
+   groupsData={};
+   seedData={projects:[],revision:"local-recovery"};
+   showToast("Modo local · algunos recursos se cargarán al reconectar");
+  }else{
+   throw error;
+  }
+ }
+
+ originalInventory=inventoryData||{};
+ flags=flagsData||{};
+ teamGroups=groupsData||{};
+ seedData=seedData||{projects:[]};
+
  bootstrapProjectsFromSeed(seedData);
- if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects);
+ if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects||[]);
+
+ // Garantía: jamás liberamos splash con un proyecto inexistente.
+ if(!projects||!Object.keys(projects).length)throw new Error("No se pudo cargar ninguna colección local.");
+ if(!projects[activeProjectId])activeProjectId=Object.keys(projects)[0];
+
  loadProjectState();
  renderProjectsList();
  setupSettingsCenter();
  document.body.classList.add("main-tab-collection");
  updateConnectionStatus();
- appDataReady=true;appDataReadyResolve?.();window.dispatchEvent(new CustomEvent("wc-app-data-ready"));
+
+ appDataReady=true;
+ appDataReadyResolve?.();
+ window.dispatchEvent(new CustomEvent("wc-app-data-ready"));
  hideLoading();
 }
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
@@ -4071,7 +4109,13 @@ function initialiseAppUpdates(){
 }
 
 initialiseAppUpdates();
-loadData().then(()=>handleIncomingQrCompare()).catch(error=>{console.error(error);hideLoading();document.body.innerHTML="<main class='app-main'><h1>Error al cargar</h1><p>Comprueba que todos los archivos estén subidos.</p></main>"});
+loadData().then(()=>handleIncomingQrCompare()).catch(error=>{
+ console.error(error);
+ hideLoading();
+ hideAppSplash();
+ const splash=$("#appSplash");if(splash)splash.hidden=true;
+ showToast("No se pudieron cargar los datos de StickerBase. Cierra y vuelve a abrir la app.");
+});
 
 
 /* Build 703.2 · formatos de compartir y copiar + recuperación al volver a primer plano */
