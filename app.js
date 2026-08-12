@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.27";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.23";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -112,19 +112,6 @@ const MEGACRACKS_SPECIAL_INFO=globalThis.MEGACRACKS_DATA?.specialInfo||{};
 globalThis.MEGACRACKS_ITEM_INFO={...MEGACRACKS_ITEM_INFO,...MEGACRACKS_SPECIAL_INFO};
 function isMegacracksSpecialTeam(team){return Object.prototype.hasOwnProperty.call(MEGACRACKS_SPECIALS,team)}
 function megacracksItemInfo(team,code){return MEGACRACKS_ITEM_INFO?.[team]?.[code]||MEGACRACKS_SPECIAL_INFO?.[team]?.[code]||null}
-function isPendingCollectionItem(team,code){
- const type=inferCollectionType(projects?.[activeProjectId]);
- if(type==="liga-este-2026-27"){
-  const info=ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code);
-  return normalizeTradeName(info?.[0]||"")==="pendiente";
- }
- if(type==="megacracks-2026-27"){
-  const info=megacracksItemInfo(team,code);
-  return normalizeTradeName(info?.[0]||"")==="pendiente";
- }
- return false;
-}
-
 function megacracksCrestUrl(team){return LIGA_ESTE_CRESTS[team]||""}
 function megacracksTeamSearchText(team){const source=MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{};return normalizeTradeName([team,...Object.entries(source).flatMap(([code,[name]])=>[code,name])].join(" "))}
 function collectionInventoryTemplate(type){
@@ -541,23 +528,6 @@ function displayUserName(user){
  return String(raw).trim().split(/\s+/)[0]||"coleccionista";
 }
 function hideAppSplash(){window.WCAuth?.hideSplash?.();const splash=$("#appSplash");if(splash)splash.hidden=true}
-// Build 704.12.27: fail-safe visual de arranque.
-// No modifica inventario ni decide conflictos: únicamente evita que el splash
-// bloquee la interfaz indefinidamente si una petición de red/auth queda colgada.
-let startupSplashFailsafe=null;
-function armStartupSplashFailsafe(){
- clearTimeout(startupSplashFailsafe);
- startupSplashFailsafe=setTimeout(()=>{
-   const authGate=$("#authGate"),onboardingGate=$("#onboardingGate"),conflict=$("#cloudConflictModal");
-   const blockingGate=(authGate&&!authGate.hidden)||(onboardingGate&&!onboardingGate.hidden)||(conflict&&!conflict.hidden);
-   if(!blockingGate&&appDataReady){
-     console.warn("[StickerBase] Sincronización lenta; liberando splash con la app local ya inicializada.");
-     hideAppSplash();
-     setCloudStatus("Trabajando con datos locales · sincronización pendiente","syncing");
-   }
- },8000);
-}
-armStartupSplashFailsafe();
 function showReturningWelcome(session){
  hideAppSplash();
  const name=displayUserName(session?.user);
@@ -601,20 +571,8 @@ async function initialCloudSync(session){
  const client=cloudClient();if(!client||!session)return;
  await appDataReadyPromise;
  cloudSession=session;setCloudStatus("Conectando con la nube…","syncing");
- let cloudResult;
- try{
-   cloudResult=await Promise.race([
-     client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",session.user.id).maybeSingle(),
-     new Promise(resolve=>setTimeout(()=>resolve({__startupTimeout:true}),7000))
-   ]);
- }catch(error){
-   console.error(error);setCloudStatus("Sin conexión · usando datos locales","error");hideAppSplash();return;
- }
- if(cloudResult?.__startupTimeout){
-   setCloudStatus("Sincronización pendiente · usando datos locales","syncing");hideAppSplash();return;
- }
- const {data,error}=cloudResult||{};
- if(error){setCloudStatus("No se pudo sincronizar · usando datos locales","error");console.error(error);hideAppSplash();return}
+ const {data,error}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",session.user.id).maybeSingle();
+ if(error){setCloudStatus("Falta preparar la base de datos","error");console.error(error);hideAppSplash();return}
  cloudReady=true;
  if(data?.payload?.projects&&Object.keys(data.payload.projects).length){
    const meta=cloudMeta(),localFp=stateFingerprint(),remoteFp=stateFingerprint(data.payload.projects,data.payload.activeProjectId),baseline=meta.fingerprint||null;
@@ -752,64 +710,26 @@ function hideLoading(){
 window.addEventListener("online",updateConnectionStatus);
 window.addEventListener("offline",updateConnectionStatus);
 
-async function fetchStaticJson(path,{timeout=7000}={}){
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);
- try{
-  const response=await fetch(`${path}?v=${encodeURIComponent(PUBLIC_BUILD_VERSION)}`,{cache:"no-store",signal:controller.signal});
-  if(!response.ok)throw new Error(`${path}: HTTP ${response.status}`);
-  return await response.json();
- }finally{clearTimeout(timer)}
-}
 async function loadData(){
  showLoading("Preparando tus colecciones…");
-
- // Primero recuperamos la copia local. Nunca mostramos la app hasta que esto esté listo.
+ const [i,f,g,s]=await Promise.all([
+   fetch("./data/inventory.json"),
+   fetch("./data/flags-v4.json"),
+   fetch("./data/team-groups.json"),
+   fetch("./data/projects-seed.json")
+ ]);
+ originalInventory=await i.json();flags=await f.json();teamGroups=await g.json();
+ const seedData=await s.json();
  projects=readJSON(PROJECTS_KEY,null);
  activeProjectId=localStorage.getItem(ACTIVE_PROJECT_KEY)||"";
-
- let inventoryData=null,flagsData=null,groupsData=null,seedData=null;
- try{
-  [inventoryData,flagsData,groupsData,seedData]=await Promise.all([
-   fetchStaticJson("./data/inventory.json"),
-   fetchStaticJson("./data/flags-v4.json"),
-   fetchStaticJson("./data/team-groups.json"),
-   fetchStaticJson("./data/projects-seed.json")
-  ]);
- }catch(error){
-  console.error("[StickerBase] Error cargando datos estáticos",error);
-  // Si ya existe una colección local, podemos arrancar sin poner en peligro su inventario.
-  if(projects&&Object.keys(projects).length){
-   inventoryData={};
-   flagsData={};
-   groupsData={};
-   seedData={projects:[],revision:"local-recovery"};
-   showToast("Modo local · algunos recursos se cargarán al reconectar");
-  }else{
-   throw error;
-  }
- }
-
- originalInventory=inventoryData||{};
- flags=flagsData||{};
- teamGroups=groupsData||{};
- seedData=seedData||{projects:[]};
-
  bootstrapProjectsFromSeed(seedData);
- if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects||[]);
-
- // Garantía: jamás liberamos splash con un proyecto inexistente.
- if(!projects||!Object.keys(projects).length)throw new Error("No se pudo cargar ninguna colección local.");
- if(!projects[activeProjectId])activeProjectId=Object.keys(projects)[0];
-
+ if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects);
  loadProjectState();
  renderProjectsList();
  setupSettingsCenter();
  document.body.classList.add("main-tab-collection");
  updateConnectionStatus();
-
- appDataReady=true;
- appDataReadyResolve?.();
- window.dispatchEvent(new CustomEvent("wc-app-data-ready"));
+ appDataReady=true;appDataReadyResolve?.();window.dispatchEvent(new CustomEvent("wc-app-data-ready"));
  hideLoading();
 }
 function readJSON(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
@@ -1131,10 +1051,6 @@ function isShinySticker(team,code){
 function collectionStickerMatches(team,code,qty){
  const target=getTarget();
  const effectiveFilter=currentFilter==="need"?"missing":currentFilter==="offer"?"repeats":collectionFilter;
- const type=inferCollectionType(projects?.[activeProjectId]);
- if((type==="liga-este-2026-27"||type==="megacracks-2026-27")&&isPendingCollectionItem(team,code)){
-  return effectiveFilter==="all";
- }
  if(effectiveFilter==="all")return true;
  if(effectiveFilter==="missing")return qty<target;
  if(effectiveFilter==="repeats")return qty>target;
@@ -1963,18 +1879,8 @@ function renderLigaEsteCollection(){
    list.appendChild(section);
  });
  if(collectionTeamFilter==="all"&&collectionFilter==="all"&&insertTeams.length){
-   insertTeams.forEach(team=>{
-     const stickers=inventory[team]||{};
-     const entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));
-     if(!entries.length)return;
-     const total=entries.reduce((sum,[,q])=>sum+Number(q||0),0),open=ligaEsteIsOpen(team);
-     const section=document.createElement("section");section.className=`ligaeste-team-accordion ligaeste-special-accordion${open?" open":""}`;
-     section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cromos</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / cromo</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
-     section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleLigaEsteTeam(team);
-     const rows=section.querySelector(".ligaeste-player-list");
-     entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));
-     list.appendChild(section);
-   });
+   const special=document.createElement("section");special.className="ligaeste-specials-group";special.innerHTML=`<div class="ligaeste-specials-title"><span>✦</span><div><strong>Especiales e inserts</strong><small>ADN · Fantasy · Draft 23 · Kromix · Extra Stickers</small></div></div>`;
+   insertTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`${flagHTML(team)}<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special);
  }
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cromos para este filtro.</div>';
 }
@@ -1990,18 +1896,7 @@ function renderMegacracksCollection(){
  const target=getTarget(),total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0),missing=Object.values(stickers).reduce((a,b)=>a+Math.max(0,target-Number(b||0)),0),open=megacracksIsOpen(team);
  const section=document.createElement("section");section.className=`ligaeste-team-accordion megacracks-team-accordion${open?" open":""}`;section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards · ${missing?`${missing} pendientes`:"Completo"}</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
  section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleMegacracksTeam(team);const rows=section.querySelector(".ligaeste-player-list");entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));list.appendChild(section)});
- if(collectionTeamFilter==="all"&&collectionFilter==="all"&&specialTeams.length){
-  specialTeams.forEach(team=>{
-   const stickers=inventory[team]||{},entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));
-   if(!entries.length)return;
-   const total=entries.reduce((a,[,b])=>a+Number(b||0),0),open=megacracksIsOpen(team);
-   const section=document.createElement("section");section.className=`ligaeste-team-accordion megacracks-team-accordion megacracks-special-accordion${open?" open":""}`;
-   section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
-   section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleMegacracksTeam(team);
-   const rows=section.querySelector(".ligaeste-player-list");entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));
-   list.appendChild(section);
-  });
- }
+ if(collectionTeamFilter==="all"&&collectionFilter==="all"&&specialTeams.length){const special=document.createElement("section");special.className="ligaeste-specials-group megacracks-specials-group";special.innerHTML=`<div class="ligaeste-specials-title"><span>◆</span><div><strong>Especiales y paralelas</strong><small>Élite · Enjoy · Zona VIP · Master Rookie · Stars on 25 · Special One</small></div></div>`;specialTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`${flagHTML(team)}<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special)}
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cards para este filtro.</div>';
 }
 function renderGlobalCollection(){
@@ -2064,8 +1959,6 @@ function calculateProjectStatistics(){
    let specialOwned=0,specialTotal=0;
    Object.entries(stickers).forEach(([code,raw])=>{
      const qty=Number(raw)||0;
-     const pendingItem=(collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27")&&isPendingCollectionItem(team,code);
-     if(pendingItem)return;
      total+=qty;
      const unitMissing=Math.max(0,target-qty);
      missing+=unitMissing;
@@ -2089,18 +1982,15 @@ function calculateProjectStatistics(){
    }
    if(isLigaInsert||isMegaInsert)specialProgress[team]={owned:specialOwned,total:specialTotal};
  });
- const required=currentTeamOrder().reduce((sum,team)=>sum+Object.keys(inventory[team]||{}).filter(code=>!((collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27")&&isPendingCollectionItem(team,code))).length,0)*target;
+ const required=currentTeamOrder().reduce((sum,team)=>sum+Object.keys(inventory[team]||{}).length,0)*target;
  const useful=Math.max(0,total-mathExcessForProgress());
  const roundedProgress=required?Math.round(useful/required*100):0;
  const progress=missing>0?Math.min(99,roundedProgress):Math.min(100,roundedProgress);
  return {total,missing,repeats,shiny,fwc,badges,collaboration,complete,progress,normalMissing,normalComplete,specialProgress,collectionType};
 }
 function mathExcessForProgress(){
- const target=getTarget(),type=inferCollectionType(projects?.[activeProjectId]);
- return currentTeamOrder().reduce((sum,team)=>sum+Object.entries(inventory[team]||{}).reduce((s,[code,q])=>{
-  if((type==="liga-este-2026-27"||type==="megacracks-2026-27")&&isPendingCollectionItem(team,code))return s;
-  return s+Math.max(0,Number(q||0)-target);
- },0),0);
+ const target=getTarget();
+ return currentTeamOrder().reduce((sum,team)=>sum+Object.values(inventory[team]||{}).reduce((s,q)=>s+Math.max(0,Number(q||0)-target),0),0);
 }
 function renderStatistics(){
  const s=calculateProjectStatistics();
@@ -4086,7 +3976,7 @@ function initialiseAppUpdates(){
 
  window.addEventListener("load",async()=>{
    try{
-     const registration=await navigator.serviceWorker.register(`./service-worker.js?v=${encodeURIComponent(PUBLIC_BUILD_VERSION)}`,{updateViaCache:"none"});
+     const registration=await navigator.serviceWorker.register("./service-worker.js",{updateViaCache:"none"});
      serviceWorkerRegistration=registration;
      // Do not show the banner merely because a worker is waiting. The
      // published version check below is the source of truth.
@@ -4109,13 +3999,7 @@ function initialiseAppUpdates(){
 }
 
 initialiseAppUpdates();
-loadData().then(()=>handleIncomingQrCompare()).catch(error=>{
- console.error(error);
- hideLoading();
- hideAppSplash();
- const splash=$("#appSplash");if(splash)splash.hidden=true;
- showToast("No se pudieron cargar los datos de StickerBase. Cierra y vuelve a abrir la app.");
-});
+loadData().then(()=>handleIncomingQrCompare()).catch(error=>{console.error(error);hideLoading();document.body.innerHTML="<main class='app-main'><h1>Error al cargar</h1><p>Comprueba que todos los archivos estén subidos.</p></main>"});
 
 
 /* Build 703.2 · formatos de compartir y copiar + recuperación al volver a primer plano */
