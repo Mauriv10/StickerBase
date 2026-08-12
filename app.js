@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.22";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.24";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -112,6 +112,19 @@ const MEGACRACKS_SPECIAL_INFO=globalThis.MEGACRACKS_DATA?.specialInfo||{};
 globalThis.MEGACRACKS_ITEM_INFO={...MEGACRACKS_ITEM_INFO,...MEGACRACKS_SPECIAL_INFO};
 function isMegacracksSpecialTeam(team){return Object.prototype.hasOwnProperty.call(MEGACRACKS_SPECIALS,team)}
 function megacracksItemInfo(team,code){return MEGACRACKS_ITEM_INFO?.[team]?.[code]||MEGACRACKS_SPECIAL_INFO?.[team]?.[code]||null}
+function isPendingCollectionItem(team,code){
+ const type=inferCollectionType(projects?.[activeProjectId]);
+ if(type==="liga-este-2026-27"){
+  const info=ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code);
+  return normalizeTradeName(info?.[0]||"")==="pendiente";
+ }
+ if(type==="megacracks-2026-27"){
+  const info=megacracksItemInfo(team,code);
+  return normalizeTradeName(info?.[0]||"")==="pendiente";
+ }
+ return false;
+}
+
 function megacracksCrestUrl(team){return LIGA_ESTE_CRESTS[team]||""}
 function megacracksTeamSearchText(team){const source=MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{};return normalizeTradeName([team,...Object.entries(source).flatMap(([code,[name]])=>[code,name])].join(" "))}
 function collectionInventoryTemplate(type){
@@ -1051,6 +1064,10 @@ function isShinySticker(team,code){
 function collectionStickerMatches(team,code,qty){
  const target=getTarget();
  const effectiveFilter=currentFilter==="need"?"missing":currentFilter==="offer"?"repeats":collectionFilter;
+ const type=inferCollectionType(projects?.[activeProjectId]);
+ if((type==="liga-este-2026-27"||type==="megacracks-2026-27")&&isPendingCollectionItem(team,code)){
+  return effectiveFilter==="all";
+ }
  if(effectiveFilter==="all")return true;
  if(effectiveFilter==="missing")return qty<target;
  if(effectiveFilter==="repeats")return qty>target;
@@ -1879,8 +1896,18 @@ function renderLigaEsteCollection(){
    list.appendChild(section);
  });
  if(collectionTeamFilter==="all"&&collectionFilter==="all"&&insertTeams.length){
-   const special=document.createElement("section");special.className="ligaeste-specials-group";special.innerHTML=`<div class="ligaeste-specials-title"><span>✦</span><div><strong>Especiales e inserts</strong><small>ADN · Fantasy · Draft 23 · Kromix · Extra Stickers</small></div></div>`;
-   insertTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`${flagHTML(team)}<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special);
+   insertTeams.forEach(team=>{
+     const stickers=inventory[team]||{};
+     const entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));
+     if(!entries.length)return;
+     const total=entries.reduce((sum,[,q])=>sum+Number(q||0),0),open=ligaEsteIsOpen(team);
+     const section=document.createElement("section");section.className=`ligaeste-team-accordion ligaeste-special-accordion${open?" open":""}`;
+     section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cromos</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / cromo</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
+     section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleLigaEsteTeam(team);
+     const rows=section.querySelector(".ligaeste-player-list");
+     entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));
+     list.appendChild(section);
+   });
  }
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cromos para este filtro.</div>';
 }
@@ -1896,7 +1923,18 @@ function renderMegacracksCollection(){
  const target=getTarget(),total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0),missing=Object.values(stickers).reduce((a,b)=>a+Math.max(0,target-Number(b||0)),0),open=megacracksIsOpen(team);
  const section=document.createElement("section");section.className=`ligaeste-team-accordion megacracks-team-accordion${open?" open":""}`;section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards · ${missing?`${missing} pendientes`:"Completo"}</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
  section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleMegacracksTeam(team);const rows=section.querySelector(".ligaeste-player-list");entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));list.appendChild(section)});
- if(collectionTeamFilter==="all"&&collectionFilter==="all"&&specialTeams.length){const special=document.createElement("section");special.className="ligaeste-specials-group megacracks-specials-group";special.innerHTML=`<div class="ligaeste-specials-title"><span>◆</span><div><strong>Especiales y paralelas</strong><small>Élite · Enjoy · Zona VIP · Master Rookie · Stars on 25 · Special One</small></div></div>`;specialTeams.forEach(team=>{const stickers=inventory[team]||{},total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0);const btn=document.createElement("button");btn.type="button";btn.className="ligaeste-special-shortcut";btn.innerHTML=`${flagHTML(team)}<span>${collectionSafeText(team)}</span><strong>${total}</strong>`;btn.onclick=()=>selectTeam(team);special.appendChild(btn)});list.appendChild(special)}
+ if(collectionTeamFilter==="all"&&collectionFilter==="all"&&specialTeams.length){
+  specialTeams.forEach(team=>{
+   const stickers=inventory[team]||{},entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));
+   if(!entries.length)return;
+   const total=entries.reduce((a,[,b])=>a+Number(b||0),0),open=megacracksIsOpen(team);
+   const section=document.createElement("section");section.className=`ligaeste-team-accordion megacracks-team-accordion megacracks-special-accordion${open?" open":""}`;
+   section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
+   section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleMegacracksTeam(team);
+   const rows=section.querySelector(".ligaeste-player-list");entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));
+   list.appendChild(section);
+  });
+ }
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cards para este filtro.</div>';
 }
 function renderGlobalCollection(){
@@ -1959,6 +1997,8 @@ function calculateProjectStatistics(){
    let specialOwned=0,specialTotal=0;
    Object.entries(stickers).forEach(([code,raw])=>{
      const qty=Number(raw)||0;
+     const pendingItem=(collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27")&&isPendingCollectionItem(team,code);
+     if(pendingItem)return;
      total+=qty;
      const unitMissing=Math.max(0,target-qty);
      missing+=unitMissing;
@@ -1982,15 +2022,18 @@ function calculateProjectStatistics(){
    }
    if(isLigaInsert||isMegaInsert)specialProgress[team]={owned:specialOwned,total:specialTotal};
  });
- const required=currentTeamOrder().reduce((sum,team)=>sum+Object.keys(inventory[team]||{}).length,0)*target;
+ const required=currentTeamOrder().reduce((sum,team)=>sum+Object.keys(inventory[team]||{}).filter(code=>!((collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27")&&isPendingCollectionItem(team,code))).length,0)*target;
  const useful=Math.max(0,total-mathExcessForProgress());
  const roundedProgress=required?Math.round(useful/required*100):0;
  const progress=missing>0?Math.min(99,roundedProgress):Math.min(100,roundedProgress);
  return {total,missing,repeats,shiny,fwc,badges,collaboration,complete,progress,normalMissing,normalComplete,specialProgress,collectionType};
 }
 function mathExcessForProgress(){
- const target=getTarget();
- return currentTeamOrder().reduce((sum,team)=>sum+Object.values(inventory[team]||{}).reduce((s,q)=>s+Math.max(0,Number(q||0)-target),0),0);
+ const target=getTarget(),type=inferCollectionType(projects?.[activeProjectId]);
+ return currentTeamOrder().reduce((sum,team)=>sum+Object.entries(inventory[team]||{}).reduce((s,[code,q])=>{
+  if((type==="liga-este-2026-27"||type==="megacracks-2026-27")&&isPendingCollectionItem(team,code))return s;
+  return s+Math.max(0,Number(q||0)-target);
+ },0),0);
 }
 function renderStatistics(){
  const s=calculateProjectStatistics();
@@ -3713,44 +3756,13 @@ function showQrComparison(raw){
  try{const peer=parseQrComparePayload(raw),result=compareQrInventory(peer),root=$("#qrCompareResult");root.hidden=false;root.innerHTML=`<div class="trade-qr-summary"><div><span>Tú puedes darle</span><strong>${result.give.reduce((a,b)=>a+b.units,0)}</strong></div><div><span>Puede darte</span><strong>${result.receive.reduce((a,b)=>a+b.units,0)}</strong></div></div><div class="trade-qr-columns"><section><h3>Para dar</h3>${renderQrCompareRows(result.give)}</section><section><h3>Para recibir</h3>${renderQrCompareRows(result.receive)}</section></div>`;$("#qrCompareIntro").hidden=true;stopQrScanner();
  }catch(error){showToast(error.message||"No se ha podido leer el QR");}
 }
-function stopQrScanner(){if(qrCompareScanTimer){cancelAnimationFrame(qrCompareScanTimer);qrCompareScanTimer=null}if(qrCompareStream){qrCompareStream.getTracks().forEach(t=>t.stop());qrCompareStream=null}const video=$("#qrCompareVideo");if(video){video.srcObject=null;video.hidden=true}const button=$("#startQrCompareScanner");if(button){button.disabled=false;button.textContent="Abrir cámara";button.onclick=null}}
-async function startQrScanner(){
- const button=$("#startQrCompareScanner"),video=$("#qrCompareVideo"),original=button?.textContent||"Abrir cámara";
- if(!navigator.mediaDevices?.getUserMedia){showToast("Este navegador no permite acceder a la cámara. Usa «Importar captura desde Fotos».");return;}
- try{
-  stopQrScanner();
-  if(button){button.disabled=true;button.textContent="Abriendo cámara…";}
-  qrCompareStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
-  video.srcObject=qrCompareStream;video.hidden=false;await video.play();
-  if(button){button.disabled=false;button.textContent="Cerrar cámara";button.onclick=()=>{stopQrScanner();button.textContent=original;button.onclick=null;};}
-  let detector=null;
-  if("BarcodeDetector" in window){try{const formats=await BarcodeDetector.getSupportedFormats();if(formats.includes("qr_code"))detector=new BarcodeDetector({formats:["qr_code"]});}catch{}}
-  const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d",{willReadFrequently:true});
-  let lastDecode=0;
-  const scan=async(now=0)=>{
-   if(!qrCompareStream)return;
-   try{
-    let raw="";
-    if(detector){const codes=await detector.detect(video);raw=codes[0]?.rawValue||"";}
-    else if(typeof globalThis.jsQR==="function"&&video.readyState>=2&&now-lastDecode>180){
-     lastDecode=now;
-     const maxW=720,scale=Math.min(1,maxW/(video.videoWidth||maxW));
-     canvas.width=Math.max(1,Math.round((video.videoWidth||maxW)*scale));canvas.height=Math.max(1,Math.round((video.videoHeight||540)*scale));
-     ctx.drawImage(video,0,0,canvas.width,canvas.height);
-     const image=ctx.getImageData(0,0,canvas.width,canvas.height),result=globalThis.jsQR(image.data,image.width,image.height,{inversionAttempts:"attemptBoth"});
-     raw=result?.data||"";
-    }
-    if(raw){if(button){button.textContent=original;button.onclick=null;}showQrComparison(raw);showToast("QR detectado ✓");return;}
-   }catch{}
-   qrCompareScanTimer=requestAnimationFrame(scan);
-  };
-  qrCompareScanTimer=requestAnimationFrame(scan);
- }catch(error){
-  stopQrScanner();
-  if(button){button.disabled=false;button.textContent=original;button.onclick=null;}
-  const denied=error?.name==="NotAllowedError"||error?.name==="PermissionDeniedError";
-  showToast(denied?"StickerBase no tiene permiso para usar la cámara. Actívalo en los ajustes de Safari.":"No se pudo abrir la cámara. Puedes importar una captura desde Fotos.");
- }
+function stopQrScanner(){
+ if(qrCompareScanTimer){cancelAnimationFrame(qrCompareScanTimer);qrCompareScanTimer=null}
+ if(qrCompareStream){qrCompareStream.getTracks().forEach(track=>{try{track.stop()}catch{}});qrCompareStream=null}
+ const video=$("#qrCompareVideo");
+ if(video){try{video.pause()}catch{}video.srcObject=null;video.hidden=true}
+ const button=$("#startQrCompareScanner");
+ if(button){button.disabled=false;button.textContent="Abrir cámara"}
 }
 async function qrImageSource(file){
  if("createImageBitmap" in window){try{return await createImageBitmap(file)}catch{}}
