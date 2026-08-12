@@ -1,3 +1,9 @@
+## 704.12.26
+- Corregido bloqueo indefinido en «Cargando tus colecciones…» durante el arranque.
+- La sincronización inicial tiene un límite de espera y, si la red/auth no responde, la app abre con los datos locales sin sobrescribir inventario.
+- Añadido fail-safe visual del splash; no resuelve ni altera conflictos de sincronización.
+- Conserva todos los cambios funcionales de 704.12.25.
+
 ## 704.12.25
 - Corregido el versionado visible de index.html, que arrastraba una versión antigua.
 - Añadido cache-busting explícito a los recursos críticos de la aplicación.

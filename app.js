@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.25";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.26";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -541,6 +541,23 @@ function displayUserName(user){
  return String(raw).trim().split(/\s+/)[0]||"coleccionista";
 }
 function hideAppSplash(){window.WCAuth?.hideSplash?.();const splash=$("#appSplash");if(splash)splash.hidden=true}
+// Build 704.12.26: fail-safe visual de arranque.
+// No modifica inventario ni decide conflictos: únicamente evita que el splash
+// bloquee la interfaz indefinidamente si una petición de red/auth queda colgada.
+let startupSplashFailsafe=null;
+function armStartupSplashFailsafe(){
+ clearTimeout(startupSplashFailsafe);
+ startupSplashFailsafe=setTimeout(()=>{
+   const authGate=$("#authGate"),onboardingGate=$("#onboardingGate"),conflict=$("#cloudConflictModal");
+   const blockingGate=(authGate&&!authGate.hidden)||(onboardingGate&&!onboardingGate.hidden)||(conflict&&!conflict.hidden);
+   if(!blockingGate){
+     console.warn("[StickerBase] Tiempo de arranque agotado; liberando splash y conservando estado local.");
+     hideAppSplash();
+     setCloudStatus("Trabajando con datos locales · sincronización pendiente","syncing");
+   }
+ },8000);
+}
+armStartupSplashFailsafe();
 function showReturningWelcome(session){
  hideAppSplash();
  const name=displayUserName(session?.user);
@@ -584,8 +601,20 @@ async function initialCloudSync(session){
  const client=cloudClient();if(!client||!session)return;
  await appDataReadyPromise;
  cloudSession=session;setCloudStatus("Conectando con la nube…","syncing");
- const {data,error}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",session.user.id).maybeSingle();
- if(error){setCloudStatus("Falta preparar la base de datos","error");console.error(error);hideAppSplash();return}
+ let cloudResult;
+ try{
+   cloudResult=await Promise.race([
+     client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",session.user.id).maybeSingle(),
+     new Promise(resolve=>setTimeout(()=>resolve({__startupTimeout:true}),7000))
+   ]);
+ }catch(error){
+   console.error(error);setCloudStatus("Sin conexión · usando datos locales","error");hideAppSplash();return;
+ }
+ if(cloudResult?.__startupTimeout){
+   setCloudStatus("Sincronización pendiente · usando datos locales","syncing");hideAppSplash();return;
+ }
+ const {data,error}=cloudResult||{};
+ if(error){setCloudStatus("No se pudo sincronizar · usando datos locales","error");console.error(error);hideAppSplash();return}
  cloudReady=true;
  if(data?.payload?.projects&&Object.keys(data.payload.projects).length){
    const meta=cloudMeta(),localFp=stateFingerprint(),remoteFp=stateFingerprint(data.payload.projects,data.payload.activeProjectId),baseline=meta.fingerprint||null;
