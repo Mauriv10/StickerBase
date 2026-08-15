@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.26";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.27";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -112,8 +112,8 @@ const MEGACRACKS_SPECIAL_INFO=globalThis.MEGACRACKS_DATA?.specialInfo||{};
 globalThis.MEGACRACKS_ITEM_INFO={...MEGACRACKS_ITEM_INFO,...MEGACRACKS_SPECIAL_INFO};
 function isMegacracksSpecialTeam(team){return Object.prototype.hasOwnProperty.call(MEGACRACKS_SPECIALS,team)}
 function megacracksItemInfo(team,code){return MEGACRACKS_ITEM_INFO?.[team]?.[code]||MEGACRACKS_SPECIAL_INFO?.[team]?.[code]||null}
-function isPendingCollectionItem(team,code){
- const type=inferCollectionType(projects?.[activeProjectId]);
+function isPendingCollectionItemForProject(project,team,code){
+ const type=inferCollectionType(project);
  if(type==="liga-este-2026-27"){
   const info=ligaEsteStickerInfo(team,code)||ligaEsteInsertInfo(team,code);
   return normalizeTradeName(info?.[0]||"")==="pendiente";
@@ -123,6 +123,9 @@ function isPendingCollectionItem(team,code){
   return normalizeTradeName(info?.[0]||"")==="pendiente";
  }
  return false;
+}
+function isPendingCollectionItem(team,code){
+ return isPendingCollectionItemForProject(projects?.[activeProjectId],team,code);
 }
 
 function megacracksCrestUrl(team){return LIGA_ESTE_CRESTS[team]||""}
@@ -2741,9 +2744,10 @@ function collectionProgress(p){
  let useful=0,total=0,different=0,pending=0,required=0;
  teams.forEach(team=>{
    const stickers=p?.inventory?.[team]||{};
-   Object.values(stickers).forEach(q=>{
+   Object.entries(stickers).forEach(([code,q])=>{
      const qty=Math.max(0,Number(q)||0);
      total+=qty;
+     if(isPendingCollectionItemForProject(p,team,code))return;
      required+=target;
      if(qty>0)different++;
      useful+=Math.min(qty,target);

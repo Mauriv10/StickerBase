@@ -1,3 +1,10 @@
+## 704.12.27
+- Unificado el porcentaje de progreso entre «Colecciones» y «Estadísticas» para Liga Este y Megacracks.
+- Las referencias todavía marcadas como «Pendiente» quedan fuera del denominador y de los faltantes también en la biblioteca de colecciones.
+- Es posible alcanzar el 100% cuando se poseen todas las referencias actualmente publicadas, aunque existan futuras posiciones «Pendiente».
+- El cálculo es específico para cada proyecto y no depende de cuál esté activo.
+- Inventario y sincronización sin cambios.
+
 ## 704.12.26
 - Los contadores «pendientes» por club de Liga Este y Megacracks excluyen referencias todavía marcadas como «Pendiente».
 - Inventario intacto.
