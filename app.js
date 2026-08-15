@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.25";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.26";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1886,7 +1886,7 @@ function renderLigaEsteCollection(){
    const stickers=inventory[team]||{};
    const entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));
    if(!entries.length)return;
-   const target=getTarget(),total=Object.values(stickers).reduce((sum,q)=>sum+Number(q||0),0),missing=Object.values(stickers).reduce((sum,q)=>sum+Math.max(0,target-Number(q||0)),0),open=ligaEsteIsOpen(team);
+   const target=getTarget(),total=Object.values(stickers).reduce((sum,q)=>sum+Number(q||0),0),missing=Object.entries(stickers).reduce((sum,[code,q])=>sum+(isPendingCollectionItem(team,code)?0:Math.max(0,target-Number(q||0))),0),open=ligaEsteIsOpen(team);
    const section=document.createElement("section");section.className=`ligaeste-team-accordion${open?" open":""}`;
    section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cromos · ${missing?`${missing} pendientes`:"Completo"}</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / cromo</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
    section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleLigaEsteTeam(team);
@@ -1917,7 +1917,7 @@ function renderMegacracksCollection(){
  let teams=currentTeamOrder().filter(team=>collectionFilter!=="all"||!isMegacracksSpecialTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));
  const specialTeams=currentTeamOrder().filter(team=>isMegacracksSpecialTeam(team));if(collectionSort==="az")teams.sort((a,b)=>a.localeCompare(b,"es"));
  teams.forEach(team=>{if(collectionTeamFilter!=="all"&&team!==collectionTeamFilter)return;const stickers=inventory[team]||{},entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));if(!entries.length)return;
- const target=getTarget(),total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0),missing=Object.values(stickers).reduce((a,b)=>a+Math.max(0,target-Number(b||0)),0),open=megacracksIsOpen(team);
+ const target=getTarget(),total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0),missing=Object.entries(stickers).reduce((a,[code,b])=>a+(isPendingCollectionItem(team,code)?0:Math.max(0,target-Number(b||0))),0),open=megacracksIsOpen(team);
  const section=document.createElement("section");section.className=`ligaeste-team-accordion megacracks-team-accordion${open?" open":""}`;section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards · ${missing?`${missing} pendientes`:"Completo"}</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
  section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleMegacracksTeam(team);const rows=section.querySelector(".ligaeste-player-list");entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));list.appendChild(section)});
  if(collectionTeamFilter==="all"&&collectionFilter==="all"&&specialTeams.length){
