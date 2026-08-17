@@ -1,3 +1,9 @@
+## 704.12.29
+- Las carpetas de «Colecciones» aparecen cerradas por defecto la primera vez.
+- StickerBase recuerda de forma independiente si World Cup 2026, Liga Este 2026/27 y Megacracks 2026/27 quedaron abiertas o cerradas.
+- El estado se conserva al salir y volver a entrar en «Colecciones» y al reiniciar la app en el mismo dispositivo.
+- Inventarios, progreso y sincronización sin cambios.
+
 ## 704.12.27
 - Unificado el porcentaje de progreso entre «Colecciones» y «Estadísticas» para Liga Este y Megacracks.
 - Las referencias todavía marcadas como «Pendiente» quedan fuera del denominador y de los faltantes también en la biblioteca de colecciones.

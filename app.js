@@ -2768,14 +2768,29 @@ function collectionLibraryGroups(){
   {type:"megacracks-2026-27",label:"Megacracks 2026/27",short:"MC",theme:"megacracks"}
  ];
 }
+const COLLECTION_FOLDER_STATE_KEY="stickerbase.collectionFolders.v1";
+function readCollectionFolderStates(){
+ const saved=readJSON(COLLECTION_FOLDER_STATE_KEY,{});
+ return saved&&typeof saved==="object"&&!Array.isArray(saved)?saved:{};
+}
+function collectionFolderIsOpen(type){
+ const states=readCollectionFolderStates();
+ return states[type]===true;
+}
+function setCollectionFolderOpen(type,isOpen){
+ const states=readCollectionFolderStates();
+ states[type]=Boolean(isOpen);
+ try{localStorage.setItem(COLLECTION_FOLDER_STATE_KEY,JSON.stringify(states))}catch{}
+}
 function renderCollections(){
  const list=$("#collectionsList");if(!list)return;
  const items=orderedProjects();
  const groups=collectionLibraryGroups().map(group=>({...group,items:items.filter(p=>inferCollectionType(p)===group.type)})).filter(group=>group.items.length);
  list.innerHTML=groups.map(group=>{
    const activeInside=group.items.some(p=>p.id===activeProjectId);
-   return `<section class="collection-folder collection-folder-${group.theme} ${activeInside?"active":""}" data-collection-folder="${group.type}">
-    <button type="button" class="collection-folder-header" data-toggle-collection-folder="${group.type}" aria-expanded="true">
+   const folderOpen=collectionFolderIsOpen(group.type);
+   return `<section class="collection-folder collection-folder-${group.theme} ${activeInside?"active":""} ${folderOpen?"":"collapsed"}" data-collection-folder="${group.type}">
+    <button type="button" class="collection-folder-header" data-toggle-collection-folder="${group.type}" aria-expanded="${folderOpen}">
       <span class="collection-folder-icon">${group.short}</span>
       <span class="collection-folder-copy"><strong>${collectionSafeText(group.label)}</strong><small>${group.items.length} ${group.items.length===1?"álbum":"álbumes"}</small></span>
       ${activeInside?'<span class="collection-folder-active">Activa</span>':''}
@@ -2805,7 +2820,9 @@ function renderCollections(){
  }).join("");
  list.querySelectorAll("[data-toggle-collection-folder]").forEach(button=>button.onclick=()=>{
    const folder=button.closest(".collection-folder"),body=folder?.querySelector(".collection-folder-body");if(!folder||!body)return;
-   const collapsed=folder.classList.toggle("collapsed");button.setAttribute("aria-expanded",String(!collapsed));
+   const collapsed=folder.classList.toggle("collapsed"),isOpen=!collapsed;
+   button.setAttribute("aria-expanded",String(isOpen));
+   setCollectionFolderOpen(folder.dataset.collectionFolder,isOpen);
  });
  list.querySelectorAll("[data-open-collection]").forEach(button=>button.onclick=()=>{
    const id=button.dataset.openCollection;
