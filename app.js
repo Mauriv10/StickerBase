@@ -2761,29 +2761,52 @@ function collectionProgress(p){
 function collectionSafeText(value){
  return String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
 }
+function collectionLibraryGroups(){
+ return [
+  {type:"world-cup-2026",label:"World Cup 2026",short:"26",theme:"worldcup"},
+  {type:"liga-este-2026-27",label:"Liga Este 2026/27",short:"LE",theme:"ligaeste"},
+  {type:"megacracks-2026-27",label:"Megacracks 2026/27",short:"MC",theme:"megacracks"}
+ ];
+}
 function renderCollections(){
  const list=$("#collectionsList");if(!list)return;
  const items=orderedProjects();
- list.innerHTML=items.map((p,index)=>{
-   const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p);
-   return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${active?"active":""}" data-collection-id="${p.id}">
-    <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
-      <div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>
-      <div class="collection-library-copy">
-        <div class="collection-title-line"><h3>${collectionSafeText(p.name)}</h3>${active?'<span class="collection-active-badge">Activa</span>':''}</div>
-        <span class="collection-type-chip">${collectionSafeText(def.label)}</span>
-        <span class="collection-brief">${s.progress}% completado · Objetivo ${p.target} ${albumWord(p.target)}</span>
-        <div class="collection-progress-track"><div class="collection-progress-fill" style="width:${s.progress}%"></div></div>
-      </div>
-      <span class="collection-card-chevron">›</span>
+ const groups=collectionLibraryGroups().map(group=>({...group,items:items.filter(p=>inferCollectionType(p)===group.type)})).filter(group=>group.items.length);
+ list.innerHTML=groups.map(group=>{
+   const activeInside=group.items.some(p=>p.id===activeProjectId);
+   return `<section class="collection-folder collection-folder-${group.theme} ${activeInside?"active":""}" data-collection-folder="${group.type}">
+    <button type="button" class="collection-folder-header" data-toggle-collection-folder="${group.type}" aria-expanded="true">
+      <span class="collection-folder-icon">${group.short}</span>
+      <span class="collection-folder-copy"><strong>${collectionSafeText(group.label)}</strong><small>${group.items.length} ${group.items.length===1?"álbum":"álbumes"}</small></span>
+      ${activeInside?'<span class="collection-folder-active">Activa</span>':''}
+      <span class="collection-folder-chevron">⌄</span>
     </button>
-    <div class="collection-card-order" aria-label="Ordenar ${collectionSafeText(p.name)}">
-      <button type="button" data-move-collection="${p.id}" data-direction="-1" aria-label="Subir ${collectionSafeText(p.name)}" ${index===0?"disabled":""}>↑</button>
-      <button type="button" data-move-collection="${p.id}" data-direction="1" aria-label="Bajar ${collectionSafeText(p.name)}" ${index===items.length-1?"disabled":""}>↓</button>
+    <div class="collection-folder-body">
+    ${group.items.map((p,index)=>{
+      const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p);
+      return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${active?"active":""}" data-collection-id="${p.id}">
+       <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
+        <div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>
+        <div class="collection-library-copy">
+         <div class="collection-title-line"><h3>${collectionSafeText(p.name)}</h3>${active?'<span class="collection-active-badge">Activa</span>':''}</div>
+         <span class="collection-brief">${s.progress}% completado · Objetivo ${p.target} ${albumWord(p.target)}</span>
+         <div class="collection-progress-track"><div class="collection-progress-fill" style="width:${s.progress}%"></div></div>
+        </div>
+       </button>
+       <div class="collection-card-order" aria-label="Ordenar ${collectionSafeText(p.name)}">
+        <button type="button" data-move-collection="${p.id}" data-direction="-1" aria-label="Subir ${collectionSafeText(p.name)}" ${index===0?"disabled":""}>↑</button>
+        <button type="button" data-move-collection="${p.id}" data-direction="1" aria-label="Bajar ${collectionSafeText(p.name)}" ${index===group.items.length-1?"disabled":""}>↓</button>
+       </div>
+       <button type="button" class="collection-card-menu" data-edit-collection="${p.id}" aria-label="Editar ${collectionSafeText(p.name)}">•••</button>
+      </article>`;
+    }).join("")}
     </div>
-    <button type="button" class="collection-card-menu" data-edit-collection="${p.id}" aria-label="Editar ${collectionSafeText(p.name)}">•••</button>
-   </article>`;
+   </section>`;
  }).join("");
+ list.querySelectorAll("[data-toggle-collection-folder]").forEach(button=>button.onclick=()=>{
+   const folder=button.closest(".collection-folder"),body=folder?.querySelector(".collection-folder-body");if(!folder||!body)return;
+   const collapsed=folder.classList.toggle("collapsed");button.setAttribute("aria-expanded",String(!collapsed));
+ });
  list.querySelectorAll("[data-open-collection]").forEach(button=>button.onclick=()=>{
    const id=button.dataset.openCollection;
    if(id!==activeProjectId)switchProject(id);
@@ -2793,13 +2816,15 @@ function renderCollections(){
    event.stopPropagation();openEditCollection(button.dataset.editCollection);
  });
  list.querySelectorAll("[data-move-collection]").forEach(button=>button.onclick=event=>{
-   event.stopPropagation();
-   moveCollectionInLibrary(button.dataset.moveCollection,Number(button.dataset.direction));
+   event.stopPropagation();moveCollectionInLibrary(button.dataset.moveCollection,Number(button.dataset.direction));
  });
 }
+
 function moveCollectionInLibrary(id,direction){
  if(!id||![1,-1].includes(direction))return;
- const ordered=orderedProjects();
+ const currentProject=projects[id];if(!currentProject)return;
+ const type=inferCollectionType(currentProject);
+ const ordered=orderedProjects().filter(project=>inferCollectionType(project)===type);
  const index=ordered.findIndex(project=>project.id===id);
  const target=index+direction;
  if(index<0||target<0||target>=ordered.length)return;

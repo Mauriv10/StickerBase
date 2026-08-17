@@ -6160,3 +6160,22 @@ body.collection-theme-megacracks #searchSuggestions .suggestion>small{margin-lef
 body.collection-theme-ligaeste .ligaeste-special-accordion,
 body.collection-theme-megacracks .megacracks-special-accordion{margin-top:10px}
 .collection-stat-card.base>span{background:#eef5ff;color:#1684df}
+
+
+/* Build 704.12.28 · Biblioteca de colecciones agrupada por colección */
+.collections-grid{display:grid;gap:14px}
+.collection-folder{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+.collection-folder-header{width:100%;min-height:78px;display:flex;align-items:center;gap:13px;padding:13px 15px;border:0;background:#fff;color:#101828;text-align:left}
+.collection-folder-header:active{background:#f8fafc}
+.collection-folder-icon{width:50px;height:50px;flex:0 0 50px;border-radius:15px;display:grid;place-items:center;font-size:17px;font-weight:950;letter-spacing:-.04em}
+.collection-folder-copy{min-width:0;flex:1;display:grid;gap:3px}.collection-folder-copy strong{font-size:18px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.collection-folder-copy small{font-size:12px;color:#7b8493;font-weight:650}
+.collection-folder-active{padding:4px 8px;border-radius:999px;background:#e9f8ee;color:#15803d;font-size:10px;font-weight:900}
+.collection-folder-chevron{font-size:24px;color:#7b8493;transition:transform .18s ease}.collection-folder.collapsed .collection-folder-chevron{transform:rotate(-90deg)}
+.collection-folder-body{display:grid;gap:8px;padding:0 9px 9px}.collection-folder.collapsed .collection-folder-body{display:none}
+.collection-folder-body .clean-library-card{border-radius:16px;background:#f9fafb}.collection-folder-body .collection-card-main{background:transparent;min-height:82px}
+.collection-folder-body .collection-type-chip{display:none}
+.collection-folder-worldcup .collection-folder-icon{background:linear-gradient(145deg,#e9f3ff,#fff);color:#1473e6;border:1px solid #d8e9ff}
+.collection-folder-ligaeste .collection-folder-icon{background:linear-gradient(145deg,#7a35d3,#b26bf0);color:#fff}
+.collection-folder-megacracks .collection-folder-icon{background:linear-gradient(145deg,#111827,#4b5563);color:#fff}
+.collection-folder.active{border-color:rgba(20,115,230,.22)}
+@media(max-width:390px){.collection-folder-header{padding-left:12px;padding-right:12px}.collection-folder-icon{width:46px;height:46px;flex-basis:46px}.collection-folder-copy strong{font-size:17px}.collection-folder-active{display:none}}
