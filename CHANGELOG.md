@@ -1,3 +1,12 @@
+## 704.12.32
+- Protección de concurrencia entre pestañas/dispositivos: las escrituras a Supabase usan comparación atómica de revisión (CAS).
+- Una pestaña antigua ya no puede sobrescribir silenciosamente una revisión más nueva. Si otra pestaña guarda primero, la escritura queda rechazada y StickerBase refresca/abre conflicto.
+- Cada pestaña mantiene su propia huella base en memoria; deja de usar la huella compartida de localStorage para decidir automáticamente qué copia es más nueva.
+- Coordinación entre pestañas mediante BroadcastChannel y evento storage para refrescar el estado cuando otra pestaña sincroniza.
+- Aviso si StickerBase detecta otra pestaña abierta.
+- Copias automáticas locales ampliadas a las 10 últimas restauraciones/sincronizaciones.
+- Construida directamente sobre 704.12.29: no incluye cambios de checklist de 704.12.30/.31.
+
 ## 704.12.29
 - Las carpetas de «Colecciones» aparecen cerradas por defecto la primera vez.
 - StickerBase recuerda de forma independiente si World Cup 2026, Liga Este 2026/27 y Megacracks 2026/27 quedaron abiertas o cerradas.

@@ -230,7 +230,11 @@ let pendingExcelImport=null;
 
 const CLOUD_STATE_TABLE="wc_user_state";
 const CLOUD_LOCAL_META_KEY="world-cup-2026-cloud-meta-v7007";
-let cloudSession=null,cloudSubscription=null,cloudSaveTimer=null,cloudApplying=false,cloudReady=false,cloudRevision=0,cloudLastUpdatedAt=null,cloudConflictOpen=false;
+let cloudSession=null,cloudSubscription=null,cloudSaveTimer=null,cloudApplying=false,cloudReady=false,cloudRevision=0,cloudLastUpdatedAt=null,cloudConflictOpen=false,cloudBaselineFingerprint=null;
+const CLOUD_TAB_ID=sessionStorage.getItem("stickerbase-cloud-tab-id")||crypto.randomUUID();
+sessionStorage.setItem("stickerbase-cloud-tab-id",CLOUD_TAB_ID);
+const cloudTabChannel=typeof BroadcastChannel!=="undefined"?new BroadcastChannel("stickerbase-cloud-sync-v1"):null;
+let cloudOtherTabWarned=false;
 let pendingBackupRestore=null;
 let appDataReady=false,appDataReadyResolve;
 const appDataReadyPromise=new Promise(resolve=>{appDataReadyResolve=resolve});
@@ -477,6 +481,22 @@ function askCloudConflict(row,{reason="sync"}={}){
 }
 function cloudMeta(){return readJSON(CLOUD_LOCAL_META_KEY,{revision:0,updatedAt:null,userId:null})}
 function writeCloudMeta(meta){localStorage.setItem(CLOUD_LOCAL_META_KEY,JSON.stringify(meta))}
+function setCloudBaseline(fingerprint=stateFingerprint()){cloudBaselineFingerprint=fingerprint||null}
+function notifyOtherTabs(type="cloud-updated",extra={}){try{cloudTabChannel?.postMessage({type,tabId:CLOUD_TAB_ID,revision:cloudRevision,...extra})}catch{}}
+function warnOtherTab(){
+ if(cloudOtherTabWarned)return;
+ cloudOtherTabWarned=true;
+ showToast("⚠ StickerBase está abierto en otra pestaña. La sincronización está protegida.");
+}
+if(cloudTabChannel){
+ cloudTabChannel.onmessage=event=>{
+   const msg=event.data||{};if(!msg||msg.tabId===CLOUD_TAB_ID)return;
+   if(msg.type==="hello"){warnOtherTab();notifyOtherTabs("presence")}
+   else if(msg.type==="presence")warnOtherTab();
+   else if(msg.type==="cloud-updated"&&cloudSession){refreshCloudState({reason:"other-tab"}).catch(console.error)}
+ };
+ setTimeout(()=>notifyOtherTabs("hello"),250);
+}
 function cloudPayload(){
  commitProjectStateLocalOnly();
  return {format:"world-cup-2026-cloud-state",schemaVersion:DATA_SCHEMA_VERSION,dataOwner:"supabase-user",version:APP_VERSION,activeProjectId,projects:structuredClone(projects)};
@@ -503,24 +523,63 @@ function scheduleCloudSave(delay=450){
 async function saveCloudState({force=false}={}){
  const client=cloudClient();if(!client||!cloudSession||!navigator.onLine||cloudApplying||cloudConflictOpen)return false;
  clearTimeout(cloudSaveTimer);cloudSaveTimer=null;setCloudStatus("Comprobando la nube…","syncing");
- if(!force){
-   const {data:remote,error:readError}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
-   if(readError){setCloudStatus("No se pudo comprobar la nube","error");throw readError}
-   if(remote?.payload?.projects&&Number(remote.revision)>cloudRevision){
-     const choice=await askCloudConflict(remote,{reason:"before-save"});
-     if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");await applyCloudPayload(remote);return false}
-     if(choice==="local"){saveExternalCloudBackup(remote,"antes-de-reemplazar-nube");cloudRevision=Number(remote.revision)||0;cloudLastUpdatedAt=remote.updated_at||null;return saveCloudState({force:true})}
-     setCloudStatus("Sin sincronizar: elige una copia","error");return false;
-   }
+ let remote=null;
+ const {data:checkedRemote,error:readError}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
+ if(readError){setCloudStatus("No se pudo comprobar la nube","error");throw readError}
+ remote=checkedRemote;
+ const remoteRevision=Number(remote?.revision)||0;
+ if(remote?.payload?.projects&&remoteRevision>cloudRevision&&!force){
+   const choice=await askCloudConflict(remote,{reason:"before-save"});
+   if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");await applyCloudPayload(remote);return false}
+   if(choice==="local"){saveExternalCloudBackup(remote,"antes-de-reemplazar-nube");cloudRevision=remoteRevision;cloudLastUpdatedAt=remote.updated_at||null;setCloudBaseline(stateFingerprint(remote.payload.projects,remote.payload.activeProjectId));return saveCloudState({force:true})}
+   setCloudStatus("Sin sincronizar: elige una copia","error");return false;
+ }
+ // Nunca escribimos sobre una revisión diferente a la que esta pestaña conoce.
+ // Esto evita que una pestaña antigua pueda ganar una carrera contra otra más reciente.
+ const expectedRevision=force?remoteRevision:cloudRevision;
+ if(remote&&remoteRevision!==expectedRevision){
+   setCloudStatus("Cambios nuevos detectados en otra pestaña","error");
+   return reconcileCloudRow(remote,{reason:"cas-precheck"});
  }
  setCloudStatus("Sincronizando…","syncing");
- const nextRevision=Math.max(cloudRevision,Number(cloudMeta().revision)||0)+1;
  const payload=cloudPayload();
- const {data,error}=await client.from(CLOUD_STATE_TABLE).upsert({user_id:cloudSession.user.id,payload,revision:nextRevision,updated_at:new Date().toISOString()},{onConflict:"user_id"}).select("revision,updated_at").single();
- if(error){setCloudStatus("Error al guardar en la nube","error");throw error}
+ const nextRevision=expectedRevision+1;
+ const writeAt=new Date().toISOString();
+ let data=null,error=null;
+ if(remote){
+   const result=await client.from(CLOUD_STATE_TABLE)
+     .update({payload,revision:nextRevision,updated_at:writeAt})
+     .eq("user_id",cloudSession.user.id)
+     .eq("revision",expectedRevision)
+     .select("revision,updated_at")
+     .maybeSingle();
+   data=result.data;error=result.error;
+ }else{
+   const result=await client.from(CLOUD_STATE_TABLE)
+     .insert({user_id:cloudSession.user.id,payload,revision:1,updated_at:writeAt})
+     .select("revision,updated_at")
+     .maybeSingle();
+   data=result.data;error=result.error;
+ }
+ if(error){
+   // Un conflicto de clave/revisión puede significar que otra pestaña escribió entre lectura y escritura.
+   const {data:latest}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
+   if(latest?.payload?.projects){setCloudStatus("Otra pestaña guardó primero","error");return reconcileCloudRow(latest,{reason:"cas-error"})}
+   setCloudStatus("Error al guardar en la nube","error");throw error;
+ }
+ if(!data){
+   // UPDATE ... WHERE revision=expected no afectó ninguna fila: CAS rechazado de forma segura.
+   const {data:latest,error:latestError}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
+   if(latestError){setCloudStatus("No se pudo comprobar el conflicto","error");throw latestError}
+   if(latest?.payload?.projects){setCloudStatus("Otra pestaña guardó primero","error");return reconcileCloudRow(latest,{reason:"cas-rejected"})}
+   return false;
+ }
  cloudRevision=Number(data.revision)||nextRevision;cloudLastUpdatedAt=data.updated_at;lastSyncedAt=data.updated_at;
  Object.values(projects).forEach(p=>{p.pendingSync={};p.lastSyncedAt=data.updated_at});pendingSync={};
- commitProjectStateLocalOnly();writeCloudMeta({revision:cloudRevision,updatedAt:data.updated_at,userId:cloudSession.user.id,fingerprint:stateFingerprint()});
+ commitProjectStateLocalOnly();
+ const fp=stateFingerprint();setCloudBaseline(fp);
+ writeCloudMeta({revision:cloudRevision,updatedAt:data.updated_at,userId:cloudSession.user.id,fingerprint:fp,writerTabId:CLOUD_TAB_ID});
+ notifyOtherTabs("cloud-updated",{fingerprint:fp});
  updateSyncUI();setCloudStatus("✓ Guardado en la nube","synced");return true;
 }
 async function applyCloudPayload(row,{silent=false}={}){
@@ -533,7 +592,8 @@ async function applyCloudPayload(row,{silent=false}={}){
    activeProjectId=row.payload.activeProjectId&&projects[row.payload.activeProjectId]?row.payload.activeProjectId:Object.keys(projects)[0];
    cloudRevision=Number(row.revision)||0;cloudLastUpdatedAt=row.updated_at||null;
    localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));localStorage.setItem(ACTIVE_PROJECT_KEY,activeProjectId);
-   writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:stateFingerprint()});
+   const appliedFp=stateFingerprint();setCloudBaseline(appliedFp);
+   writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:appliedFp,writerTabId:cloudMeta().writerTabId||null});
    loadProjectState();renderProjectsList();
    if(!silent)showToast("Datos actualizados desde la nube");
    setCloudStatus("✓ Sincronizado","synced");return true;
@@ -591,8 +651,8 @@ async function initialCloudSync(session){
  if(error){setCloudStatus("Falta preparar la base de datos","error");console.error(error);hideAppSplash();return}
  cloudReady=true;
  if(data?.payload?.projects&&Object.keys(data.payload.projects).length){
-   const meta=cloudMeta(),localFp=stateFingerprint(),remoteFp=stateFingerprint(data.payload.projects,data.payload.activeProjectId),baseline=meta.fingerprint||null;
-   if(localFp===remoteFp){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:session.user.id,fingerprint:localFp});setCloudStatus("✓ Sincronizado","synced")}
+   const meta=cloudMeta(),localFp=stateFingerprint(),remoteFp=stateFingerprint(data.payload.projects,data.payload.activeProjectId);if(cloudBaselineFingerprint===null)setCloudBaseline(meta.fingerprint||null);const baseline=cloudBaselineFingerprint;
+   if(localFp===remoteFp){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;setCloudBaseline(localFp);writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:session.user.id,fingerprint:localFp,writerTabId:cloudMeta().writerTabId||null});setCloudStatus("✓ Sincronizado","synced")}
    else if(baseline&&localFp===baseline){createAutoBackup("antes-de-actualizar-desde-nube");await applyCloudPayload(data,{silent:true})}
    else if(baseline&&remoteFp===baseline){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;saveExternalCloudBackup(data,"nube-anterior");await saveCloudState({force:true})}
    else{
@@ -617,12 +677,12 @@ window.addEventListener("wc-auth-changed",event=>{
  if(!session){cloudSession=null;cloudReady=false;if(cloudSubscription)cloudClient()?.removeChannel(cloudSubscription);cloudSubscription=null}
 });
 function hasLocalPendingChanges(){
- return stateFingerprint()!==(cloudMeta().fingerprint||stateFingerprint())||Object.values(projects||{}).some(project=>Object.keys(project?.pendingSync||{}).length>0)||Object.keys(pendingSync||{}).length>0;
+ return Boolean(cloudBaselineFingerprint&&stateFingerprint()!==cloudBaselineFingerprint)||Object.values(projects||{}).some(project=>Object.keys(project?.pendingSync||{}).length>0)||Object.keys(pendingSync||{}).length>0;
 }
 async function reconcileCloudRow(row,{reason="manual"}={}){
  if(!row?.payload?.projects||cloudConflictOpen)return false;
- const localFp=stateFingerprint(),remoteFp=stateFingerprint(row.payload.projects,row.payload.activeProjectId),baseline=cloudMeta().fingerprint||null;
- if(localFp===remoteFp){cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:localFp});setCloudStatus("✓ Sincronizado","synced");return true}
+ const localFp=stateFingerprint(),remoteFp=stateFingerprint(row.payload.projects,row.payload.activeProjectId),baseline=cloudBaselineFingerprint;
+ if(localFp===remoteFp){cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;setCloudBaseline(localFp);writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:localFp,writerTabId:cloudMeta().writerTabId||null});setCloudStatus("✓ Sincronizado","synced");return true}
  if(baseline&&localFp===baseline){createAutoBackup("antes-de-actualizar-desde-nube");return applyCloudPayload(row,{silent:reason!=="manual"})}
  if(baseline&&remoteFp===baseline){cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;saveExternalCloudBackup(row,"nube-anterior");return saveCloudState({force:true})}
  const choice=await askCloudConflict(row,{reason});
@@ -643,6 +703,13 @@ window.addEventListener("online",()=>{if(cloudSession){cloudReady=true;refreshCl
 window.addEventListener("focus",()=>{if(cloudSession)refreshCloudState({reason:"focus"}).catch(console.error)});
 document.addEventListener("visibilitychange",()=>{
  if(document.visibilityState==="visible"&&cloudSession)refreshCloudState({reason:"foreground"}).catch(console.error);
+});
+window.addEventListener("storage",event=>{
+ if(event.key===CLOUD_LOCAL_META_KEY&&cloudSession){
+   // Otra pestaña del mismo navegador ha sincronizado. No copiamos su meta como baseline:
+   // refrescamos Supabase y dejamos que la revisión atómica decida.
+   refreshCloudState({reason:"storage-meta"}).catch(console.error);
+ }
 });
 
 // Build 703.1: foreground recovery for iOS PWAs and desktop browser tabs.
@@ -3246,7 +3313,7 @@ function createAutomaticBackup(reason){
  const backup=buildFullBackup(reason);
  const snapshots=readJSON("panini-mercat-auto-backups-v5",[]);
  snapshots.push(backup);
- while(snapshots.length>5)snapshots.shift();
+ while(snapshots.length>10)snapshots.shift();
  localStorage.setItem("panini-mercat-auto-backups-v5",JSON.stringify(snapshots));
  return backup;
 }
