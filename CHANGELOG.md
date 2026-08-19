@@ -1,3 +1,11 @@
+## 704.12.33
+- Liga Este: Extra Stickers Bronce, Plata y Oro pasan a ser opcionales mediante un único interruptor en Ajustes.
+- Si los Extra Stickers están desactivados, se conserva todo su inventario pero quedan fuera de vistas, faltantes, progreso y estadísticas; al reactivarlos vuelven a contar.
+- Todas las colecciones: cuando el objetivo es 2 o más álbumes, Estadísticas muestra el progreso independiente de cada álbum (Álbum 1, Álbum 2, etc.).
+- El progreso por álbum respeta las mismas reglas del proyecto: referencias Pendiente excluidas y módulos opcionales incluidos solo cuando están activos.
+- Se mantiene íntegra la protección de sincronización/concurrencia de 704.12.32.
+- Inventarios existentes intactos.
+
 ## 704.12.32
 - Protección de concurrencia entre pestañas/dispositivos: las escrituras a Supabase usan comparación atómica de revisión (CAS).
 - Una pestaña antigua ya no puede sobrescribir silenciosamente una revisión más nueva. Si otra pestaña guarda primero, la escritura queda rechazada y StickerBase refresca/abre conflicto.

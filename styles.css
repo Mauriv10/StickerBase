@@ -6179,3 +6179,25 @@ body.collection-theme-megacracks .megacracks-special-accordion{margin-top:10px}
 .collection-folder-megacracks .collection-folder-icon{background:linear-gradient(145deg,#111827,#4b5563);color:#fff}
 .collection-folder.active{border-color:rgba(20,115,230,.22)}
 @media(max-width:390px){.collection-folder-header{padding-left:12px;padding-right:12px}.collection-folder-icon{width:46px;height:46px;flex-basis:46px}.collection-folder-copy strong{font-size:17px}.collection-folder-active{display:none}}
+
+/* 704.12.33 · Progreso independiente por álbum */
+.album-progress-stats{margin:18px 0 20px;padding:18px;border:1px solid rgba(124,136,160,.18);border-radius:24px;background:rgba(255,255,255,.88);box-shadow:0 12px 30px rgba(30,42,62,.06)}
+.album-progress-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+.album-progress-heading strong{font-size:1.12rem}
+.album-progress-heading small{color:#7c8492;font-size:.88rem}
+.album-progress-list{display:grid;gap:10px}
+.album-progress-row{display:grid;grid-template-columns:1fr auto;gap:5px 14px;padding:13px 14px;border-radius:17px;background:#f5f7fb;border:1px solid rgba(117,129,151,.12)}
+.album-progress-row>div:first-child{display:flex;align-items:baseline;gap:8px;min-width:0}
+.album-progress-row>div:first-child strong{font-size:1rem;white-space:nowrap}
+.album-progress-row>div:first-child span{font-size:.78rem;color:#7b8494;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.album-progress-value{font-weight:800;font-size:1rem}
+.album-progress-track{grid-column:1/-1;height:7px;border-radius:999px;background:#e3e8f0;overflow:hidden}
+.album-progress-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#1f7eea,#6a45e8)}
+body.ligaeste-theme .album-progress-track i{background:linear-gradient(90deg,#4b0c78,#9a36ea)}
+body.megacracks-theme .album-progress-track i{background:linear-gradient(90deg,#10151d,#66707d)}
+@media(max-width:560px){
+ .album-progress-stats{padding:15px;border-radius:20px}
+ .album-progress-row{padding:12px}
+ .album-progress-row>div:first-child{display:block}
+ .album-progress-row>div:first-child span{display:block;margin-top:2px}
+}

@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.27";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.33";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -267,16 +267,21 @@ function projectTeamOrder(project=projects?.[activeProjectId],sourceInventory=pr
    .filter(team=>available.includes(team)&&!seen.has(team)&&seen.add(team));
 }
 function currentCollectionOptions(project=projects?.[activeProjectId]){
- if(!project)return {collaborationEnabled:true,extra:{epic:false,bronze:false,silver:false,gold:false}};
+ if(!project)return {collaborationEnabled:true,extra:{epic:false,bronze:false,silver:false,gold:false},ligaEsteExtrasEnabled:true};
  project.collectionOptions=project.collectionOptions||{collaborationEnabled:true};
  if(typeof project.collectionOptions.collaborationEnabled!=="boolean")project.collectionOptions.collaborationEnabled=true;
+ if(typeof project.collectionOptions.ligaEsteExtrasEnabled!=="boolean")project.collectionOptions.ligaEsteExtrasEnabled=true;
  project.collectionOptions.extra={epic:false,bronze:false,silver:false,gold:false,...(project.collectionOptions.extra||{})};
  return project.collectionOptions;
 }
 function collaborationEnabled(project=projects?.[activeProjectId]){return currentCollectionOptions(project).collaborationEnabled!==false}
 function extraVariantEnabled(key,project=projects?.[activeProjectId]){return currentCollectionOptions(project).extra?.[key]===true}
+function ligaEsteExtrasEnabled(project=projects?.[activeProjectId]){return currentCollectionOptions(project).ligaEsteExtrasEnabled!==false}
+function isLigaEsteExtraStickerTeam(team){return team==="EXTRA STICKER BRONCE"||team==="EXTRA STICKER PLATA"||team==="EXTRA STICKER ORO"}
 function teamVisibleForProject(team,project=projects?.[activeProjectId]){
+ const type=inferCollectionType(project);
  if(team==="Coca-Cola")return collaborationEnabled(project);
+ if(type==="liga-este-2026-27"&&isLigaEsteExtraStickerTeam(team))return ligaEsteExtrasEnabled(project);
  const variant=extraVariantForTeam(team);
  return variant?extraVariantEnabled(variant.key,project):true;
 }
@@ -2096,7 +2101,8 @@ function calculateProjectStatistics(){
  const useful=Math.max(0,total-mathExcessForProgress());
  const roundedProgress=required?Math.round(useful/required*100):0;
  const progress=missing>0?Math.min(99,roundedProgress):Math.min(100,roundedProgress);
- return {total,missing,repeats,shiny,fwc,badges,collaboration,complete,progress,normalMissing,normalComplete,baseOwned,baseAvailable,specialProgress,collectionType};
+ const albumProgress=albumLayerProgress(projects?.[activeProjectId]);
+ return {total,missing,repeats,shiny,fwc,badges,collaboration,complete,progress,normalMissing,normalComplete,baseOwned,baseAvailable,specialProgress,collectionType,albumProgress};
 }
 function mathExcessForProgress(){
  const target=getTarget(),type=inferCollectionType(projects?.[activeProjectId]);
@@ -2104,6 +2110,25 @@ function mathExcessForProgress(){
    if((type==="liga-este-2026-27"||type==="megacracks-2026-27")&&isPendingCollectionItem(team,code))return s;
    return s+Math.max(0,Number(q||0)-target);
  },0),0);
+}
+function albumLayerProgress(project=projects?.[activeProjectId]){
+ const target=Math.max(1,Number(project?.target)||1);
+ if(target<2)return [];
+ const type=inferCollectionType(project);
+ const inv=project?.inventory||{};
+ const teams=projectTeamOrder(project,inv).filter(team=>teamVisibleForProject(team,project));
+ const eligible=[];
+ teams.forEach(team=>Object.entries(inv?.[team]||{}).forEach(([code,raw])=>{
+   if((type==="liga-este-2026-27"||type==="megacracks-2026-27")&&isPendingCollectionItemForProject(project,team,code))return;
+   eligible.push(Math.max(0,Number(raw)||0));
+ }));
+ const required=eligible.length;
+ return Array.from({length:target},(_,index)=>{
+   const album=index+1;
+   const owned=eligible.reduce((sum,qty)=>sum+(qty>=album?1:0),0);
+   const progress=required?Math.round(owned/required*100):0;
+   return {album,owned,required,progress};
+ });
 }
 function renderStatistics(){
  const s=calculateProjectStatistics();
@@ -2123,6 +2148,12 @@ function renderStatistics(){
  Object.entries(values).forEach(([id,value])=>{const node=$("#"+id);if(node)node.textContent=value});
  const ring=$("#statsProgressRing");
  if(ring)ring.style.setProperty("--progress",String(s.progress));
+ const albumProgressRoot=$("#albumProgressStats");
+ if(albumProgressRoot){
+   const rows=s.albumProgress||[];
+   albumProgressRoot.hidden=rows.length<2;
+   albumProgressRoot.innerHTML=rows.length<2?"":`<div class="album-progress-heading"><strong>Progreso por álbum</strong><small>Objetivo ${rows.length} álbumes</small></div><div class="album-progress-list">${rows.map(row=>`<article class="album-progress-row"><div><strong>Álbum ${row.album}</strong><span>${row.owned}/${row.required} cromos</span></div><div class="album-progress-value">${row.progress}%</div><div class="album-progress-track"><i style="width:${Math.max(0,Math.min(100,row.progress))}%"></i></div></article>`).join("")}</div>`;
+ }
 
  const genericGrid=document.querySelector(".visual-stats-grid");
  const shinyBreakdown=document.querySelector(".shiny-breakdown");
@@ -2131,7 +2162,7 @@ function renderStatistics(){
    if(genericGrid)genericGrid.hidden=true;
    if(shinyBreakdown)shinyBreakdown.hidden=true;
    custom.hidden=false;
-   const specials=isMega?Object.keys(MEGACRACKS_SPECIALS):Object.keys(LIGA_ESTE_INSERTS);
+   const specials=(isMega?Object.keys(MEGACRACKS_SPECIALS):Object.keys(LIGA_ESTE_INSERTS)).filter(team=>teamVisibleForProject(team));
    custom.innerHTML=`<div class="collection-stats-summary-grid">
      <article class="collection-stat-card total"><span>▦</span><div><small>Cromos que tienes</small><strong>${s.total.toLocaleString("es-ES")}</strong><em>unidades totales</em></div></article>
      <article class="collection-stat-card base"><span>◫</span><div><small>Cromos base</small><strong>${s.baseOwned}/${s.baseAvailable}</strong><em>disponibles actualmente</em></div></article>
@@ -3679,7 +3710,8 @@ function renderCollectionModuleSettings(){
       <div class="optional-collection-group">${EXTRA_VARIANTS.map(v=>`<label class="settings-toggle-row extra-toggle-row"><span><strong>${v.icon} ${v.label}</strong><small>20 futbolistas</small></span><input type="checkbox" data-extra-variant="${v.key}" ${options.extra[v.key]?"checked":""}></label>`).join("")}</div>`
    : `<div class="collection-settings-inactive">Entra en un proyecto del Mundial para configurar Coca-Cola y Extra Stickers.</div>`;
  const ligaState=type==="liga-este-2026-27"
-   ? `<div class="collection-settings-status active">✓ 20 clubes y ${Object.keys(LIGA_ESTE_INSERTS).length} apartados especiales activos</div>`
+   ? `<div class="collection-settings-status active">✓ 20 clubes y especiales activos</div>
+      <label class="settings-toggle-row"><span><strong>Extra Stickers</strong><small>Bronce, Plata y Oro · cuentan en el progreso solo si están activos</small></span><input id="toggleLigaEsteExtras" type="checkbox" ${ligaEsteExtrasEnabled()?"checked":""}></label>`
    : `<div class="collection-settings-inactive">Configuración disponible al entrar en Liga Este 26/27.</div>`;
  root.innerHTML=`<section class="collection-settings-family ${type==="world-cup-2026"?"is-active":""}">
    <header><span>🌍</span><div><strong>World Cup 2026</strong><small>Selecciones, FWC, colaboraciones y extras</small></div></header>${worldControls}
@@ -3696,6 +3728,12 @@ function renderCollectionModuleSettings(){
    if(!event.currentTarget.checked&&collectionTeamFilter==="Coca-Cola")collectionTeamFilter="all";
    persistProjects();populateTeams();renderAll();renderCollectionModuleSettings();updateOptionalCollectionVisibility();
    showToast(event.currentTarget.checked?"Coca-Cola activada":"Coca-Cola ocultada");
+ });
+ $("#toggleLigaEsteExtras")?.addEventListener("change",event=>{
+   currentCollectionOptions().ligaEsteExtrasEnabled=event.currentTarget.checked;
+   if(!event.currentTarget.checked&&isLigaEsteExtraStickerTeam(collectionTeamFilter))collectionTeamFilter="all";
+   persistProjects();populateTeams();renderAll();renderCollectionModuleSettings();updateOptionalCollectionVisibility();
+   showToast(event.currentTarget.checked?"Extra Stickers de Liga Este activados":"Extra Stickers de Liga Este ocultados");
  });
  root.querySelectorAll("[data-extra-variant]").forEach(input=>input.addEventListener("change",event=>{
    const key=event.currentTarget.dataset.extraVariant;currentCollectionOptions().extra[key]=event.currentTarget.checked;
