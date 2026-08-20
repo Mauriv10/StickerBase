@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.13.3";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.13.4";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -878,7 +878,7 @@ async function loadData(){
  activeProjectId=localStorage.getItem(ACTIVE_PROJECT_KEY)||"";
  bootstrapProjectsFromSeed(seedData);
  if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects);
- // 704.13.3: no crear/hidratar proyectos Pokémon antes de resolver Supabase.
+ // 704.13.4: no crear/hidratar proyectos Pokémon antes de resolver Supabase.
  // Hacerlo aquí alteraba el estado local y provocaba un falso conflicto en cada dispositivo.
  loadProjectState();
  renderProjectsList();
@@ -1421,9 +1421,18 @@ function teamSearchText(team){
  const activeType=inferCollectionType(projects?.[activeProjectId]);
  if(activeType==="liga-este-2026-27")return ligaEsteTeamSearchText(team);
  if(activeType==="megacracks-2026-27")return megacracksTeamSearchText(team);
+ if(isPokemonCollectionType(activeType)){
+   const p=projects?.[activeProjectId],meta=pokemonProjectMeta(p);
+   return normalizeTradeName([team,...Object.keys(p?.inventory?.[team]||{}).flatMap(code=>[code,meta?.[code]?.name||"",meta?.[code]?.rarity||"",...(meta?.[code]?.types||[]),...(meta?.[code]?.subtypes||[])])].join(" "));
+ }
  const code=TEAM_TO_PANINI_CODE[team]||team;
  const aliases=PANINI_TEAM_NAME_ALIASES[code]||[];
  return normalizeTradeName([team,code,...aliases].join(" "));
+}
+function pokemonCardMatchesSearch(section,code,project=projects?.[activeProjectId]){
+ const q=normalizeTradeName(teamSearch?.value||"");if(!q)return true;
+ const meta=pokemonCardMeta(code,project)||{};
+ return normalizeTradeName([section,code,Number(code),meta.name||"",meta.rarity||"",...(meta.types||[]),...(meta.subtypes||[])].join(" ")).includes(q);
 }
 function filterTeamsByQuery(query){
  const q=normalizeTradeName(query);
@@ -2119,8 +2128,8 @@ function renderPokemonCollection(){
  const list=$("#globalCollectionList"),p=projects?.[activeProjectId],def=POKEMON_SET_DEFS[inferCollectionType(p)];if(!list||!p||!def)return;renderPokemonDashboard();list.innerHTML="";
  def.ranges.forEach(([section])=>{
   if(collectionTeamFilter!=="all"&&section!==collectionTeamFilter)return;
-  const cards=inventory[section]||{},entries=Object.entries(cards).filter(([code,qty])=>collectionStickerMatches(section,code,Number(qty)||0));if(!entries.length)return;
-  const open=pokemonIsOpen(section);let copies=0,unique=0;
+  const cards=inventory[section]||{},searching=Boolean(normalizeTradeName(teamSearch?.value||"")),entries=Object.entries(cards).filter(([code,qty])=>collectionStickerMatches(section,code,Number(qty)||0)&&pokemonCardMatchesSearch(section,code,p));if(!entries.length)return;
+  const open=searching?true:pokemonIsOpen(section);let copies=0,unique=0;
   entries.forEach(([code,q])=>{if(section==="BASE"&&!pokemonIsEx(pokemonCardMeta(code,p))){const v=pokemonVariantState(p,code),sum=Object.values(v).reduce((a,b)=>a+Number(b||0),0);copies+=sum;if(sum>0)unique++;}else{const n=Number(q)||0;copies+=n;if(n>0)unique++;}});
   const pct=entries.length?Math.round(unique/entries.length*100):0;
   const sec=document.createElement("section");sec.className=`pokemon-accordion tone-${pokemonSectionTone(section)} ${open?"open":""}`;
@@ -2253,7 +2262,60 @@ function albumLayerProgress(project=projects?.[activeProjectId]){
    return {album,owned,required,progress};
  });
 }
+function calculatePokemonStatistics(project=projects?.[activeProjectId]){
+ const type=inferCollectionType(project),def=POKEMON_SET_DEFS[type];if(!def)return null;
+ const sections={};let unique=0,copies=0,repeats=0;
+ let baseBasic=0,baseHolo=0,baseReverse=0,baseVariantEligible=0,baseUnique=0;
+ def.ranges.forEach(([section])=>{
+   const cards=project?.inventory?.[section]||{};let sectionOwned=0,sectionCopies=0;
+   Object.entries(cards).forEach(([code,raw])=>{
+     const meta=pokemonCardMeta(code,project)||{};
+     if(section==="BASE"&&!pokemonIsEx(meta)){
+       const v=pokemonVariantState(project,code),b=Number(v.basic)||0,h=Number(v.holo)||0,r=Number(v.reverse)||0,sum=b+h+r;
+       baseVariantEligible++;if(b>0)baseBasic++;if(h>0)baseHolo++;if(r>0)baseReverse++;
+       if(sum>0){sectionOwned++;baseUnique++;unique++;}
+       copies+=sum;sectionCopies+=sum;repeats+=Math.max(0,b-1)+Math.max(0,h-1)+Math.max(0,r-1);
+     }else{
+       const qty=Number(raw)||0;if(qty>0){sectionOwned++;unique++;if(section==="BASE")baseUnique++;}
+       copies+=qty;sectionCopies+=qty;repeats+=Math.max(0,qty-1);
+     }
+   });
+   const total=Object.keys(cards).length;
+   sections[section]={owned:sectionOwned,total,copies:sectionCopies,progress:total?Math.round(sectionOwned/total*100):0};
+ });
+ return {type,def,unique,copies,repeats,missing:Math.max(0,def.total-unique),progress:def.total?Math.round(unique/def.total*100):0,baseUnique,baseTotal:def.official,baseBasic,baseHolo,baseReverse,baseVariantEligible,sections};
+}
+function renderPokemonStatistics(){
+ const ps=calculatePokemonStatistics();if(!ps)return;
+ const genericGrid=document.querySelector(".visual-stats-grid"),shinyBreakdown=document.querySelector(".shiny-breakdown"),custom=$("#collectionSpecificStats"),albumProgressRoot=$("#albumProgressStats");
+ if(genericGrid)genericGrid.hidden=true;if(shinyBreakdown)shinyBreakdown.hidden=true;if(albumProgressRoot)albumProgressRoot.hidden=true;
+ $("#statsTotalStickers").textContent=`${ps.unique}/${ps.def.total} cartas`;
+ $("#statsCompleteTeamsText").textContent=`${ps.missing} pendientes · ${ps.copies} copias`;
+ $("#statsProgress").textContent=`${ps.progress}%`;
+ const ring=$("#statsProgressRing");if(ring)ring.style.setProperty("--progress",String(ps.progress));
+ if(custom){
+   custom.hidden=false;
+   const specialSections=ps.def.ranges.map(r=>r[0]).filter(section=>section!=="BASE");
+   custom.innerHTML=`<div class="pokemon-stats-grid">
+     <article><span>◉</span><div><small>Cartas distintas</small><strong>${ps.unique}/${ps.def.total}</strong><em>checklist numerada</em></div></article>
+     <article><span>▣</span><div><small>Base Set</small><strong>${ps.baseUnique}/${ps.baseTotal}</strong><em>cartas conseguidas</em></div></article>
+     <article><span>＋</span><div><small>Copias totales</small><strong>${ps.copies}</strong><em>incluye variantes</em></div></article>
+     <article><span>↺</span><div><small>Repetidas</small><strong>${ps.repeats}</strong><em>copias extra</em></div></article>
+   </div>
+   <section class="pokemon-variant-stats">
+     <div class="pokemon-stats-title"><strong>Variantes del Base Set</strong><small>Progreso independiente</small></div>
+     ${[["Básica",ps.baseBasic],["Holo",ps.baseHolo],["Inverse Holo",ps.baseReverse]].map(([label,owned])=>{const pct=ps.baseVariantEligible?Math.round(owned/ps.baseVariantEligible*100):0;return `<article><div><strong>${label}</strong><span>${owned}/${ps.baseVariantEligible}</span></div><div class="pokemon-stat-track"><i style="width:${pct}%"></i></div><b>${pct}%</b></article>`}).join("")}
+   </section>
+   <section class="pokemon-rarity-stats">
+     <div class="pokemon-stats-title"><strong>Rarezas ocultas</strong><small>Progreso por apartado</small></div>
+     ${specialSections.map(section=>{const s=ps.sections[section]||{owned:0,total:0,progress:0};return `<article class="tone-${pokemonSectionTone(section)}"><span class="pokemon-section-orb"></span><div><strong>${collectionSafeText(pokemonSectionLabel(section))}</strong><small>${s.owned}/${s.total} cartas</small><div class="pokemon-stat-track"><i style="width:${s.progress}%"></i></div></div><b>${s.progress}%</b></article>`}).join("")}
+   </section>`;
+ }
+}
+
 function renderStatistics(){
+ const activeStatsType=inferCollectionType(projects?.[activeProjectId]);
+ if(isPokemonCollectionType(activeStatsType)){renderPokemonStatistics();return;}
  const s=calculateProjectStatistics();
  const isLiga=s.collectionType==="liga-este-2026-27";const isMega=s.collectionType==="megacracks-2026-27";
  const values={
@@ -2347,6 +2409,7 @@ function setMainTab(tab){
 
 function renderAll(){
  applyCollectionIdentity();
+ if(isPokemonCollectionType(inferCollectionType(projects?.[activeProjectId]))&&mainTab==="trade")mainTab="collection";
  updateOptionalCollectionVisibility();
  const homeName=$("#homeCollectionName");if(homeName&&projects[activeProjectId])homeName.textContent=projects[activeProjectId].name;
  if(currentView!=="missing")renderCards();
@@ -2413,9 +2476,13 @@ function syncMainSearchSpace(){
 }
 teamSearch.oninput=()=>{
  const q=normalizeTradeName(teamSearch.value);
+ const searchType=inferCollectionType(projects?.[activeProjectId]);
+ if(isPokemonCollectionType(searchType)){
+   suggestions.hidden=true;syncMainSearchSpace();renderPokemonCollection();return;
+ }
  if(!q){suggestions.hidden=true;syncMainSearchSpace();return}
  const matches=filterTeamsByQuery(q).slice(0,8);
- const searchType=inferCollectionType(projects?.[activeProjectId]);const isLiga=searchType==="liga-este-2026-27";const isMega=searchType==="megacracks-2026-27";
+ const isLiga=searchType==="liga-este-2026-27";const isMega=searchType==="megacracks-2026-27";
  const worldMatch=!isLiga&&!isMega&&["todo","todos","mundo","global","selecciones"].some(word=>word.includes(q)||q.includes(word));
  suggestions.innerHTML=(worldMatch?`<button class="suggestion" data-team="all"><span>🌍</span><strong>Todas las selecciones</strong></button>`:"")
    +matches.map(team=>{const source=isLiga?(LIGA_ESTE_TEAM_INFO?.[team]||LIGA_ESTE_INSERT_INFO?.[team]||{}):isMega?(MEGACRACKS_ITEM_INFO?.[team]||MEGACRACKS_SPECIAL_INFO?.[team]||{}):{};const hit=(isLiga||isMega)?Object.entries(source).find(([code,[name,pos]])=>normalizeTradeName(`${code} ${name} ${pos||""}`).includes(q)):null;return `<button class="suggestion" data-team="${team}">${flagHTML(team)}<strong>${team}</strong><small>${hit?`${hit[0]} · ${hit[1][0]}`:(TEAM_TO_PANINI_CODE[team]||"")}</small></button>`}).join("");
@@ -2424,6 +2491,11 @@ teamSearch.oninput=()=>{
  suggestions.querySelectorAll("button").forEach(button=>button.onclick=()=>selectTeam(button.dataset.team));
 };
 document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap")){suggestions.hidden=true;syncMainSearchSpace()}});
+teamSearch?.addEventListener("blur",()=>{
+ if(isPokemonCollectionType(inferCollectionType(projects?.[activeProjectId]))){
+   requestAnimationFrame(()=>{document.documentElement.scrollLeft=0;document.body.scrollLeft=0;document.querySelector(".app-scroll")?.scrollTo({left:0,behavior:"auto"});});
+ }
+});
 function syncTeamDialogViewport(){
  const vv=window.visualViewport;
  const root=document.documentElement;

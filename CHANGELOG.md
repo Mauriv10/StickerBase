@@ -1,3 +1,11 @@
+## 704.13.4
+- Pokémon: buscador funcional por nombre, número, rareza, tipo y subtipo; filtra directamente las cartas y abre los acordeones con coincidencias.
+- Pokémon/iPhone: el buscador usa 16 px para evitar el zoom automático de Safari y se bloquea el desbordamiento horizontal.
+- Pokémon: Estadísticas rediseñadas como Pokédex, con cartas distintas, Base Set, copias, repetidas, variantes y progreso por rareza oculta.
+- Pokémon: se elimina temporalmente la pestaña Cambiar.
+- Pokémon: se elimina la barra Todos / Pedir / Entregar.
+- Mundial, Liga Este y Megacracks mantienen su navegación y estadísticas actuales.
+
 ## 704.13.3
 - Pokémon: interfaz premium oscura/dorada aplicada a la app real, inspirada en la referencia aprobada.
 - Encabezado, resumen de progreso, búsqueda, filtros, acordeones y navegación inferior adaptados exclusivamente a Pokémon.
