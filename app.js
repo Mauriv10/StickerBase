@@ -3112,7 +3112,7 @@ function renderCollections(){
       const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
       const pokemonDef=isPokemon?POKEMON_SET_DEFS[ptype]:null;
       const pokemonTotal=isPokemon?Object.values(p.inventory||{}).reduce((n,cards)=>n+Object.keys(cards||{}).length,0):0;
-      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":124,"pokemon-surging-sparks":238};
+      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219};
       const pokemonThumb=isPokemon?pokemonDirectImageUrl(ptype,pokemonLibraryChase[ptype]||1,"small"):"";
       return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${isPokemon?`pokemon-library-card pokemon-library-${ptype.replace(/^pokemon-/,'')}`:''} ${active?"active":""}" data-collection-id="${p.id}">
        <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">

@@ -1,3 +1,8 @@
+## 704.13.9
+- Pokémon · Colecciones: portadas fijadas a Mega Darkrai ex #116/084, Mega Greninja ex #116/086, Meowth ex #121/088 y Pikachu ex #219/191.
+- El menú de los tres puntos de las colecciones Pokémon pasa a pantalla completa y adopta la estética oscura/premium Pokémon, respetando el color de acento de cada expansión.
+- No se modifica el aspecto actual de las tarjetas de colección ni el inventario.
+
 ## 704.13.8
 - Pokémon · Colecciones: sustituidas las miniaturas doradas genéricas por la carta chase representativa de cada expansión.
 - Pitch Black: Mega Darkrai ex #116.
