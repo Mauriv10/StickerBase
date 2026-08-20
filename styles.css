@@ -6425,3 +6425,189 @@ body.collection-theme-pokemon .collection-stock-tools .danger-soft,body.collecti
 body.collection-theme-pokemon .collection-stock-tools .danger-soft b{color:#ff6b72!important}
 body.collection-theme-pokemon .transfer-inventory-button b,body.collection-theme-pokemon .collection-export-album-button b{color:#42a5ff!important}
 @media(max-width:600px){body.collection-theme-pokemon .collection-edit-dialog{border-radius:0!important;align-self:stretch!important}body.collection-theme-pokemon .collection-edit-dialog form{padding-left:20px!important;padding-right:20px!important}}
+
+/* =========================================================
+   BUILD 704.14.0 — PANINI PREMIUM + FIX ACTIVA POKÉMON
+   ========================================================= */
+/* Pokémon: la insignia Activa ya no compite con las flechas */
+.collection-folder-pokemon .pokemon-library-card .collection-active-badge{
+  top:10px!important;right:12px!important;bottom:auto!important;
+}
+.collection-folder-pokemon .pokemon-library-card .collection-card-order{
+  top:auto!important;bottom:15px!important;right:47px!important;
+}
+.collection-folder-pokemon .pokemon-library-card .collection-card-menu{
+  top:auto!important;bottom:15px!important;right:8px!important;
+}
+.collection-folder-pokemon .pokemon-library-card .collection-card-main{
+  padding-right:118px!important;
+}
+@media(max-width:390px){
+ .collection-folder-pokemon .pokemon-library-card .collection-card-main{padding-right:108px!important}
+ .collection-folder-pokemon .pokemon-library-card .collection-active-badge{right:10px!important}
+}
+
+/* Variables premium Panini */
+body.collection-theme-ligaeste{
+ --panini-accent:#8d3bf5;--panini-accent2:#d4a72c;--panini-rgb:141,59,245;
+ --panini-bg:#08060d;--panini-panel:#111019;--panini-panel2:#171321;--panini-line:#2c2439;
+ background:var(--panini-bg)!important;color:#f7f5fb!important;
+}
+body.collection-theme-megacracks{
+ --panini-accent:#e7ecf3;--panini-accent2:#8b96a6;--panini-rgb:231,236,243;
+ --panini-bg:#07090c;--panini-panel:#10141a;--panini-panel2:#171c24;--panini-line:#2b323d;
+ background:var(--panini-bg)!important;color:#f5f7fa!important;
+}
+body.collection-theme-ligaeste .app-main,body.collection-theme-megacracks .app-main,
+body.collection-theme-ligaeste .app-scroll,body.collection-theme-megacracks .app-scroll{background:var(--panini-bg)!important}
+
+/* Cabeceras Panini al nivel visual de Pokémon */
+body.collection-theme-ligaeste .compact-home-titlebar{
+ background:
+  radial-gradient(circle at 82% 10%,rgba(183,89,255,.34),transparent 35%),
+  linear-gradient(112deg,#250748 0%,#4e0c7c 48%,#8127cb 100%)!important;
+ border-bottom:1px solid rgba(212,167,44,.42)!important;
+ box-shadow:0 15px 38px rgba(0,0,0,.30)!important;
+}
+body.collection-theme-megacracks .compact-home-titlebar{
+ background:
+  radial-gradient(circle at 80% 5%,rgba(255,255,255,.09),transparent 34%),
+  linear-gradient(115deg,#05070a 0%,#161c24 58%,#303844 100%)!important;
+ border-bottom:1px solid rgba(231,236,243,.22)!important;
+ box-shadow:0 15px 38px rgba(0,0,0,.34)!important;
+}
+body.collection-theme-ligaeste .collection-header-kicker{color:#f4c94f!important}
+body.collection-theme-megacracks .collection-header-kicker{color:#cfd6df!important}
+body.collection-theme-ligaeste .compact-home-copy h1,body.collection-theme-megacracks .compact-home-copy h1{color:#fff!important;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+body.collection-theme-ligaeste .collection-header-subtitle,body.collection-theme-megacracks .collection-header-subtitle{color:#c8c3cf!important}
+body.collection-theme-ligaeste .ligaeste-header-logo,body.collection-theme-megacracks .ligaeste-header-logo{
+ background:rgba(7,8,12,.34)!important;border:1px solid color-mix(in srgb,var(--panini-accent) 58%,transparent)!important;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 8px 24px rgba(0,0,0,.20)!important;
+ color:#fff!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)
+}
+body.collection-theme-ligaeste .compact-home-titlebar .icon-action,body.collection-theme-megacracks .compact-home-titlebar .icon-action{
+ background:rgba(10,12,17,.42)!important;border:1px solid color-mix(in srgb,var(--panini-accent) 45%,transparent)!important;color:#fff!important;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 7px 22px rgba(0,0,0,.22)!important
+}
+
+/* Selector de club y búsqueda: vidrio oscuro */
+body.collection-theme-ligaeste .premium-selection-row,body.collection-theme-megacracks .premium-selection-row,
+body.collection-theme-ligaeste .premium-search,body.collection-theme-megacracks .premium-search{background:transparent!important}
+body.collection-theme-ligaeste .premium-team-card,body.collection-theme-megacracks .premium-team-card,
+body.collection-theme-ligaeste .search-wrap,body.collection-theme-megacracks .search-wrap{
+ background:linear-gradient(145deg,rgba(20,22,29,.96),rgba(12,14,20,.98))!important;
+ border:1px solid color-mix(in srgb,var(--panini-accent) 30%,#2c323c)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.035),0 10px 26px rgba(0,0,0,.24)!important;
+ color:#fff!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)
+}
+body.collection-theme-ligaeste .premium-team-copy small,body.collection-theme-megacracks .premium-team-copy small{color:#858e9c!important}
+body.collection-theme-ligaeste .premium-team-copy strong,body.collection-theme-megacracks .premium-team-copy strong{color:var(--panini-accent)!important}
+body.collection-theme-ligaeste .search-wrap input,body.collection-theme-megacracks .search-wrap input{color:#f5f7fb!important;font-size:16px!important}
+body.collection-theme-ligaeste .search-wrap input::placeholder,body.collection-theme-megacracks .search-wrap input::placeholder{color:#7e8795!important}
+body.collection-theme-ligaeste .search-wrap svg,body.collection-theme-megacracks .search-wrap svg{color:#9da6b3!important}
+
+/* Filtros y controles */
+body.collection-theme-ligaeste #collectionStickyControls,body.collection-theme-megacracks #collectionStickyControls{background:transparent!important;border:0!important;box-shadow:none!important}
+body.collection-theme-ligaeste .collection-filter-bar,body.collection-theme-megacracks .collection-filter-bar{
+ background:#11151c!important;border:1px solid var(--panini-line)!important;border-radius:16px!important;padding:5px!important;box-shadow:0 9px 22px rgba(0,0,0,.20)!important
+}
+body.collection-theme-ligaeste .collection-filter-button,body.collection-theme-megacracks .collection-filter-button{background:transparent!important;color:#8f98a6!important;border:0!important}
+body.collection-theme-ligaeste .collection-filter-button.active{background:linear-gradient(135deg,#6b1bd0,#9e4cf5)!important;color:#fff!important;box-shadow:0 5px 16px rgba(126,44,226,.28)!important}
+body.collection-theme-megacracks .collection-filter-button.active{background:linear-gradient(135deg,#dfe5ec,#8e9aa9)!important;color:#0b0e12!important;box-shadow:0 5px 16px rgba(207,216,227,.16)!important}
+body.collection-theme-ligaeste .collection-heading h2,body.collection-theme-megacracks .collection-heading h2{color:#fff!important;letter-spacing:-.04em}
+body.collection-theme-ligaeste .collection-sort-row,body.collection-theme-megacracks .collection-sort-row{background:#11151c!important;border:1px solid var(--panini-line)!important;color:#aeb6c2!important;box-shadow:none!important}
+body.collection-theme-ligaeste .collection-sort-row select,body.collection-theme-megacracks .collection-sort-row select{background:#171c24!important;color:#f3f5f8!important;border-color:#252d38!important}
+
+/* Acordeones premium */
+body.collection-theme-ligaeste .ligaeste-team-accordion,body.collection-theme-megacracks .ligaeste-team-accordion{
+ background:linear-gradient(145deg,#10141a,#0c1015)!important;border:1px solid var(--panini-line)!important;border-radius:17px!important;
+ box-shadow:0 10px 28px rgba(0,0,0,.24)!important;overflow:hidden!important
+}
+body.collection-theme-ligaeste .ligaeste-team-accordion.open{border-color:rgba(141,59,245,.72)!important;box-shadow:0 12px 30px rgba(85,24,145,.22)!important}
+body.collection-theme-megacracks .ligaeste-team-accordion.open{border-color:#697485!important;box-shadow:0 12px 30px rgba(0,0,0,.35)!important}
+body.collection-theme-ligaeste .ligaeste-team-toggle,body.collection-theme-megacracks .ligaeste-team-toggle{background:linear-gradient(145deg,#151a21,#10141a)!important;color:#f7f8fa!important}
+body.collection-theme-ligaeste .ligaeste-team-heading strong,body.collection-theme-megacracks .ligaeste-team-heading strong{color:#fff!important;font-size:15px!important}
+body.collection-theme-ligaeste .ligaeste-team-heading span,body.collection-theme-megacracks .ligaeste-team-heading span{color:#8e98a6!important}
+body.collection-theme-ligaeste .ligaeste-team-chevron{background:rgba(141,59,245,.13)!important;color:#ad6df8!important;border:1px solid rgba(141,59,245,.28)}
+body.collection-theme-ligaeste .ligaeste-team-accordion.open .ligaeste-team-chevron{background:#7c2de0!important;color:#fff!important}
+body.collection-theme-megacracks .ligaeste-team-chevron{background:#1f2630!important;color:#cdd5df!important;border:1px solid #303946}
+body.collection-theme-megacracks .ligaeste-team-accordion.open .ligaeste-team-chevron{background:#dce2e9!important;color:#0c1015!important}
+body.collection-theme-ligaeste .ligaeste-list-head,body.collection-theme-megacracks .ligaeste-list-head{background:#0b0f14!important;color:#7e8896!important;border-color:#252c35!important}
+body.collection-theme-ligaeste .ligaeste-player-row,body.collection-theme-megacracks .ligaeste-player-row{background:#0d1117!important;border-color:#202731!important;color:#f4f6f9!important}
+body.collection-theme-ligaeste .ligaeste-player-row:nth-child(even),body.collection-theme-megacracks .ligaeste-player-row:nth-child(even){background:#0f141b!important}
+body.collection-theme-ligaeste .ligaeste-player-number{color:#b77aff!important}
+body.collection-theme-megacracks .ligaeste-player-number{color:#d8dee7!important}
+body.collection-theme-ligaeste .ligaeste-player-copy strong,body.collection-theme-megacracks .ligaeste-player-copy strong{color:#f5f7fa!important}
+body.collection-theme-ligaeste .ligaeste-player-copy span,body.collection-theme-megacracks .ligaeste-player-copy span{color:#818b99!important}
+body.collection-theme-ligaeste .ligaeste-row-step,body.collection-theme-megacracks .ligaeste-row-step{background:#151b23!important;border:1px solid #303a46!important;color:#d8dee7!important;box-shadow:none!important}
+body.collection-theme-ligaeste .ligaeste-row-step.plus{background:linear-gradient(145deg,#7130d8,#9a4cf5)!important;border-color:#9e54f4!important;color:#fff!important}
+body.collection-theme-megacracks .ligaeste-row-step.plus{background:linear-gradient(145deg,#657181,#d6dde6)!important;border-color:#c7d0dc!important;color:#0b0f14!important}
+
+/* Barra inferior premium, negra y coherente */
+body.collection-theme-ligaeste .bottom-app-nav,body.collection-theme-megacracks .bottom-app-nav{
+ background:rgba(5,8,12,.97)!important;border-top:1px solid var(--panini-line)!important;box-shadow:0 -12px 28px rgba(0,0,0,.30)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+}
+body.collection-theme-ligaeste .bottom-nav-button,body.collection-theme-megacracks .bottom-nav-button{color:#8d96a3!important;background:transparent!important}
+body.collection-theme-ligaeste .bottom-nav-button.active{color:#c18bff!important}
+body.collection-theme-megacracks .bottom-nav-button.active{color:#eef2f7!important}
+body.collection-theme-ligaeste .bottom-nav-button.active .bottom-nav-icon{filter:drop-shadow(0 0 7px rgba(157,81,244,.38))}
+body.collection-theme-megacracks .bottom-nav-button.active .bottom-nav-icon{filter:drop-shadow(0 0 7px rgba(230,236,244,.25))}
+
+/* Estadísticas Panini premium */
+body.collection-theme-ligaeste #statisticsView,body.collection-theme-megacracks #statisticsView{color:#f5f7fb!important}
+body.collection-theme-ligaeste #statisticsView .tab-page-heading h2,body.collection-theme-megacracks #statisticsView .tab-page-heading h2{color:#fff!important}
+body.collection-theme-ligaeste #statisticsView .tab-page-heading span{color:#b773ff!important}
+body.collection-theme-megacracks #statisticsView .tab-page-heading span{color:#d8e0e9!important}
+body.collection-theme-ligaeste .stats-hero,body.collection-theme-megacracks .stats-hero{background:linear-gradient(145deg,#141820,#0d1117)!important;border:1px solid var(--panini-line)!important;color:#fff!important;box-shadow:0 12px 30px rgba(0,0,0,.28)!important}
+body.collection-theme-ligaeste .stats-ring{background:conic-gradient(#994cf1 calc(var(--progress,0)*1%),#272e38 0)!important}
+body.collection-theme-megacracks .stats-ring{background:conic-gradient(#dce3eb calc(var(--progress,0)*1%),#272e38 0)!important}
+body.collection-theme-ligaeste .stats-ring:before,body.collection-theme-megacracks .stats-ring:before{background:#0d1117!important}
+body.collection-theme-ligaeste .visual-stat-card,body.collection-theme-megacracks .visual-stat-card,
+body.collection-theme-ligaeste .collection-specific-stats>*,body.collection-theme-megacracks .collection-specific-stats>*{background:#11161d!important;border-color:var(--panini-line)!important;color:#eef2f7!important}
+
+/* Biblioteca: Liga Este y Megacracks pasan a tarjetas premium oscuras */
+.collection-folder-ligaeste,.collection-folder-megacracks{background:#0b0f14!important;border-color:#252d37!important;box-shadow:0 12px 30px rgba(0,0,0,.22)!important}
+.collection-folder-ligaeste .collection-folder-header,.collection-folder-megacracks .collection-folder-header{background:linear-gradient(145deg,#11171e,#0c1015)!important;color:#fff!important}
+.collection-folder-ligaeste .collection-folder-copy small,.collection-folder-megacracks .collection-folder-copy small{color:#8f99a7!important}
+.collection-folder-ligaeste .collection-folder-chevron,.collection-folder-megacracks .collection-folder-chevron{color:#9da6b3!important}
+.collection-folder-ligaeste .collection-folder-body,.collection-folder-megacracks .collection-folder-body{padding:0 9px 10px!important;background:#080c11!important}
+.collection-folder-ligaeste .clean-library-card,.collection-folder-megacracks .clean-library-card{background:linear-gradient(145deg,#11161d,#0d1218)!important;border-color:#29313c!important;border-radius:17px!important;box-shadow:0 7px 18px rgba(0,0,0,.17)!important}
+.collection-folder-ligaeste .clean-library-card.active{border-color:#8f4aee!important;box-shadow:0 0 0 1px rgba(143,74,238,.22)!important}
+.collection-folder-megacracks .clean-library-card.active{border-color:#7d8999!important;box-shadow:0 0 0 1px rgba(200,210,222,.12)!important}
+.collection-folder-ligaeste .collection-card-main,.collection-folder-megacracks .collection-card-main{background:transparent!important;min-height:105px!important;padding:11px 124px 11px 11px!important}
+.collection-folder-ligaeste .collection-album-icon,.collection-folder-megacracks .collection-album-icon{width:78px!important;height:88px!important;flex:0 0 78px!important;border-radius:14px!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.30)!important}
+.collection-folder-ligaeste .collection-album-icon{background:radial-gradient(circle at 72% 20%,rgba(225,175,255,.25),transparent 36%),linear-gradient(145deg,#32065c,#8735d9)!important;border:1px solid rgba(212,167,44,.45)!important}
+.collection-folder-megacracks .collection-album-icon{background:radial-gradient(circle at 75% 20%,rgba(255,255,255,.11),transparent 36%),linear-gradient(145deg,#090c10,#3b4552)!important;border:1px solid #56616f!important}
+.collection-folder-ligaeste .collection-album-icon:after{content:"LIGA ESTE";display:block;position:absolute;bottom:10px;font-size:7px;letter-spacing:.08em;color:#f1cd63;font-weight:950}
+.collection-folder-megacracks .collection-album-icon:after{content:"MEGACRACKS";display:block;position:absolute;bottom:10px;font-size:6px;letter-spacing:.05em;color:#cfd6df;font-weight:950}
+.collection-folder-ligaeste .collection-album-icon,.collection-folder-megacracks .collection-album-icon{position:relative;align-content:center}
+.collection-folder-ligaeste .collection-album-icon span,.collection-folder-megacracks .collection-album-icon span{font-size:20px!important;color:#fff!important;transform:translateY(-6px)}
+.collection-folder-ligaeste .clean-library-card h3,.collection-folder-megacracks .clean-library-card h3{color:#fff!important;font-size:16px!important}
+.collection-folder-ligaeste .collection-brief,.collection-folder-megacracks .collection-brief{color:#9aa4b1!important;font-size:10.5px!important}
+.collection-folder-ligaeste .collection-progress-track,.collection-folder-megacracks .collection-progress-track{background:#232a33!important;height:5px!important;margin-top:8px!important}
+.collection-folder-ligaeste .collection-progress-fill{background:linear-gradient(90deg,#6e25d2,#b15ef8)!important}
+.collection-folder-megacracks .collection-progress-fill{background:linear-gradient(90deg,#626e7d,#d8e0e9)!important}
+.collection-folder-ligaeste .collection-card-order,.collection-folder-megacracks .collection-card-order{top:auto!important;bottom:13px!important;right:47px!important}
+.collection-folder-ligaeste .collection-card-menu,.collection-folder-megacracks .collection-card-menu{top:auto!important;bottom:13px!important;right:8px!important;color:#a4adba!important}
+.collection-folder-ligaeste .collection-card-order button,.collection-folder-megacracks .collection-card-order button{background:#151b23!important;border-color:#303a46!important;color:#d6dde6!important}
+.collection-folder-ligaeste .collection-active-badge,.collection-folder-megacracks .collection-active-badge{position:absolute!important;top:10px!important;right:10px!important;z-index:5!important;background:#153523!important;color:#68d391!important}
+
+/* Menú de tres puntos: Panini también a pantalla completa y premium */
+body.collection-theme-ligaeste .collection-edit-dialog,body.collection-theme-megacracks .collection-edit-dialog{width:100vw!important;max-width:none!important;height:100dvh!important;max-height:none!important;margin:0!important;border-radius:0!important;background:#080c11!important;color:#f7f9fc!important;box-shadow:none!important;padding:0!important;overflow:auto!important}
+body.collection-theme-ligaeste .collection-edit-dialog::backdrop,body.collection-theme-megacracks .collection-edit-dialog::backdrop{background:#080c11!important}
+body.collection-theme-ligaeste .collection-edit-dialog form,body.collection-theme-megacracks .collection-edit-dialog form{min-height:100dvh;box-sizing:border-box;padding:calc(18px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom))!important;background:radial-gradient(circle at 100% 0,rgba(var(--panini-rgb),.13),transparent 35%),#080c11!important}
+body.collection-theme-ligaeste .collection-edit-handle,body.collection-theme-megacracks .collection-edit-handle{display:none!important}
+body.collection-theme-ligaeste .collection-edit-header,body.collection-theme-megacracks .collection-edit-header{padding:8px 0 24px!important;border-bottom:1px solid var(--panini-line)!important;margin-bottom:22px!important}
+body.collection-theme-ligaeste .collection-edit-header span{color:#ba75ff!important}body.collection-theme-megacracks .collection-edit-header span{color:#d7dee7!important}
+body.collection-theme-ligaeste .collection-edit-header h2,body.collection-theme-megacracks .collection-edit-header h2{color:#fff!important;font-size:30px!important}
+body.collection-theme-ligaeste .collection-edit-header button,body.collection-theme-megacracks .collection-edit-header button{background:#151b23!important;color:#fff!important;border:1px solid #2d3642!important}
+body.collection-theme-ligaeste .collection-edit-field>span,body.collection-theme-megacracks .collection-edit-field>span,body.collection-theme-ligaeste .collection-stock-tools>span,body.collection-theme-megacracks .collection-stock-tools>span{color:#c9d1dc!important}
+body.collection-theme-ligaeste .collection-edit-field>input,body.collection-theme-megacracks .collection-edit-field>input,body.collection-theme-ligaeste .collection-target-editor input,body.collection-theme-megacracks .collection-target-editor input,body.collection-theme-ligaeste .collection-target-editor button,body.collection-theme-megacracks .collection-target-editor button{background:#0e151d!important;border:1px solid #2b3643!important;color:#fff!important}
+body.collection-theme-ligaeste .collection-target-editor button{color:#b76fff!important}body.collection-theme-megacracks .collection-target-editor button{color:#e0e6ed!important}
+body.collection-theme-ligaeste .collection-save-button{background:linear-gradient(135deg,#7430dc,#a655f5)!important;color:#fff!important}body.collection-theme-megacracks .collection-save-button{background:linear-gradient(135deg,#7b8796,#e0e6ed)!important;color:#080c11!important}
+body.collection-theme-ligaeste .collection-stock-tools button,body.collection-theme-megacracks .collection-stock-tools button,body.collection-theme-ligaeste .collection-export-album-button,body.collection-theme-megacracks .collection-export-album-button,body.collection-theme-ligaeste .collection-edit-secondary button,body.collection-theme-megacracks .collection-edit-secondary button{background:#0e151d!important;border:1px solid #293440!important;color:#eef3f8!important;box-shadow:none!important}
+
+@media(max-width:430px){
+ .collection-folder-ligaeste .collection-card-main,.collection-folder-megacracks .collection-card-main{padding-right:112px!important;min-height:100px!important}
+ .collection-folder-ligaeste .collection-album-icon,.collection-folder-megacracks .collection-album-icon{width:70px!important;height:82px!important;flex-basis:70px!important}
+}

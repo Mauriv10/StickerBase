@@ -1,4 +1,12 @@
-## 704.13.9
+## 704.14.0
+- Pokémon: corregida la insignia Activa en la biblioteca para que no quede oculta detrás de las flechas.
+- Liga Este: rediseño Premium oscuro/morado-dorado en cabecera, selector, búsqueda, filtros, acordeones, filas, estadísticas y navegación.
+- Megacracks: rediseño Premium negro/plateado en cabecera, selector, búsqueda, filtros, acordeones, filas, estadísticas y navegación.
+- Colecciones: Liga Este y Megacracks reciben tarjetas premium propias, con mayor jerarquía visual y controles reorganizados.
+- Opciones de colección: Liga Este y Megacracks pasan a pantalla completa con estética coherente con su colección.
+- Sin cambios en inventarios, checklists ni sincronización.
+
+## 704.14.0
 - Pokémon · Colecciones: portadas fijadas a Mega Darkrai ex #116/084, Mega Greninja ex #116/086, Meowth ex #121/088 y Pikachu ex #219/191.
 - El menú de los tres puntos de las colecciones Pokémon pasa a pantalla completa y adopta la estética oscura/premium Pokémon, respetando el color de acento de cada expansión.
 - No se modifica el aspecto actual de las tarjetas de colección ni el inventario.
