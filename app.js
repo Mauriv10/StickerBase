@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.13.1";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.13.2";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -443,13 +443,13 @@ async function hydratePokemonProjects(){
    const related=Object.values(projects||{}).filter(p=>inferCollectionType(p)===type);if(!related.length)continue;
    let cards=null;try{const response=await fetch(def.source,{cache:"force-cache"});if(response.ok)cards=await response.json();}catch{}
    if(!Array.isArray(cards))continue;
-   const meta=Object.fromEntries(cards.map(card=>[pokemonCode(Number(card.number)),{name:card.name,rarity:pokemonRarityLabel(card.rarity),supertype:card.supertype,types:card.types||[],subtypes:card.subtypes||[]}]));
+   const meta=Object.fromEntries(cards.map(card=>[pokemonCode(Number(card.number)),{name:card.name,rarity:pokemonRarityLabel(card.rarity),supertype:card.supertype,types:card.types||[],subtypes:card.subtypes||[],images:card.images||{}}]));
    for(const p of related){
-     p.pokemonMeta=meta;p.pokemonDataSource=def.source;
+     p.pokemonMeta=meta;p.pokemonDataSource=def.source;p.pokemonVariants=p.pokemonVariants||{};
      const reverseCards=cards.filter(card=>Number(card.number)<=def.official&&["Common","Uncommon","Rare","Rare Holo"].includes(String(card.rarity)));
      const reverse=p.inventory["REVERSE HOLO"]||(p.inventory["REVERSE HOLO"]={});
-     reverseCards.forEach(card=>{const code=pokemonCode(Number(card.number));if(!Object.prototype.hasOwnProperty.call(reverse,code))reverse[code]=0;});
-     p.teamOrder=[...def.ranges.map(r=>r[0]),"REVERSE HOLO"].filter(x=>p.inventory[x]);changed=true;
+     reverseCards.forEach(card=>{const code=pokemonCode(Number(card.number));if(!Object.prototype.hasOwnProperty.call(reverse,code))reverse[code]=0;const v=p.pokemonVariants[code]||(p.pokemonVariants[code]={basic:0,holo:0,reverse:0});if(Number(reverse[code])>0&&Number(v.reverse)===0)v.reverse=Number(reverse[code]);});
+     p.teamOrder=def.ranges.map(r=>r[0]).filter(x=>p.inventory[x]);changed=true;
    }
  }
  if(changed)persistProjects();
@@ -490,7 +490,7 @@ function canonicalize(value){
 function comparableProjects(source=projects){
  return Object.fromEntries(Object.entries(source||{}).map(([id,p])=>[id,{
    id:p.id,name:p.name,target:Number(p.target)||1,seedType:p.seedType||"custom",collectionType:inferCollectionType(p),collectionOrder:Number(p.collectionOrder)||0,
-   inventory:p.inventory||{},collectionOptions:p.collectionOptions||{},teamOrder:p.teamOrder||[],selectedTeam:p.selectedTeam||"",
+   inventory:p.inventory||{},pokemonVariants:p.pokemonVariants||{},collectionOptions:p.collectionOptions||{},teamOrder:p.teamOrder||[],selectedTeam:p.selectedTeam||"",
    exchange:p.exchange||{give:{},receive:{}},createdAt:p.createdAt||null
  }]));
 }
@@ -874,7 +874,7 @@ async function loadData(){
  activeProjectId=localStorage.getItem(ACTIVE_PROJECT_KEY)||"";
  bootstrapProjectsFromSeed(seedData);
  if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects);
- // 704.13.1: no crear/hidratar proyectos Pokémon antes de resolver Supabase.
+ // 704.13.2: no crear/hidratar proyectos Pokémon antes de resolver Supabase.
  // Hacerlo aquí alteraba el estado local y provocaba un falso conflicto en cada dispositivo.
  loadProjectState();
  renderProjectsList();
@@ -2074,11 +2074,28 @@ function renderMegacracksCollection(){
  }
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cards para este filtro.</div>';
 }
+
+function pokemonIsEx(meta){return (meta?.subtypes||[]).some(x=>/\bex\b/i.test(String(x)))||/\bex\b/i.test(meta?.name||"")}
+function pokemonVariantState(project,code){project.pokemonVariants=project.pokemonVariants||{};return project.pokemonVariants[code]||(project.pokemonVariants[code]={basic:0,holo:0,reverse:0})}
+function pokemonSelectedVariant(project,code){project.ui=project.ui||{};project.ui.pokemonVariantChoice=project.ui.pokemonVariantChoice||{};return project.ui.pokemonVariantChoice[code]||"basic"}
+function pokemonSetSelectedVariant(project,code,variant){project.ui=project.ui||{};project.ui.pokemonVariantChoice=project.ui.pokemonVariantChoice||{};project.ui.pokemonVariantChoice[code]=variant;persistProjects();renderGlobalCollection()}
+function pokemonVariantQty(project,code,variant){return Number(pokemonVariantState(project,code)[variant])||0}
+function changePokemonVariant(code,variant,delta){const p=projects?.[activeProjectId];if(!p)return;const state=pokemonVariantState(p,code),previous=Number(state[variant])||0,next=Math.max(0,previous+delta);if(next===previous)return;state[variant]=next;history.push({id:crypto.randomUUID?.()||String(Date.now()+Math.random()),team:"BASE",code:`${code}:${variant}`,previous,next,delta,at:new Date().toISOString(),source:"pokemon-variant"});delta>0?sessionStats.plus++:sessionStats.minus++;saveAll("✓ Guardado ahora");vibrate();renderAll();showToast(`✓ ${pokemonCardMeta(code,p)?.name||code} · ${variant==="reverse"?"Inverse Holo":variant==="holo"?"Holo":"Básica"} x${next}`)}
+function pokemonIsOpen(section){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.pokemonOpenSections=p.ui.pokemonOpenSections||{};return p.ui.pokemonOpenSections[section]??(section==="BASE")}
+function togglePokemonSection(section){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.pokemonOpenSections=p.ui.pokemonOpenSections||{};p.ui.pokemonOpenSections[section]=!pokemonIsOpen(section);persistProjects();renderGlobalCollection()}
+function pokemonCardRow(section,code,qty){const p=projects?.[activeProjectId],meta=pokemonCardMeta(code,p)||{},ex=section==="BASE"&&pokemonIsEx(meta),row=document.createElement("div");row.className="pokemon-card-row";const img=meta.images?.small||meta.images?.large||"";let controls="";
+ if(section==="BASE"&&!ex){const choice=pokemonSelectedVariant(p,code),v=pokemonVariantState(p,code);controls=`<div class="pokemon-variant-chips">${[["basic","Básica"],["holo","Holo"],["reverse","Inverse Holo"]].map(([k,l])=>`<button type="button" data-variant="${k}" class="pokemon-variant-chip ${choice===k?"active":""}">${l}<small>x${Number(v[k])||0}</small></button>`).join("")}</div><div class="pokemon-stock"><strong>x${pokemonVariantQty(p,code,choice)}</strong><button class="pokemon-step minus">−</button><button class="pokemon-step plus">+</button></div>`}
+ else controls=`<div class="pokemon-fixed-badge">${ex?"EX":collectionSafeText(meta.rarity||section)}</div><div class="pokemon-stock"><strong>x${qty}</strong><button class="pokemon-step minus">−</button><button class="pokemon-step plus">+</button></div>`;
+ row.innerHTML=`<div class="pokemon-number">${collectionSafeText(code)}</div><div class="pokemon-thumb">${img?`<img src="${collectionSafeText(img)}" alt="" loading="lazy">`:"<span>PK</span>"}</div><div class="pokemon-card-main"><strong>${collectionSafeText(meta.name||`#${code}`)}</strong>${controls}</div>`;
+ row.querySelectorAll("[data-variant]").forEach(b=>b.onclick=()=>pokemonSetSelectedVariant(p,code,b.dataset.variant));const minus=row.querySelector(".minus"),plus=row.querySelector(".plus");if(section==="BASE"&&!ex){minus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),-1);plus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),1)}else{minus.onclick=e=>changeQuantity(section,code,-1,e.currentTarget);plus.onclick=e=>changeQuantity(section,code,1,e.currentTarget)}return row}
+function renderPokemonCollection(){const list=$("#globalCollectionList"),p=projects?.[activeProjectId],def=POKEMON_SET_DEFS[inferCollectionType(p)];if(!list||!p||!def)return;list.innerHTML="";def.ranges.forEach(([section])=>{if(collectionTeamFilter!=="all"&&section!==collectionTeamFilter)return;const cards=inventory[section]||{},entries=Object.entries(cards);if(!entries.length)return;const open=pokemonIsOpen(section);let owned=0;entries.forEach(([code,q])=>{if(section==="BASE"&&!pokemonIsEx(pokemonCardMeta(code,p))){const v=pokemonVariantState(p,code);owned+=Object.values(v).reduce((a,b)=>a+Number(b||0),0)}else owned+=Number(q)||0});const sec=document.createElement("section");sec.className=`pokemon-accordion ${open?"open":""}`;sec.innerHTML=`<button type="button" class="pokemon-section-toggle"><div><strong>${collectionSafeText(section==="BASE"?"BASE SET":section)}</strong><span>${owned} cartas · ${entries.length} disponibles</span></div><b>${entries.length}</b><span class="pokemon-chevron">⌄</span></button><div class="pokemon-section-body" ${open?"":"hidden"}></div>`;sec.querySelector(".pokemon-section-toggle").onclick=()=>togglePokemonSection(section);const body=sec.querySelector(".pokemon-section-body");entries.sort(([a],[b])=>Number(a)-Number(b)).forEach(([code,q])=>body.appendChild(pokemonCardRow(section,code,Number(q)||0)));list.appendChild(sec)});if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cartas para este filtro.</div>'}
+
 function renderGlobalCollection(){
  updateShareCollectionButton();
  const activeCollectionType=inferCollectionType(projects?.[activeProjectId]);
  if(activeCollectionType==="liga-este-2026-27"){renderLigaEsteCollection();return;}
  if(activeCollectionType==="megacracks-2026-27"){renderMegacracksCollection();return;}
+ if(isPokemonCollectionType(activeCollectionType)){renderPokemonCollection();return;}
  const list=$("#globalCollectionList");
  if(!list)return;
  list.innerHTML="";

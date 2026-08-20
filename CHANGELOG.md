@@ -1,3 +1,13 @@
+## 704.13.2
+- Pokémon pasa a una vista en acordeón inspirada en Liga Este/Megacracks.
+- Cada carta muestra su imagen real cuando está disponible en los datos del set.
+- Las cartas BASE no EX permiten llevar stock independiente de Básica, Holo e Inverse Holo.
+- Las cartas EX del set base conservan su tipo fijo, sin selector de variante.
+- Illustration Rare, Ultra Rare, Special Illustration Rare y Mega/Hyper Rare quedan en apartados independientes.
+- Se conserva el inventario previo y se migra el stock Reverse Holo existente al nuevo registro de variantes sin borrarlo.
+- Las variantes Pokémon se incluyen en el estado sincronizado con Supabase.
+- No se rediseñan todavía encabezado ni barra inferior.
+
 ## 704.13.1
 - Corregido el falso conflicto de sincronización al abrir StickerBase en otro dispositivo tras añadir Pokémon.
 - La migración/hidratación Pokémon ya no modifica el estado local antes de comparar con Supabase.
