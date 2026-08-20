@@ -1,3 +1,9 @@
+## 704.13.7
+- Pokémon: rediseñada la biblioteca de Colecciones para identificar cada expansión de un vistazo.
+- Cada álbum Pokémon muestra miniatura visual, nombre completo, bloque/serie, progreso y cartas conseguidas.
+- Pitch Black, Chaos Rising, Perfect Order y Surging Sparks conservan su identidad cromática individual también en Colecciones.
+- Se mantienen los controles de orden, menú y estado Activa sin alterar Mundial, Liga Este ni Megacracks.
+
 ## 704.13.4
 - Pokémon: buscador funcional por nombre, número, rareza, tipo y subtipo; filtra directamente las cartas y abre los acordeones con coincidencias.
 - Pokémon/iPhone: el buscador usa 16 px para evitar el zoom automático de Safari y se bloquea el desbordamiento horizontal.

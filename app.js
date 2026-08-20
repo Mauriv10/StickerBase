@@ -3109,13 +3109,16 @@ function renderCollections(){
     </button>
     <div class="collection-folder-body">
     ${group.items.map((p,index)=>{
-      const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p);
-      return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${active?"active":""}" data-collection-id="${p.id}">
+      const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
+      const pokemonDef=isPokemon?POKEMON_SET_DEFS[ptype]:null;
+      const pokemonTotal=isPokemon?Object.values(p.inventory||{}).reduce((n,cards)=>n+Object.keys(cards||{}).length,0):0;
+      const pokemonThumb=isPokemon?pokemonDirectImageUrl(ptype,ptype==="pokemon-pitch-black"?120:ptype==="pokemon-chaos-rising"?122:ptype==="pokemon-perfect-order"?124:247,"small"):"";
+      return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${isPokemon?`pokemon-library-card pokemon-library-${ptype.replace(/^pokemon-/,'')}`:''} ${active?"active":""}" data-collection-id="${p.id}">
        <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
-        <div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>
+        ${isPokemon?`<div class="pokemon-library-cover" aria-hidden="true">${pokemonThumb?`<img src="${collectionSafeText(pokemonThumb)}" alt="" loading="lazy">`:''}<span>${collectionSafeText(p.name)}</span></div>`:`<div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>`}
         <div class="collection-library-copy">
          <div class="collection-title-line"><h3>${collectionSafeText(p.name)}</h3>${active?'<span class="collection-active-badge">Activa</span>':''}</div>
-         <span class="collection-brief">${s.progress}% completado · Objetivo ${p.target} ${albumWord(p.target)}</span>
+         ${isPokemon?`<span class="pokemon-library-subtitle">${collectionSafeText(def.subtitle||'Pokémon TCG')}</span><span class="collection-brief">${s.progress}% completado · ${s.different}/${pokemonTotal} cartas</span>`:`<span class="collection-brief">${s.progress}% completado · Objetivo ${p.target} ${albumWord(p.target)}</span>`}
          <div class="collection-progress-track"><div class="collection-progress-fill" style="width:${s.progress}%"></div></div>
         </div>
        </button>
