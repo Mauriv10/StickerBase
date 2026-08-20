@@ -1,3 +1,11 @@
+# 704.14.4
+
+- Liga Este y Megacracks: la cabecera premium se muestra también en la pestaña Cromos.
+- Eliminados los separadores blancos heredados sobre el buscador y entre la cabecera del club y la tabla.
+- Escudos centrados dentro de su contenedor en acordeones abiertos y cerrados.
+- Se conserva la composición, tamaños, filtros y navegación de la 704.14.3.
+- Sin cambios de inventario, checklist, sincronización ni datos.
+
 # 704.14.2
 
 - Liga Este y Megacracks: interfaz reconstruida siguiendo el mockup compacto aprobado.
