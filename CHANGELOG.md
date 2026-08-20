@@ -1,3 +1,13 @@
+# 704.14.2
+
+- Liga Este y Megacracks: interfaz reconstruida siguiendo el mockup compacto aprobado.
+- Se eliminan en Cromos los bloques superiores duplicados que rompían la continuidad visual.
+- Buscador, filtros y orden pasan a un bloque compacto.
+- Acordeones de clubes/equipos pasan a funcionar como cabecera visual principal.
+- Tablas y controles +/- se compactan y se corrige el recorte lateral de botones.
+- Barra inferior vuelve a formato integrado a todo el ancho, como en el diseño de referencia.
+- Sin cambios de inventario, checklists, sincronización ni datos.
+
 # 704.14.1
 
 - Corrige la legibilidad del título de Pokémon TCG en la biblioteca.

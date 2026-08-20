@@ -6892,3 +6892,352 @@ body.collection-theme-megacracks .bottom-nav-button.active{
     padding-bottom:13px!important;
   }
 }
+
+
+/* =========================================================
+   704.14.2 · Panini compact premium layout
+   Objetivo visual: mockup aprobado Liga Este / Megacracks.
+   ========================================================= */
+
+/* En Cromos Panini, el propio acordeón del club/equipo pasa a ser
+   el protagonista. Quitamos los bloques superiores duplicados. */
+body.main-tab-collection.collection-theme-ligaeste .app-header,
+body.main-tab-collection.collection-theme-megacracks .app-header{
+  position:static!important;
+  top:auto!important;
+  z-index:auto!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .compact-home-titlebar,
+body.main-tab-collection.collection-theme-megacracks .compact-home-titlebar,
+body.main-tab-collection.collection-theme-ligaeste .premium-selection-row,
+body.main-tab-collection.collection-theme-megacracks .premium-selection-row{
+  display:none!important;
+}
+
+/* Buscador compacto, como en la referencia */
+body.main-tab-collection.collection-theme-ligaeste .premium-search,
+body.main-tab-collection.collection-theme-megacracks .premium-search{
+  width:min(calc(100% - 28px),760px)!important;
+  margin:14px auto 8px!important;
+  padding:0!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .search-wrap,
+body.main-tab-collection.collection-theme-megacracks .search-wrap{
+  min-height:46px!important;
+  margin:0!important;
+  border-radius:12px!important;
+  background:#0d1117!important;
+  border:1px solid #343c48!important;
+  box-shadow:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .search-wrap input,
+body.main-tab-collection.collection-theme-megacracks .search-wrap input{
+  height:44px!important;
+  font-size:13px!important;
+  color:#eef2f6!important;
+  background:transparent!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .search-wrap input::placeholder,
+body.main-tab-collection.collection-theme-megacracks .search-wrap input::placeholder{
+  color:#8e97a4!important;
+}
+
+/* Se elimina la barra duplicada Todos/Pedir/Entregar de arriba */
+body.main-tab-collection.collection-theme-ligaeste #collectionStickyControls,
+body.main-tab-collection.collection-theme-megacracks #collectionStickyControls{
+  display:none!important;
+}
+
+/* Toolbar compacta: filtros + orden en una sola línea */
+body.main-tab-collection.collection-theme-ligaeste .collection-toolbar,
+body.main-tab-collection.collection-theme-megacracks .collection-toolbar{
+  width:min(calc(100% - 28px),760px)!important;
+  margin:0 auto 8px!important;
+  padding:0!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:7px!important;
+  align-items:center!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-toolbar>div:first-child,
+body.main-tab-collection.collection-theme-megacracks .collection-toolbar>div:first-child{
+  display:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-filter,
+body.main-tab-collection.collection-theme-megacracks .collection-filter{
+  min-width:0!important;
+  height:38px!important;
+  padding:3px!important;
+  gap:3px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  overflow:hidden!important;
+  border-radius:11px!important;
+  background:#0d1117!important;
+  border:1px solid #252d38!important;
+  box-shadow:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-filter-button,
+body.main-tab-collection.collection-theme-megacracks .collection-filter-button{
+  min-width:0!important;
+  min-height:30px!important;
+  height:30px!important;
+  padding:0 7px!important;
+  font-size:10px!important;
+  border-radius:8px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-filter-button:nth-child(n+4),
+body.main-tab-collection.collection-theme-megacracks .collection-filter-button:nth-child(n+4){
+  display:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-filter-button.active{
+  background:#f5f6f8!important;
+  color:#11151b!important;
+  box-shadow:none!important;
+}
+body.main-tab-collection.collection-theme-megacracks .collection-filter-button.active{
+  background:#f0f3f6!important;
+  color:#11151b!important;
+  box-shadow:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-sort-bar,
+body.main-tab-collection.collection-theme-megacracks .collection-sort-bar{
+  min-height:38px!important;
+  height:38px!important;
+  padding:3px 5px!important;
+  margin:0!important;
+  display:flex!important;
+  gap:4px!important;
+  align-items:center!important;
+  border-radius:11px!important;
+  background:#0d1117!important;
+  border:1px solid #252d38!important;
+  box-shadow:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-sort-bar label,
+body.main-tab-collection.collection-theme-megacracks .collection-sort-bar label{
+  font-size:9px!important;
+  color:#9aa3af!important;
+  padding-left:5px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .collection-sort-bar select,
+body.main-tab-collection.collection-theme-megacracks .collection-sort-bar select{
+  width:126px!important;
+  max-width:126px!important;
+  height:30px!important;
+  padding:0 24px 0 8px!important;
+  font-size:9px!important;
+  border-radius:8px!important;
+  background:#11161d!important;
+  color:#eef2f6!important;
+  border:1px solid #252d38!important;
+}
+
+/* Lista central estrecha como el mockup */
+body.main-tab-collection.collection-theme-ligaeste #globalCollectionList,
+body.main-tab-collection.collection-theme-megacracks #globalCollectionList{
+  width:min(calc(100% - 28px),760px)!important;
+  margin:0 auto!important;
+  gap:8px!important;
+  padding:0 0 calc(76px + env(safe-area-inset-bottom))!important;
+}
+
+/* Cabecera del equipo: verdadera cabecera premium del panel */
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-accordion,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-accordion{
+  margin:0 0 8px!important;
+  border-radius:13px!important;
+  overflow:hidden!important;
+  background:#090d12!important;
+  box-shadow:none!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-accordion{
+  border:1px solid rgba(132,46,220,.72)!important;
+}
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-accordion{
+  border:1px solid #576171!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-toggle{
+  min-height:72px!important;
+  padding:11px 13px!important;
+  background:
+    radial-gradient(circle at 92% 10%,rgba(165,66,244,.30),transparent 30%),
+    linear-gradient(120deg,#25053f 0%,#4e0b78 65%,#61118f 100%)!important;
+}
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-toggle{
+  min-height:72px!important;
+  padding:11px 13px!important;
+  background:
+    radial-gradient(circle at 92% 10%,rgba(255,255,255,.09),transparent 30%),
+    linear-gradient(120deg,#262f3b 0%,#171d25 64%,#10151b 100%)!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading img,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading img{
+  width:42px!important;
+  height:42px!important;
+  padding:3px!important;
+  border-radius:50%!important;
+  background:#fff!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading strong,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading strong{
+  font-size:18px!important;
+  line-height:1.05!important;
+  color:#fff!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading span,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading span{
+  margin-top:4px!important;
+  font-size:10px!important;
+  color:#aeb6c2!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-chevron,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-chevron{
+  width:34px!important;
+  height:34px!important;
+  font-size:18px!important;
+  border-radius:50%!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-chevron{
+  color:#fff!important;
+  background:#7220c7!important;
+  border:1px solid #9747e8!important;
+}
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-chevron{
+  color:#fff!important;
+  background:#222a34!important;
+  border:1px solid #657080!important;
+}
+
+/* Tabla compacta */
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-list-head,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-list-head{
+  grid-template-columns:44px minmax(0,1fr) 118px!important;
+  gap:5px!important;
+  padding:6px 10px!important;
+  font-size:8px!important;
+  background:#080c11!important;
+  border-top:1px solid #252d37!important;
+  border-bottom:1px solid #252d37!important;
+  color:#9ba4b1!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-row,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-row{
+  grid-template-columns:44px minmax(0,1fr) 118px!important;
+  gap:5px!important;
+  min-height:52px!important;
+  padding:5px 10px!important;
+  background:#0b1016!important;
+  border-top:1px solid #202731!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-row:nth-child(even),
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-row:nth-child(even){
+  background:#0d1218!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-number,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-number{
+  font-size:12px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-copy strong,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-copy strong{
+  font-size:12px!important;
+  line-height:1.1!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-copy span,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-copy span{
+  font-size:9px!important;
+  margin-top:2px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-row-stock,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-row-stock{
+  grid-template-columns:34px 28px 34px!important;
+  gap:5px!important;
+  justify-content:end!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-row-step,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-row-step{
+  width:34px!important;
+  height:34px!important;
+  border-radius:8px!important;
+  font-size:15px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-row-step.plus{
+  background:linear-gradient(145deg,#6214c2,#9a35ec)!important;
+  border-color:#8b32df!important;
+  color:#fff!important;
+}
+body.main-tab-collection.collection-theme-megacracks .ligaeste-row-step.plus{
+  background:linear-gradient(145deg,#3f4855,#cbd4df)!important;
+  border-color:#aeb9c6!important;
+  color:#0b0f14!important;
+}
+
+/* Barra inferior: plana y pegada al borde, como el mockup */
+body.collection-theme-ligaeste .bottom-app-nav,
+body.collection-theme-megacracks .bottom-app-nav{
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  border:0!important;
+  border-top:1px solid #28303a!important;
+  border-radius:0!important;
+  padding-bottom:env(safe-area-inset-bottom)!important;
+  background:rgba(7,10,14,.98)!important;
+  box-shadow:0 -8px 22px rgba(0,0,0,.28)!important;
+}
+body.collection-theme-ligaeste .bottom-nav-button,
+body.collection-theme-megacracks .bottom-nav-button{
+  min-height:58px!important;
+  margin:0!important;
+  border-radius:0!important;
+  font-size:9px!important;
+}
+body.collection-theme-ligaeste .bottom-nav-button.active{
+  color:#e0bdff!important;
+  background:linear-gradient(180deg,rgba(102,24,178,.56),rgba(77,15,139,.70))!important;
+}
+body.collection-theme-megacracks .bottom-nav-button.active{
+  color:#fff!important;
+  background:linear-gradient(180deg,rgba(92,103,116,.45),rgba(45,52,61,.65))!important;
+}
+
+/* En estas dos colecciones no queremos sensación de tarjeta flotante gigante */
+body.main-tab-collection.collection-theme-ligaeste .app-main,
+body.main-tab-collection.collection-theme-megacracks .app-main{
+  padding-top:0!important;
+}
+body.main-tab-collection.collection-theme-ligaeste #inventoryView,
+body.main-tab-collection.collection-theme-megacracks #inventoryView{
+  padding-top:0!important;
+}
+
+@media(max-width:430px){
+  body.main-tab-collection.collection-theme-ligaeste .premium-search,
+  body.main-tab-collection.collection-theme-megacracks .premium-search,
+  body.main-tab-collection.collection-theme-ligaeste .collection-toolbar,
+  body.main-tab-collection.collection-theme-megacracks .collection-toolbar,
+  body.main-tab-collection.collection-theme-ligaeste #globalCollectionList,
+  body.main-tab-collection.collection-theme-megacracks #globalCollectionList{
+    width:calc(100% - 24px)!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .collection-toolbar,
+  body.main-tab-collection.collection-theme-megacracks .collection-toolbar{
+    grid-template-columns:minmax(0,1fr) 132px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .collection-sort-bar label,
+  body.main-tab-collection.collection-theme-megacracks .collection-sort-bar label{
+    display:none!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .collection-sort-bar select,
+  body.main-tab-collection.collection-theme-megacracks .collection-sort-bar select{
+    width:122px!important;
+    max-width:122px!important;
+  }
+}
