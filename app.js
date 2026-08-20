@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.13.0";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.13.1";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -874,8 +874,8 @@ async function loadData(){
  activeProjectId=localStorage.getItem(ACTIVE_PROJECT_KEY)||"";
  bootstrapProjectsFromSeed(seedData);
  if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects);
- ensurePokemonProjects();
- await hydratePokemonProjects();
+ // 704.13.1: no crear/hidratar proyectos Pokémon antes de resolver Supabase.
+ // Hacerlo aquí alteraba el estado local y provocaba un falso conflicto en cada dispositivo.
  loadProjectState();
  renderProjectsList();
  setupSettingsCenter();

@@ -1,3 +1,9 @@
+## 704.13.1
+- Corregido el falso conflicto de sincronización al abrir StickerBase en otro dispositivo tras añadir Pokémon.
+- La migración/hidratación Pokémon ya no modifica el estado local antes de comparar con Supabase.
+- Al elegir la nube, el payload de Supabase se conserva como fuente de verdad, incluidos todos los álbumes de Liga Este.
+- No se modifica inventario ni estructura existente en Supabase.
+
 ## 704.13.0
 - Nueva familia Pokémon TCG en Colecciones.
 - Añadidas Pitch Black (120), Chaos Rising (122), Perfect Order (124) y Surging Sparks (252).
