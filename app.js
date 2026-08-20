@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.12.33";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.13.0";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -9,8 +9,26 @@ const ACTIVE_PROJECT_KEY="world-cup-2026-active-project-v600";
 const COLLECTION_DEFINITIONS={
   "world-cup-2026":{label:"WORLD CUP 2026",subtitle:"Mi colección",icon:"26",theme:"worldcup"},
   "liga-este-2026-27":{label:"LIGA ESTE 2026/27",subtitle:"Panini · LaLiga EA Sports",icon:"LE",theme:"ligaeste"},
-  "megacracks-2026-27":{label:"MEGACRACKS 2026/27",subtitle:"25.º aniversario",icon:"MC",theme:"megacracks"}
+  "megacracks-2026-27":{label:"MEGACRACKS 2026/27",subtitle:"25.º aniversario",icon:"MC",theme:"megacracks"},
+  "pokemon-pitch-black":{label:"POKÉMON · PITCH BLACK",subtitle:"Mega Evolution · ME05",icon:"PB",theme:"pokemon"},
+  "pokemon-chaos-rising":{label:"POKÉMON · CHAOS RISING",subtitle:"Mega Evolution · ME04",icon:"CR",theme:"pokemon"},
+  "pokemon-perfect-order":{label:"POKÉMON · PERFECT ORDER",subtitle:"Mega Evolution · ME03",icon:"PO",theme:"pokemon"},
+  "pokemon-surging-sparks":{label:"POKÉMON · SURGING SPARKS",subtitle:"Scarlet & Violet · SV08",icon:"SS",theme:"pokemon"}
 };
+
+const POKEMON_SET_DEFS={
+ "pokemon-pitch-black":{name:"Pitch Black",seedType:"pokemon-pitch-black",official:84,total:120,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me5.json",ranges:[["BASE",1,84],["ILLUSTRATION RARE",85,95],["ULTRA RARE",96,113],["SPECIAL ILLUSTRATION RARE",114,119],["MEGA HYPER RARE",120,120]]},
+ "pokemon-chaos-rising":{name:"Chaos Rising",seedType:"pokemon-chaos-rising",official:86,total:122,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me4.json",ranges:[["BASE",1,86],["ILLUSTRATION RARE",87,97],["ULTRA RARE",98,115],["SPECIAL ILLUSTRATION RARE",116,121],["MEGA HYPER RARE",122,122]]},
+ "pokemon-perfect-order":{name:"Perfect Order",seedType:"pokemon-perfect-order",official:88,total:124,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me3.json",ranges:[["BASE",1,88],["ILLUSTRATION RARE",89,99],["ULTRA RARE",100,117],["SPECIAL ILLUSTRATION RARE",118,123],["MEGA HYPER RARE",124,124]]},
+ "pokemon-surging-sparks":{name:"Surging Sparks",seedType:"pokemon-surging-sparks",official:191,total:252,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/sv8.json",ranges:[["BASE",1,191],["ILLUSTRATION RARE",192,214],["ULTRA RARE",215,235],["SPECIAL ILLUSTRATION RARE",236,246],["HYPER RARE",247,252]]}
+};
+function isPokemonCollectionType(type){return Boolean(POKEMON_SET_DEFS[type])}
+function pokemonCode(n){return String(n).padStart(3,"0")}
+function pokemonInventoryTemplate(type){const def=POKEMON_SET_DEFS[type];if(!def)return {};return Object.fromEntries(def.ranges.map(([section,start,end])=>[section,Object.fromEntries(Array.from({length:end-start+1},(_,i)=>[pokemonCode(start+i),0]))]));}
+function pokemonProjectMeta(project=projects?.[activeProjectId]){return project?.pokemonMeta||{}}
+function pokemonCardMeta(code,project=projects?.[activeProjectId]){return pokemonProjectMeta(project)?.[String(code)]||null}
+function pokemonRarityLabel(rarity=""){return String(rarity||"").replace(/^Rare Holo$/i,"Rare · Holo").replace(/^Rare$/i,"Rare · Holo")}
+
 
 const LIGA_ESTE_TEAMS={
  "Deportivo Alavés":["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18A","18B","19","20"],
@@ -134,11 +152,13 @@ function collectionInventoryTemplate(type){
  if(type==="liga-este-2026-27")return inventoryFromCodeMap({...LIGA_ESTE_TEAMS,...LIGA_ESTE_INSERTS});
  if(type==="megacracks-2026-27")return inventoryFromCodeMap({...MEGACRACKS_TEAMS,...MEGACRACKS_SPECIALS});
  if(type==="world-cup-2026")return createEmptyInventoryFrom(masterInventories["world-cup-2026-main"]||originalInventory);
+ if(isPokemonCollectionType(type))return pokemonInventoryTemplate(type);
  return {};
 }
 function seedTypeForCollection(type){
  if(type==="liga-este-2026-27")return "liga-este-2026-27-first-edition";
  if(type==="megacracks-2026-27")return "megacracks-2026-27-first-edition";
+ if(isPokemonCollectionType(type))return POKEMON_SET_DEFS[type].seedType;
  return "world-cup-2026-main";
 }
 function isLigaEsteInsertTeam(team){return Object.prototype.hasOwnProperty.call(LIGA_ESTE_INSERTS,team)}
@@ -150,6 +170,7 @@ function inferCollectionType(projectOrSeed={}){
  const name=String(projectOrSeed.name||"").toLowerCase();
  if(seed.includes("liga-este-2026-27")||name.includes("liga este 2026")||name.includes("liga este 26/27"))return "liga-este-2026-27";
  if(seed.includes("megacracks-2026-27")||name.includes("megacracks 2026")||name.includes("megacracks 26/27"))return "megacracks-2026-27";
+ for(const type of Object.keys(POKEMON_SET_DEFS)){const def=POKEMON_SET_DEFS[type];if(seed===def.seedType||name.includes(def.name.toLowerCase()))return type;}
  return "world-cup-2026";
 }
 function collectionDefinition(project=projects?.[activeProjectId]){return COLLECTION_DEFINITIONS[inferCollectionType(project)]||COLLECTION_DEFINITIONS["world-cup-2026"]}
@@ -159,7 +180,7 @@ function syncCollectionChrome(collectionType){
  const header=document.querySelector(".app-header");
  const titlebar=document.querySelector(".compact-home-titlebar");
  if(!shell||!scroll||!header||!titlebar)return;
- const detached=collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27";
+ const detached=collectionType==="liga-este-2026-27"||collectionType==="megacracks-2026-27"||isPokemonCollectionType(collectionType);
  if(detached){
    if(titlebar.parentElement!==shell)shell.insertBefore(titlebar,scroll);
  }else if(titlebar.parentElement!==header){
@@ -172,16 +193,16 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  syncCollectionChrome(project.collectionType);
  const def=collectionDefinition(project);
  document.body.dataset.collectionType=project.collectionType;
- document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks");
+ document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks","collection-theme-pokemon");
  document.body.classList.add(`collection-theme-${def.theme}`);
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
  const subtitle=document.querySelector(".collection-header-subtitle");if(subtitle)subtitle.textContent=def.subtitle;
- if(teamSearch)teamSearch.placeholder=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Buscar jugador, club o nº…":"Buscar selección…";
+ if(teamSearch)teamSearch.placeholder=isPokemonCollectionType(project.collectionType)?"Buscar carta, nº o rareza…":(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Buscar jugador, club o nº…":"Buscar selección…";
  const dialogSearch=document.querySelector("#dialogSearch");if(dialogSearch)dialogSearch.placeholder=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Buscar jugador o club…":"Buscar selección…";
- const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Club":"Selección";
- const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Elegir club":"Elegir selección";
+ const teamLabel=document.querySelector("#teamSelectorLabel");if(teamLabel)teamLabel.textContent=isPokemonCollectionType(project.collectionType)?"Rareza":(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Club":"Selección";
+ const dialogTitle=document.querySelector("#teamDialogTitle");if(dialogTitle)dialogTitle.textContent=isPokemonCollectionType(project.collectionType)?"Elegir rareza":(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Elegir club":"Elegir selección";
  const infoSub=$("#appInfoSubtitle");if(infoSub)infoSub.textContent=`Build ${APP_VERSION}`;
- const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo){logo.hidden=project.collectionType==="world-cup-2026";logo.textContent=project.collectionType==="megacracks-2026-27"?"Mega\nCracks":"LIGA\nESTE";}
+ const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo){logo.hidden=project.collectionType==="world-cup-2026";logo.textContent=isPokemonCollectionType(project.collectionType)?"POKÉ\nMON":project.collectionType==="megacracks-2026-27"?"Mega\nCracks":"LIGA\nESTE";}
 }
 
 const EXTRA_PLAYERS=[
@@ -201,7 +222,9 @@ function isExtraTeam(team){return EXTRA_TEAMS.includes(team)}
 function extraVariantForTeam(team){return EXTRA_VARIANTS.find(item=>item.team===team)||null}
 function extraPlayerName(code){return EXTRA_PLAYERS[Math.max(0,Number(code)-1)]||String(code)}
 function stickerDisplayLabel(team,code){
- if(inferCollectionType(projects?.[activeProjectId])==="liga-este-2026-27"){
+ const activeType=inferCollectionType(projects?.[activeProjectId]);
+ if(isPokemonCollectionType(activeType)){const meta=pokemonCardMeta(code);return meta?`#${String(code)} · ${meta.name}`:`#${String(code)}`;}
+ if(activeType==="liga-este-2026-27"){
    if(team.startsWith("EXTRA STICKER"))return LIGA_ESTE_EXTRA_NAMES[Math.max(0,Number(code)-1)]||code;
    const info=ligaEsteStickerInfo(team,code);if(info)return info[0];
    const insertInfo=ligaEsteInsertInfo(team,code);if(insertInfo)return insertInfo[0];
@@ -313,6 +336,11 @@ function ensureProjectInventorySchema(project){
    }
    return;
  }
+ if(isPokemonCollectionType(project.collectionType)){
+   const template=pokemonInventoryTemplate(project.collectionType);
+   for(const [section,codes] of Object.entries(template)){if(!project.inventory[section])project.inventory[section]={};for(const code of Object.keys(codes))if(!Object.prototype.hasOwnProperty.call(project.inventory[section],code))project.inventory[section][code]=0;}
+   return;
+ }
  if(project.collectionType==="megacracks-2026-27"){
    project.migrations=project.migrations||{};
    // 704.12.12 · Levante: Carlos Espí pasa de 214 a 215. Movemos el stock una sola vez.
@@ -380,6 +408,7 @@ function bootstrapProjectsFromSeed(seedData){
  masterInventories=Object.fromEntries(seedProjects.map(seed=>[seed.seedType,structuredClone(seed.inventory)]));
  masterInventories["liga-este-2026-27-first-edition"]=collectionInventoryTemplate("liga-este-2026-27");
  masterInventories["megacracks-2026-27-first-edition"]=collectionInventoryTemplate("megacracks-2026-27");
+ Object.keys(POKEMON_SET_DEFS).forEach(type=>masterInventories[POKEMON_SET_DEFS[type].seedType]=pokemonInventoryTemplate(type));
  originalInventory=structuredClone(masterInventories["world-cup-2026-main"]||originalInventory);
 
  // Build 700.7: los datos existentes pertenecen al usuario y nunca se sobrescriben
@@ -393,6 +422,39 @@ function bootstrapProjectsFromSeed(seedData){
  migrateLegacy(seedProjects);
  localStorage.setItem(MASTER_SEED_KEY,seedData.revision||DATA_REVISION);
 }
+
+const POKEMON_SEED_MIGRATION_KEY="stickerbase.pokemon.collections.v1";
+function ensurePokemonProjects(){
+ if(localStorage.getItem(POKEMON_SEED_MIGRATION_KEY))return false;
+ let changed=false;
+ for(const [type,def] of Object.entries(POKEMON_SET_DEFS)){
+   if(Object.values(projects||{}).some(p=>inferCollectionType(p)===type))continue;
+   const p=defaultProject(def.name,1,pokemonInventoryTemplate(type),def.seedType);
+   p.collectionType=type;p.pokemonMeta={};p.pokemonDataSource=def.source;p.teamOrder=Object.keys(p.inventory);
+   projects[p.id]=p;changed=true;
+ }
+ localStorage.setItem(POKEMON_SEED_MIGRATION_KEY,"1");
+ if(changed)persistProjects();
+ return changed;
+}
+async function hydratePokemonProjects(){
+ let changed=false;
+ for(const [type,def] of Object.entries(POKEMON_SET_DEFS)){
+   const related=Object.values(projects||{}).filter(p=>inferCollectionType(p)===type);if(!related.length)continue;
+   let cards=null;try{const response=await fetch(def.source,{cache:"force-cache"});if(response.ok)cards=await response.json();}catch{}
+   if(!Array.isArray(cards))continue;
+   const meta=Object.fromEntries(cards.map(card=>[pokemonCode(Number(card.number)),{name:card.name,rarity:pokemonRarityLabel(card.rarity),supertype:card.supertype,types:card.types||[],subtypes:card.subtypes||[]}]));
+   for(const p of related){
+     p.pokemonMeta=meta;p.pokemonDataSource=def.source;
+     const reverseCards=cards.filter(card=>Number(card.number)<=def.official&&["Common","Uncommon","Rare","Rare Holo"].includes(String(card.rarity)));
+     const reverse=p.inventory["REVERSE HOLO"]||(p.inventory["REVERSE HOLO"]={});
+     reverseCards.forEach(card=>{const code=pokemonCode(Number(card.number));if(!Object.prototype.hasOwnProperty.call(reverse,code))reverse[code]=0;});
+     p.teamOrder=[...def.ranges.map(r=>r[0]),"REVERSE HOLO"].filter(x=>p.inventory[x]);changed=true;
+   }
+ }
+ if(changed)persistProjects();
+}
+
 function getMasterInventoryForProject(project){
  const stored=masterInventories[project?.seedType];
  if(stored)return structuredClone(stored);
@@ -812,6 +874,8 @@ async function loadData(){
  activeProjectId=localStorage.getItem(ACTIVE_PROJECT_KEY)||"";
  bootstrapProjectsFromSeed(seedData);
  if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects);
+ ensurePokemonProjects();
+ await hydratePokemonProjects();
  loadProjectState();
  renderProjectsList();
  setupSettingsCenter();
@@ -905,7 +969,7 @@ function saveAll(message="Todo guardado"){
  $("#saveStatus").textContent=message;
  $("#saveDot").textContent="✓";
 }
-function collectionAllTeamsLabel(){const type=inferCollectionType(projects?.[activeProjectId]);return type==="world-cup-2026"?"Todas las selecciones":"Todos los clubes";}
+function collectionAllTeamsLabel(){const type=inferCollectionType(projects?.[activeProjectId]);return type==="world-cup-2026"?"Todas las selecciones":isPokemonCollectionType(type)?"Todas las rarezas":"Todos los clubes";}
 function populateTeams(){
  teamSelect.innerHTML="";
  const allOption=document.createElement("option");
@@ -2861,9 +2925,10 @@ function collectionSafeText(value){
 }
 function collectionLibraryGroups(){
  return [
-  {type:"world-cup-2026",label:"World Cup 2026",short:"26",theme:"worldcup"},
-  {type:"liga-este-2026-27",label:"Liga Este 2026/27",short:"LE",theme:"ligaeste"},
-  {type:"megacracks-2026-27",label:"Megacracks 2026/27",short:"MC",theme:"megacracks"}
+  {type:"world-cup-2026",label:"World Cup 2026",short:"26",theme:"worldcup",match:p=>inferCollectionType(p)==="world-cup-2026"},
+  {type:"liga-este-2026-27",label:"Liga Este 2026/27",short:"LE",theme:"ligaeste",match:p=>inferCollectionType(p)==="liga-este-2026-27"},
+  {type:"megacracks-2026-27",label:"Megacracks 2026/27",short:"MC",theme:"megacracks",match:p=>inferCollectionType(p)==="megacracks-2026-27"},
+  {type:"pokemon",label:"Pokémon TCG",short:"PK",theme:"pokemon",match:p=>isPokemonCollectionType(inferCollectionType(p))}
  ];
 }
 const COLLECTION_FOLDER_STATE_KEY="stickerbase.collectionFolders.v1";
@@ -2883,7 +2948,7 @@ function setCollectionFolderOpen(type,isOpen){
 function renderCollections(){
  const list=$("#collectionsList");if(!list)return;
  const items=orderedProjects();
- const groups=collectionLibraryGroups().map(group=>({...group,items:items.filter(p=>inferCollectionType(p)===group.type)})).filter(group=>group.items.length);
+ const groups=collectionLibraryGroups().map(group=>({...group,items:items.filter(group.match)})).filter(group=>group.items.length);
  list.innerHTML=groups.map(group=>{
    const activeInside=group.items.some(p=>p.id===activeProjectId);
    const folderOpen=collectionFolderIsOpen(group.type);

@@ -6201,3 +6201,10 @@ body.megacracks-theme .album-progress-track i{background:linear-gradient(90deg,#
  .album-progress-row>div:first-child{display:block}
  .album-progress-row>div:first-child span{display:block;margin-top:2px}
 }
+
+/* 704.13.0 · Pokémon TCG */
+.collection-theme-pokemon{--collection-accent:#e3350d;--collection-accent-soft:#fff1ed}
+.collection-folder-pokemon .collection-folder-icon{background:linear-gradient(145deg,#ffcb05,#f29b00);color:#233a79}
+.collection-card-pokemon .collection-album-icon{background:linear-gradient(145deg,#233a79,#3466af);color:#ffcb05}
+.collection-theme-pokemon .compact-home-titlebar{background:linear-gradient(115deg,#182d62,#3466af)}
+.collection-theme-pokemon .collection-header-kicker{color:#ffcb05}

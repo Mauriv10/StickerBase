@@ -1,3 +1,11 @@
+## 704.13.0
+- Nueva familia Pokémon TCG en Colecciones.
+- Añadidas Pitch Black (120), Chaos Rising (122), Perfect Order (124) y Surging Sparks (252).
+- Checklist completa por número, nombre y rareza.
+- Separación de BASE, Illustration Rare, Ultra Rare, Special Illustration Rare, Hyper/Mega Hyper Rare y Reverse Holo.
+- Reverse Holo se registra como variante independiente para master set.
+- Se mantienen sincronización segura y backups.
+
 ## 704.12.33
 - Liga Este: Extra Stickers Bronce, Plata y Oro pasan a ser opcionales mediante un único interruptor en Ajustes.
 - Si los Extra Stickers están desactivados, se conserva todo su inventario pero quedan fuera de vistas, faltantes, progreso y estadísticas; al reactivarlos vuelven a contar.
