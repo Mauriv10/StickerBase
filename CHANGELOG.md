@@ -211,3 +211,8 @@
 - Exportar álbum omite las referencias con cantidad 0.
 - Los tres formatos existentes siguen disponibles: compartir con banderas, copiar texto y copiar compacto.
 - Conserva la sincronización protegida, el orden oficial de selecciones y todas las funciones de la 704.10.3.
+
+
+## 704.13.5
+- Identidad visual independiente para Pitch Black, Chaos Rising, Perfect Order y Surging Sparks.
+- Chaos Rising combina azul eléctrico y magenta; Perfect Order prioriza verde; Surging Sparks usa amarillo/naranja; Pitch Black conserva negro/dorado.

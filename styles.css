@@ -6326,3 +6326,31 @@ body.collection-theme-pokemon .pokemon-rarity-stats article>b{color:#ffcb05;font
  body.collection-theme-pokemon .pokemon-stats-grid article>span{width:29px;height:29px}
  body.collection-theme-pokemon .pokemon-stats-grid strong{font-size:17px}
 }
+
+
+/* 704.13.5 · Identidad visual individual Pokémon */
+body.collection-theme-pokemon{--pk-accent:#ffcb05;--pk-accent2:#d39c00;--pk-rgb:255,203,5;--pk-glow:rgba(255,203,5,.12)}
+body.pokemon-theme-chaos-rising{--pk-accent:#21c7ff;--pk-accent2:#f33aa6;--pk-rgb:33,199,255;--pk-glow:rgba(243,58,166,.16)}
+body.pokemon-theme-perfect-order{--pk-accent:#8eea39;--pk-accent2:#43b91f;--pk-rgb:142,234,57;--pk-glow:rgba(91,220,41,.14)}
+body.pokemon-theme-surging-sparks{--pk-accent:#ffb000;--pk-accent2:#ff7900;--pk-rgb:255,176,0;--pk-glow:rgba(255,121,0,.16)}
+body.collection-theme-pokemon .compact-home-titlebar{background:radial-gradient(circle at 76% -20%,var(--pk-glow),transparent 42%),linear-gradient(125deg,#05080c 0%,#0b1017 55%,#111821 100%)!important;box-shadow:inset 0 -1px 0 rgba(var(--pk-rgb),.24)!important}
+body.pokemon-theme-chaos-rising .compact-home-titlebar{background:radial-gradient(circle at 92% 10%,rgba(243,58,166,.20),transparent 30%),radial-gradient(circle at 70% 40%,rgba(33,199,255,.16),transparent 38%),linear-gradient(125deg,#05080c,#07131d 58%,#160a18)!important}
+body.pokemon-theme-perfect-order .compact-home-titlebar{background:radial-gradient(circle at 90% 12%,rgba(92,230,39,.18),transparent 34%),linear-gradient(125deg,#05080c,#07130b 62%,#0b1a0c)!important}
+body.pokemon-theme-surging-sparks .compact-home-titlebar{background:radial-gradient(circle at 90% 8%,rgba(255,122,0,.22),transparent 32%),linear-gradient(125deg,#05080c,#151006 62%,#1b0d02)!important}
+body.collection-theme-pokemon .compact-home-titlebar:before{background:linear-gradient(90deg,transparent,var(--pk-accent),var(--pk-accent2),transparent)!important;box-shadow:0 -24px 0 rgba(var(--pk-rgb),.08),0 -48px 0 rgba(var(--pk-rgb),.045)!important}
+body.collection-theme-pokemon .ligaeste-header-logo{border-color:rgba(var(--pk-rgb),.34)!important;color:var(--pk-accent)!important;box-shadow:0 8px 24px rgba(0,0,0,.32),0 0 18px rgba(var(--pk-rgb),.06)!important}
+body.collection-theme-pokemon .ligaeste-header-logo span,body.collection-theme-pokemon .collection-header-kicker{color:var(--pk-accent)!important}
+body.collection-theme-pokemon .icon-action{border-color:rgba(var(--pk-rgb),.50)!important;color:var(--pk-accent)!important}
+body.collection-theme-pokemon .search-wrap{border-color:rgba(var(--pk-rgb),.22)!important;box-shadow:0 0 22px rgba(var(--pk-rgb),.035)!important}
+body.pokemon-theme-chaos-rising .search-wrap{border-color:rgba(33,199,255,.42)!important;box-shadow:inset -45px 0 70px rgba(243,58,166,.05)!important}
+body.collection-theme-pokemon .pokemon-dashboard-progress strong,body.collection-theme-pokemon .pokemon-number,body.collection-theme-pokemon .pokemon-stock strong,body.collection-theme-pokemon .pokemon-section-progress strong,body.collection-theme-pokemon .pokemon-variant-stats article>b,body.collection-theme-pokemon .pokemon-rarity-stats article>b{color:var(--pk-accent)!important}
+body.collection-theme-pokemon .pokemon-dashboard-track i,body.collection-theme-pokemon .pokemon-section-progress i,body.collection-theme-pokemon .pokemon-stat-track i{background:linear-gradient(90deg,var(--pk-accent2),var(--pk-accent))!important}
+body.collection-theme-pokemon .pokemon-section-orb{background:radial-gradient(circle at 50% 42%,var(--pk-accent) 0 14%,#171d24 15% 31%,var(--pk-accent2) 32% 36%,#080b0f 37% 100%)!important;border-color:rgba(var(--pk-rgb),.60)!important;box-shadow:0 0 12px rgba(var(--pk-rgb),.10)!important}
+body.collection-theme-pokemon .pokemon-section-toggle>b{background:rgba(var(--pk-rgb),.08)!important;color:var(--pk-accent)!important}
+body.collection-theme-pokemon .pokemon-variant-chip.active{border-color:var(--pk-accent)!important;background:rgba(var(--pk-rgb),.075)!important;color:var(--pk-accent)!important;box-shadow:inset 0 0 0 1px rgba(var(--pk-rgb),.07)!important}
+body.collection-theme-pokemon .pokemon-step.plus{background:linear-gradient(145deg,var(--pk-accent2),var(--pk-accent))!important;border-color:var(--pk-accent)!important;color:#080b0f!important}
+body.collection-theme-pokemon .bottom-nav-button.active,body.collection-theme-pokemon .bottom-nav-button.active .bottom-nav-icon{color:var(--pk-accent)!important}.collection-theme-pokemon .bottom-nav-button.active .bottom-nav-icon{filter:drop-shadow(0 0 7px rgba(var(--pk-rgb),.28))!important}
+body.collection-theme-pokemon #statisticsView .tab-page-heading span{color:var(--pk-accent)!important}
+body.collection-theme-pokemon .stats-hero{background:radial-gradient(circle at 18% 20%,rgba(var(--pk-rgb),.09),transparent 34%),linear-gradient(145deg,#11171e,#0b1016)!important}
+body.collection-theme-pokemon .stats-ring{background:conic-gradient(var(--pk-accent) calc(var(--progress,0)*1%),#252c35 0)!important}
+body.collection-theme-pokemon .pokemon-stats-grid article>span{background:rgba(var(--pk-rgb),.08)!important;color:var(--pk-accent)!important}

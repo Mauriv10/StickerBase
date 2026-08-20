@@ -197,8 +197,9 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  syncCollectionChrome(project.collectionType);
  const def=collectionDefinition(project);
  document.body.dataset.collectionType=project.collectionType;
- document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks","collection-theme-pokemon");
+ document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks","collection-theme-pokemon","pokemon-theme-pitch-black","pokemon-theme-chaos-rising","pokemon-theme-perfect-order","pokemon-theme-surging-sparks");
  document.body.classList.add(`collection-theme-${def.theme}`);
+ if(isPokemonCollectionType(project.collectionType)) document.body.classList.add(`pokemon-theme-${project.collectionType.replace(/^pokemon-/,"")}`);
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
  const subtitle=document.querySelector(".collection-header-subtitle");if(subtitle)subtitle.textContent=def.subtitle;
  if(teamSearch)teamSearch.placeholder=isPokemonCollectionType(project.collectionType)?"Buscar carta, nº o rareza…":(project.collectionType==="liga-este-2026-27"||project.collectionType==="megacracks-2026-27")?"Buscar jugador, club o nº…":"Buscar selección…";
