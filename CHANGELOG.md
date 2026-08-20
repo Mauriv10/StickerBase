@@ -213,6 +213,12 @@
 - Conserva la sincronización protegida, el orden oficial de selecciones y todas las funciones de la 704.10.3.
 
 
+## 704.13.6
+- Pokémon: las miniaturas de las cartas ahora se pueden pulsar para abrir un visor ampliado superpuesto sobre la app.
+- El visor usa la imagen de mayor resolución disponible, mantiene la app visible y desenfocada al fondo y permite cerrar con X, tocando fuera o con Escape.
+- Añadida interacción accesible mediante teclado en las miniaturas.
+
+
 ## 704.13.5
 - Identidad visual independiente para Pitch Black, Chaos Rising, Perfect Order y Surging Sparks.
 - Chaos Rising combina azul eléctrico y magenta; Perfect Order prioriza verde; Surging Sparks usa amarillo/naranja; Pitch Black conserva negro/dorado.

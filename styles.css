@@ -6354,3 +6354,18 @@ body.collection-theme-pokemon #statisticsView .tab-page-heading span{color:var(-
 body.collection-theme-pokemon .stats-hero{background:radial-gradient(circle at 18% 20%,rgba(var(--pk-rgb),.09),transparent 34%),linear-gradient(145deg,#11171e,#0b1016)!important}
 body.collection-theme-pokemon .stats-ring{background:conic-gradient(var(--pk-accent) calc(var(--progress,0)*1%),#252c35 0)!important}
 body.collection-theme-pokemon .pokemon-stats-grid article>span{background:rgba(var(--pk-rgb),.08)!important;color:var(--pk-accent)!important}
+
+/* 704.13.6 · Visor ampliado de cartas Pokémon */
+body.collection-theme-pokemon .pokemon-thumb.is-clickable{cursor:zoom-in;position:relative;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+body.collection-theme-pokemon .pokemon-thumb.is-clickable:active{transform:scale(.96)}
+body.collection-theme-pokemon .pokemon-thumb.is-clickable:focus-visible{outline:2px solid var(--pk-accent);outline-offset:3px}
+body.pokemon-card-viewer-open{overflow:hidden!important}
+.pokemon-card-viewer{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:max(22px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom));background:rgba(2,5,9,.78);backdrop-filter:blur(10px) saturate(.8);-webkit-backdrop-filter:blur(10px) saturate(.8);opacity:0;transition:opacity .18s ease}
+.pokemon-card-viewer.visible{opacity:1}
+.pokemon-card-viewer-stage{position:relative;display:grid;place-items:center;max-width:min(88vw,560px);max-height:82dvh;transform:scale(.94);transition:transform .22s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 24px 42px rgba(0,0,0,.65))}
+.pokemon-card-viewer.visible .pokemon-card-viewer-stage{transform:scale(1)}
+.pokemon-card-viewer-stage img{display:block;width:auto;height:auto;max-width:min(88vw,560px);max-height:82dvh;object-fit:contain;border-radius:3.8%/2.7%;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.pokemon-card-viewer-close{position:absolute;z-index:2;top:max(16px,env(safe-area-inset-top));right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.24);background:rgba(8,12,17,.82);color:#fff;font:300 31px/1 system-ui,sans-serif;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer}
+.pokemon-card-viewer-caption{position:absolute;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:8px;max-width:80vw;padding:7px 12px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(7,10,14,.72);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:11px;white-space:nowrap}
+.pokemon-card-viewer-caption strong{overflow:hidden;text-overflow:ellipsis}.pokemon-card-viewer-caption span{color:#aeb7c3}
+@media(max-width:430px){.pokemon-card-viewer{padding-left:10px;padding-right:10px}.pokemon-card-viewer-stage,.pokemon-card-viewer-stage img{max-width:94vw;max-height:79dvh}.pokemon-card-viewer-close{right:12px}.pokemon-card-viewer-caption{bottom:max(9px,env(safe-area-inset-bottom))}}

@@ -2106,6 +2106,22 @@ function pokemonVariantQty(project,code,variant){return Number(pokemonVariantSta
 function changePokemonVariant(code,variant,delta){const p=projects?.[activeProjectId];if(!p)return;const state=pokemonVariantState(p,code),previous=Number(state[variant])||0,next=Math.max(0,previous+delta);if(next===previous)return;state[variant]=next;history.push({id:crypto.randomUUID?.()||String(Date.now()+Math.random()),team:"BASE",code:`${code}:${variant}`,previous,next,delta,at:new Date().toISOString(),source:"pokemon-variant"});delta>0?sessionStats.plus++:sessionStats.minus++;saveAll("✓ Guardado ahora");vibrate();renderAll();showToast(`✓ ${pokemonCardMeta(code,p)?.name||code} · ${variant==="reverse"?"Inverse Holo":variant==="holo"?"Holo":"Básica"} x${next}`)}
 function pokemonIsOpen(section){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.pokemonOpenSections=p.ui.pokemonOpenSections||{};return p.ui.pokemonOpenSections[section]??(section==="BASE")}
 function togglePokemonSection(section){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.pokemonOpenSections=p.ui.pokemonOpenSections||{};p.ui.pokemonOpenSections[section]=!pokemonIsOpen(section);persistProjects();renderGlobalCollection()}
+
+function openPokemonCardViewer(type,code,meta={}){
+ closePokemonCardViewer();
+ const small=meta.images?.small||pokemonDirectImageUrl(type,code,"small")||"";
+ const large=meta.images?.large||pokemonDirectImageUrl(type,code,"large")||small;
+ if(!large)return;
+ const viewer=document.createElement("div");viewer.className="pokemon-card-viewer";viewer.setAttribute("role","dialog");viewer.setAttribute("aria-modal","true");viewer.setAttribute("aria-label",meta.name?`Vista ampliada de ${meta.name}`:"Vista ampliada de carta Pokémon");
+ viewer.innerHTML=`<button type="button" class="pokemon-card-viewer-close" aria-label="Cerrar">×</button><div class="pokemon-card-viewer-stage"><img src="${collectionSafeText(large)}" data-fallback="${collectionSafeText(small)}" alt="${collectionSafeText(meta.name||`Carta ${code}`)}"></div><div class="pokemon-card-viewer-caption"><strong>${collectionSafeText(meta.name||`Carta ${code}`)}</strong><span>#${collectionSafeText(code)}</span></div>`;
+ document.body.appendChild(viewer);document.body.classList.add("pokemon-card-viewer-open");
+ const img=viewer.querySelector("img");img.onerror=()=>{const f=img.dataset.fallback;if(f&&img.src!==f){img.src=f;delete img.dataset.fallback;}};
+ viewer.querySelector(".pokemon-card-viewer-close").onclick=closePokemonCardViewer;viewer.onclick=e=>{if(e.target===viewer)closePokemonCardViewer();};
+ requestAnimationFrame(()=>viewer.classList.add("visible"));
+}
+function closePokemonCardViewer(){const viewer=document.querySelector(".pokemon-card-viewer");if(!viewer)return;viewer.classList.remove("visible");document.body.classList.remove("pokemon-card-viewer-open");setTimeout(()=>viewer.remove(),180)}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".pokemon-card-viewer"))closePokemonCardViewer();});
+
 function pokemonCardRow(section,code,qty){
  const p=projects?.[activeProjectId],type=inferCollectionType(p),meta=pokemonCardMeta(code,p)||{},ex=section==="BASE"&&pokemonIsEx(meta),row=document.createElement("div");
  row.className=`pokemon-card-row ${ex?"is-ex":""}`;
@@ -2118,7 +2134,7 @@ function pokemonCardRow(section,code,qty){
   controls=`<div class="pokemon-fixed-badge ${ex?"ex":""}">${ex?"EX":collectionSafeText(meta.rarity||section)}</div><div class="pokemon-stock"><strong>x${qty}</strong><button class="pokemon-step minus" aria-label="Restar">−</button><button class="pokemon-step plus" aria-label="Sumar">+</button></div>`;
  }
  row.innerHTML=`<div class="pokemon-number">${collectionSafeText(code)}</div><div class="pokemon-thumb">${img?`<img src="${collectionSafeText(img)}" data-fallback="${collectionSafeText(fallback)}" alt="${collectionSafeText(meta.name||`Carta ${code}`)}" loading="lazy" decoding="async">`:"<span>PK</span>"}</div><div class="pokemon-card-main"><strong>${collectionSafeText(meta.name||`#${code}`)}</strong>${controls}</div>`;
- const image=row.querySelector(".pokemon-thumb img");if(image)image.onerror=()=>{const f=image.dataset.fallback;if(f&&image.src!==f){image.src=f;delete image.dataset.fallback;}else{image.closest(".pokemon-thumb").innerHTML="<span>PK</span>";}};
+ const image=row.querySelector(".pokemon-thumb img");if(image){image.onerror=()=>{const f=image.dataset.fallback;if(f&&image.src!==f){image.src=f;delete image.dataset.fallback;}else{image.closest(".pokemon-thumb").innerHTML="<span>PK</span>";}};image.closest(".pokemon-thumb").classList.add("is-clickable");image.closest(".pokemon-thumb").setAttribute("role","button");image.closest(".pokemon-thumb").setAttribute("tabindex","0");image.closest(".pokemon-thumb").setAttribute("aria-label",`Ver ${meta.name||`carta ${code}`} en grande`);const open=()=>openPokemonCardViewer(type,code,meta);image.closest(".pokemon-thumb").onclick=open;image.closest(".pokemon-thumb").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};}
  row.querySelectorAll("[data-variant]").forEach(b=>b.onclick=()=>pokemonSetSelectedVariant(p,code,b.dataset.variant));
  const minus=row.querySelector(".minus"),plus=row.querySelector(".plus");
  if(section==="BASE"&&!ex){minus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),-1);plus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),1)}
