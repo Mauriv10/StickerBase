@@ -1,3 +1,12 @@
+# 704.14.1
+
+- Corrige la legibilidad del título de Pokémon TCG en la biblioteca.
+- Liga Este y Megacracks adoptan una composición visual más integrada y coherente con el acabado premium de Pokémon.
+- Sustituye los iconos LE/MC de cada álbum por portadas reales 2026/27.
+- Refina cabecera, selector, búsqueda, filtros, acordeones y barra inferior de Liga Este y Megacracks.
+- No se añaden imágenes individuales a los cromos/cards de fútbol.
+- Sin cambios en inventario, checklists, sincronización ni lógica de negocio.
+
 ## 704.14.0
 - Pokémon: corregida la insignia Activa en la biblioteca para que no quede oculta detrás de las flechas.
 - Liga Este: rediseño Premium oscuro/morado-dorado en cabecera, selector, búsqueda, filtros, acordeones, filas, estadísticas y navegación.

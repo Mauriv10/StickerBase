@@ -6611,3 +6611,284 @@ body.collection-theme-ligaeste .collection-stock-tools button,body.collection-th
  .collection-folder-ligaeste .collection-card-main,.collection-folder-megacracks .collection-card-main{padding-right:112px!important;min-height:100px!important}
  .collection-folder-ligaeste .collection-album-icon,.collection-folder-megacracks .collection-album-icon{width:70px!important;height:82px!important;flex-basis:70px!important}
 }
+
+
+/* =========================================================
+   704.14.1 · Panini Premium coherence pass
+   - Liga Este / Megacracks: interfaz oscura integrada
+   - Portadas reales 2026/27 en Biblioteca
+   - Pokémon TCG: título legible sobre tarjeta blanca
+   ========================================================= */
+
+/* Biblioteca Pokémon: texto oscuro sobre el contenedor blanco */
+.collection-folder-pokemon .collection-folder-copy strong,
+.collection-folder-pokemon .clean-library-card h3,
+.collection-folder-pokemon .collection-card-copy h3{
+  color:#111827!important;
+  text-shadow:none!important;
+}
+.collection-folder-pokemon .collection-folder-copy small,
+.collection-folder-pokemon .collection-brief{
+  color:#667085!important;
+}
+
+/* Portadas reales de las colecciones Panini 2026/27 */
+.collection-folder-ligaeste .collection-album-icon,
+.collection-folder-megacracks .collection-album-icon{
+  overflow:hidden!important;
+  padding:0!important;
+  display:block!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:cover!important;
+  border-radius:14px!important;
+}
+.collection-folder-ligaeste .collection-album-icon{
+  background-image:url("./assets/collection-covers/liga-este-2026-27.jpg")!important;
+  border:1px solid rgba(177,92,255,.62)!important;
+}
+.collection-folder-megacracks .collection-album-icon{
+  background-image:url("./assets/collection-covers/megacracks-2026-27.webp")!important;
+  border:1px solid rgba(213,221,232,.55)!important;
+  background-size:cover!important;
+}
+.collection-folder-ligaeste .collection-album-icon span,
+.collection-folder-megacracks .collection-album-icon span,
+.collection-folder-ligaeste .collection-album-icon:after,
+.collection-folder-megacracks .collection-album-icon:after{
+  display:none!important;
+}
+
+/* Las carpetas Panini se sienten parte de la misma app premium */
+body.collection-theme-ligaeste,
+body.collection-theme-megacracks{
+  background:#06080d!important;
+}
+body.collection-theme-ligaeste .app-shell,
+body.collection-theme-megacracks .app-shell,
+body.collection-theme-ligaeste .app-scroll,
+body.collection-theme-megacracks .app-scroll,
+body.collection-theme-ligaeste .app-main,
+body.collection-theme-megacracks .app-main,
+body.collection-theme-ligaeste #inventoryView,
+body.collection-theme-megacracks #inventoryView{
+  background:
+    radial-gradient(circle at 100% 8%,rgba(var(--panini-rgb),.09),transparent 28%),
+    #07090e!important;
+}
+
+/* Cabecera: una sola pieza, sin corte blanco entre título, selector y buscador */
+body.collection-theme-ligaeste .app-header,
+body.collection-theme-megacracks .app-header{
+  background:
+    radial-gradient(circle at 100% 0,rgba(var(--panini-rgb),.18),transparent 34%),
+    linear-gradient(180deg,#0b0e14 0%,#080b10 100%)!important;
+  border-bottom:1px solid var(--panini-line)!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.30)!important;
+  padding-bottom:16px!important;
+}
+body.collection-theme-ligaeste .premium-selection-row,
+body.collection-theme-megacracks .premium-selection-row{
+  padding-top:14px!important;
+  margin-top:0!important;
+}
+body.collection-theme-ligaeste .premium-search,
+body.collection-theme-megacracks .premium-search{
+  padding-bottom:0!important;
+  margin-bottom:0!important;
+}
+body.collection-theme-ligaeste .premium-team-card,
+body.collection-theme-megacracks .premium-team-card{
+  border-radius:17px!important;
+  min-height:72px!important;
+}
+body.collection-theme-ligaeste .search-wrap,
+body.collection-theme-megacracks .search-wrap{
+  border-radius:17px!important;
+  min-height:58px!important;
+}
+body.collection-theme-ligaeste .search-wrap:focus-within{
+  border-color:#9147eb!important;
+  box-shadow:0 0 0 3px rgba(145,71,235,.12),0 12px 28px rgba(0,0,0,.28)!important;
+}
+body.collection-theme-megacracks .search-wrap:focus-within{
+  border-color:#9aa6b6!important;
+  box-shadow:0 0 0 3px rgba(205,214,225,.08),0 12px 28px rgba(0,0,0,.28)!important;
+}
+
+/* Zona de filtros: elimina la sensación de bloques blancos pegados */
+body.collection-theme-ligaeste #collectionStickyControls,
+body.collection-theme-megacracks #collectionStickyControls{
+  margin:14px 16px 0!important;
+  padding:5px!important;
+  border-radius:18px!important;
+  background:rgba(16,20,27,.96)!important;
+  border:1px solid var(--panini-line)!important;
+}
+body.collection-theme-ligaeste #collectionStickyControls .tab,
+body.collection-theme-megacracks #collectionStickyControls .tab{
+  color:#8f98a6!important;
+  border-radius:14px!important;
+  background:transparent!important;
+}
+body.collection-theme-ligaeste #collectionStickyControls .tab.active{
+  color:#fff!important;
+  background:linear-gradient(135deg,#6320c5,#a347f2)!important;
+  box-shadow:0 6px 18px rgba(120,40,218,.26)!important;
+}
+body.collection-theme-megacracks #collectionStickyControls .tab.active{
+  color:#0b0f14!important;
+  background:linear-gradient(135deg,#f0f4f8,#9ca8b7)!important;
+  box-shadow:0 6px 18px rgba(215,223,233,.13)!important;
+}
+body.collection-theme-ligaeste #collectionStickyControls .tab b,
+body.collection-theme-megacracks #collectionStickyControls .tab b{
+  background:rgba(255,255,255,.08)!important;
+  color:inherit!important;
+}
+body.collection-theme-ligaeste .collection-toolbar,
+body.collection-theme-megacracks .collection-toolbar{
+  background:transparent!important;
+  padding-top:18px!important;
+}
+body.collection-theme-ligaeste .collection-toolbar>div:first-child h2,
+body.collection-theme-megacracks .collection-toolbar>div:first-child h2{
+  color:#f7f8fb!important;
+  font-size:29px!important;
+  letter-spacing:-.045em!important;
+}
+body.collection-theme-ligaeste .collection-filter,
+body.collection-theme-megacracks .collection-filter{
+  background:#11151c!important;
+  border:1px solid var(--panini-line)!important;
+  box-shadow:0 8px 20px rgba(0,0,0,.18)!important;
+}
+body.collection-theme-ligaeste .collection-sort-bar,
+body.collection-theme-megacracks .collection-sort-bar{
+  background:#10151c!important;
+  border:1px solid var(--panini-line)!important;
+  box-shadow:0 8px 20px rgba(0,0,0,.18)!important;
+}
+body.collection-theme-ligaeste .collection-sort-bar label,
+body.collection-theme-megacracks .collection-sort-bar label{
+  color:#9aa4b2!important;
+}
+body.collection-theme-ligaeste .collection-sort-bar select,
+body.collection-theme-megacracks .collection-sort-bar select{
+  background:#171c24!important;
+  color:#f5f7fa!important;
+  border-color:#29323d!important;
+}
+
+/* Acordeones: cabecera y filas más compactas y consistentes */
+body.collection-theme-ligaeste #globalCollectionList,
+body.collection-theme-megacracks #globalCollectionList{
+  padding-bottom:112px!important;
+}
+body.collection-theme-ligaeste .ligaeste-team-accordion,
+body.collection-theme-megacracks .ligaeste-team-accordion{
+  margin-bottom:12px!important;
+  border-radius:18px!important;
+}
+body.collection-theme-ligaeste .ligaeste-team-toggle,
+body.collection-theme-megacracks .ligaeste-team-toggle{
+  min-height:78px!important;
+  padding:13px 14px!important;
+}
+body.collection-theme-ligaeste .ligaeste-team-heading img,
+body.collection-theme-megacracks .ligaeste-team-heading img{
+  width:48px!important;
+  height:48px!important;
+  object-fit:contain!important;
+  padding:5px!important;
+  border-radius:13px!important;
+  background:#f7f8fb!important;
+}
+body.collection-theme-ligaeste .ligaeste-team-heading strong,
+body.collection-theme-megacracks .ligaeste-team-heading strong{
+  font-size:17px!important;
+  letter-spacing:-.02em!important;
+}
+body.collection-theme-ligaeste .ligaeste-player-row,
+body.collection-theme-megacracks .ligaeste-player-row{
+  min-height:66px!important;
+}
+body.collection-theme-ligaeste .ligaeste-row-step,
+body.collection-theme-megacracks .ligaeste-row-step{
+  width:43px!important;
+  height:43px!important;
+  border-radius:12px!important;
+}
+
+/* Bottom nav: integrada, flotante y con identidad de cada colección */
+body.collection-theme-ligaeste .bottom-app-nav,
+body.collection-theme-megacracks .bottom-app-nav{
+  left:10px!important;
+  right:10px!important;
+  bottom:calc(8px + env(safe-area-inset-bottom))!important;
+  width:auto!important;
+  border:1px solid var(--panini-line)!important;
+  border-radius:20px!important;
+  background:rgba(7,10,14,.92)!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.42)!important;
+  overflow:hidden!important;
+}
+body.collection-theme-ligaeste .bottom-nav-button,
+body.collection-theme-megacracks .bottom-nav-button{
+  border-radius:14px!important;
+  margin:5px 2px!important;
+}
+body.collection-theme-ligaeste .bottom-nav-button.active{
+  color:#d4a3ff!important;
+  background:linear-gradient(180deg,rgba(139,57,230,.18),rgba(139,57,230,.08))!important;
+}
+body.collection-theme-megacracks .bottom-nav-button.active{
+  color:#fff!important;
+  background:linear-gradient(180deg,rgba(210,219,230,.14),rgba(210,219,230,.06))!important;
+}
+
+/* Biblioteca: la carpeta completa también adopta el look premium */
+.collection-folder-ligaeste,
+.collection-folder-megacracks{
+  border-radius:22px!important;
+  overflow:hidden!important;
+}
+.collection-folder-ligaeste .collection-folder-header{
+  background:
+    radial-gradient(circle at 85% 15%,rgba(180,91,255,.20),transparent 34%),
+    linear-gradient(145deg,#171020,#0d1118)!important;
+}
+.collection-folder-megacracks .collection-folder-header{
+  background:
+    radial-gradient(circle at 85% 15%,rgba(210,220,232,.12),transparent 34%),
+    linear-gradient(145deg,#171c24,#0c1015)!important;
+}
+.collection-folder-ligaeste .collection-folder-icon{
+  background:linear-gradient(145deg,#43116f,#a044ef)!important;
+  color:#fff!important;
+  border:1px solid rgba(208,146,255,.42)!important;
+}
+.collection-folder-megacracks .collection-folder-icon{
+  background:linear-gradient(145deg,#10151c,#566171)!important;
+  color:#fff!important;
+  border:1px solid rgba(218,225,235,.34)!important;
+}
+
+/* En móvil, la portada gana presencia sin quitar sitio al nombre */
+@media(max-width:430px){
+  .collection-folder-ligaeste .collection-album-icon,
+  .collection-folder-megacracks .collection-album-icon{
+    width:82px!important;
+    height:104px!important;
+    flex-basis:82px!important;
+  }
+  .collection-folder-ligaeste .collection-card-main,
+  .collection-folder-megacracks .collection-card-main{
+    min-height:124px!important;
+    padding-left:10px!important;
+  }
+  body.collection-theme-ligaeste .app-header,
+  body.collection-theme-megacracks .app-header{
+    padding-bottom:13px!important;
+  }
+}
