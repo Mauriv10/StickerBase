@@ -1,3 +1,13 @@
+# 704.14.6
+
+- Liga Este y Megacracks (Cromos): estructura visual fijada al mockup aprobado.
+- El buscador queda siempre visible inmediatamente bajo la cabecera premium.
+- Eliminada la línea clara entre cabecera y buscador.
+- Filtros Todos / Me faltan / Repetidos y Orden del álbum quedan alineados en una sola fila.
+- Selector Orden del álbum reajustado para evitar texto cortado o aspecto deformado.
+- El listado de clubes/equipos comienza siempre después de buscador y filtros.
+- Sin cambios de inventario, checklist, datos ni sincronización.
+
 # 704.14.5
 
 - Liga Este y Megacracks: la cabecera premium se oculta en Colecciones y Cambiar.
