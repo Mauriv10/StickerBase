@@ -7472,3 +7472,96 @@ body.main-tab-collection.collection-theme-megacracks .compact-home-titlebar{
     max-height:44px!important;
   }
 }
+
+
+/* =========================================================
+   704.14.5 · Panini tab header visibility + scroll + special icons
+   ========================================================= */
+
+/* La cabecera premium pertenece solo a Cromos y Estadísticas. */
+body.main-tab-trade.collection-theme-ligaeste .app-header,
+body.main-tab-trade.collection-theme-megacracks .app-header,
+body.main-tab-collections.collection-theme-ligaeste .app-header,
+body.main-tab-collections.collection-theme-megacracks .app-header{
+  display:none!important;
+}
+
+/* En Cromos/Estadísticas forma parte del flujo normal: nunca tapa contenido. */
+body.main-tab-collection.collection-theme-ligaeste .app-header,
+body.main-tab-collection.collection-theme-megacracks .app-header,
+body.main-tab-statistics.collection-theme-ligaeste .app-header,
+body.main-tab-statistics.collection-theme-megacracks .app-header{
+  position:static!important;
+  inset:auto!important;
+  transform:none!important;
+  width:100%!important;
+  flex:none!important;
+}
+
+/* Sin compensaciones antiguas de cabeceras sticky/fijas. */
+body.main-tab-collection.collection-theme-ligaeste .app-main,
+body.main-tab-collection.collection-theme-megacracks .app-main,
+body.main-tab-statistics.collection-theme-ligaeste .app-main,
+body.main-tab-statistics.collection-theme-megacracks .app-main{
+  padding-top:0!important;
+  margin-top:0!important;
+}
+
+/* Especiales Liga Este: misma caja centrada que los escudos de clubes. */
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading .ligaeste-insert-mark{
+  width:54px!important;
+  height:54px!important;
+  min-width:54px!important;
+  flex:0 0 54px!important;
+  display:grid!important;
+  place-items:center!important;
+  align-self:center!important;
+  margin:0!important;
+  padding:5px!important;
+  box-sizing:border-box!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  overflow:hidden!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading .ligaeste-insert-mark img{
+  width:100%!important;
+  height:100%!important;
+  max-width:44px!important;
+  max-height:44px!important;
+  display:block!important;
+  margin:auto!important;
+  padding:0!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+}
+
+/* Especiales Megacracks: icono SVG perfectamente centrado en su caja. */
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading .megacracks-special-badge{
+  width:54px!important;
+  height:54px!important;
+  min-width:54px!important;
+  flex:0 0 54px!important;
+  display:grid!important;
+  place-items:center!important;
+  align-self:center!important;
+  margin:0!important;
+}
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading .megacracks-special-badge svg{
+  position:static!important;
+  width:32px!important;
+  height:32px!important;
+  margin:auto!important;
+  transform:none!important;
+}
+
+/* Elimina la última raya clara que podía sobrevivir por reglas antiguas. */
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-toggle,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-toggle,
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-body,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-body{
+  border-bottom-color:transparent!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-list-head,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-list-head{
+  border-top-color:#252d37!important;
+}

@@ -1,3 +1,12 @@
+# 704.14.5
+
+- Liga Este y Megacracks: la cabecera premium se oculta en Colecciones y Cambiar.
+- La cabecera permanece únicamente en Cromos y Estadísticas.
+- Al cambiar de pestaña se reinicia también el scroll interno de StickerBase, evitando que buscador/filtros queden ocultos bajo la cabecera.
+- Iconos de apartados especiales de Liga Este y Megacracks centrados igual que los escudos de clubes.
+- Eliminada la última posibilidad de separadores claros heredados entre cabecera de equipo y listado.
+- Sin cambios de inventario, checklist, sincronización ni datos.
+
 # 704.14.4
 
 - Liga Este y Megacracks: la cabecera premium se muestra también en la pestaña Cromos.
