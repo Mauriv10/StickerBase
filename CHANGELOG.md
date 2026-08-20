@@ -1,3 +1,11 @@
+## 704.13.3
+- Pokémon: interfaz premium oscura/dorada aplicada a la app real, inspirada en la referencia aprobada.
+- Encabezado, resumen de progreso, búsqueda, filtros, acordeones y navegación inferior adaptados exclusivamente a Pokémon.
+- Las cartas muestran imagen real mediante Scrydex con URL determinista por set/número, incluso si el metadata antiguo de Supabase no incluía imágenes.
+- BASE SET mantiene Básica / Holo / Inverse Holo por carta; las EX del set base y las rarezas ocultas siguen siendo tipos fijos.
+- Acordeones de rarezas con contador, subtítulo y progreso del Base Set.
+- Mundial, Liga Este y Megacracks no reciben cambios visuales.
+
 ## 704.13.2
 - Pokémon pasa a una vista en acordeón inspirada en Liga Este/Megacracks.
 - Cada carta muestra su imagen real cuando está disponible en los datos del set.

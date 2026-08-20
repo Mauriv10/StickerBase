@@ -176,6 +176,16 @@
 <main class="app-main">
   
 <section id="inventoryView" class="app-view active">
+
+<section id="pokemonDashboard" class="pokemon-dashboard" hidden>
+  <div class="pokemon-dashboard-grid">
+    <div><strong id="pokemonDashTotal">0</strong><span>Total</span></div>
+    <div><strong id="pokemonDashComplete">0</strong><span>Completadas</span></div>
+    <div><strong id="pokemonDashPending">0</strong><span>Pendientes</span></div>
+    <div class="pokemon-dashboard-progress"><strong id="pokemonDashProgress">0%</strong><span>Completado</span></div>
+  </div>
+  <div class="pokemon-dashboard-track"><i id="pokemonDashBar"></i></div>
+</section>
   
 <nav id="collectionStickyControls" class="tabs premium-tabs collection-tabs-sticky" aria-label="Filtrar cromos">
   <button class="tab active" data-filter="all"><span>Todos</span><b id="tabAllCount">20</b></button>
