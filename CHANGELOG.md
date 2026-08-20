@@ -1,3 +1,11 @@
+## 704.13.8
+- Pokémon · Colecciones: sustituidas las miniaturas doradas genéricas por la carta chase representativa de cada expansión.
+- Pitch Black: Mega Darkrai ex #116.
+- Chaos Rising: Mega Greninja ex #116.
+- Perfect Order: Mega Zygarde ex #124.
+- Surging Sparks: Pikachu ex #238.
+- Sin cambios en inventarios, progreso, temas visuales ni funcionamiento del visor de cartas.
+
 ## 704.13.7
 - Pokémon: rediseñada la biblioteca de Colecciones para identificar cada expansión de un vistazo.
 - Cada álbum Pokémon muestra miniatura visual, nombre completo, bloque/serie, progreso y cartas conseguidas.

@@ -3112,7 +3112,8 @@ function renderCollections(){
       const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
       const pokemonDef=isPokemon?POKEMON_SET_DEFS[ptype]:null;
       const pokemonTotal=isPokemon?Object.values(p.inventory||{}).reduce((n,cards)=>n+Object.keys(cards||{}).length,0):0;
-      const pokemonThumb=isPokemon?pokemonDirectImageUrl(ptype,ptype==="pokemon-pitch-black"?120:ptype==="pokemon-chaos-rising"?122:ptype==="pokemon-perfect-order"?124:247,"small"):"";
+      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":124,"pokemon-surging-sparks":238};
+      const pokemonThumb=isPokemon?pokemonDirectImageUrl(ptype,pokemonLibraryChase[ptype]||1,"small"):"";
       return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${isPokemon?`pokemon-library-card pokemon-library-${ptype.replace(/^pokemon-/,'')}`:''} ${active?"active":""}" data-collection-id="${p.id}">
        <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
         ${isPokemon?`<div class="pokemon-library-cover" aria-hidden="true">${pokemonThumb?`<img src="${collectionSafeText(pokemonThumb)}" alt="" loading="lazy">`:''}<span>${collectionSafeText(p.name)}</span></div>`:`<div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>`}
