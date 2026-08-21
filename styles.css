@@ -7735,3 +7735,93 @@ body.main-tab-collection.collection-theme-megacracks .compact-home-titlebar::aft
     padding-left:8px!important;
   }
 }
+
+
+/* =========================================================
+   704.14.7 · Panini header solo en Cromos + estadísticas legibles
+   ========================================================= */
+
+/* La cabecera premium Panini SOLO existe visualmente en la pestaña Cromos.
+   Como titlebar está desacoplada del app-scroll, hay que ocultarla directamente,
+   no solo ocultar .app-header. */
+body.collection-theme-ligaeste:not(.main-tab-collection) .compact-home-titlebar,
+body.collection-theme-megacracks:not(.main-tab-collection) .compact-home-titlebar{
+  display:none!important;
+}
+
+/* Estadísticas, Cambiar y Colecciones no deben reservar espacio para cabecera. */
+body.main-tab-statistics.collection-theme-ligaeste .app-header,
+body.main-tab-statistics.collection-theme-megacracks .app-header,
+body.main-tab-trade.collection-theme-ligaeste .app-header,
+body.main-tab-trade.collection-theme-megacracks .app-header,
+body.main-tab-collections.collection-theme-ligaeste .app-header,
+body.main-tab-collections.collection-theme-megacracks .app-header{
+  display:none!important;
+}
+
+/* En Cromos la cabecera es un bloque normal del shell; no flota ni tapa el scroll. */
+body.main-tab-collection.collection-theme-ligaeste .compact-home-titlebar,
+body.main-tab-collection.collection-theme-megacracks .compact-home-titlebar{
+  display:grid!important;
+  position:relative!important;
+  inset:auto!important;
+  top:auto!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  flex:none!important;
+  width:100%!important;
+  z-index:2!important;
+}
+
+/* El contenido desplazable comienza limpio justo debajo de la cabecera. */
+body.main-tab-collection.collection-theme-ligaeste .app-scroll,
+body.main-tab-collection.collection-theme-megacracks .app-scroll{
+  position:relative!important;
+  z-index:1!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  padding-top:0!important;
+  margin-top:0!important;
+}
+
+/* Estadísticas Panini: eliminar combinaciones de texto claro sobre tarjeta clara. */
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-stats,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-stats{
+  background:#0d131b!important;
+  border:1px solid #2a3442!important;
+  color:#f5f7fb!important;
+  box-shadow:none!important;
+}
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-heading strong,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-heading strong,
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-row strong,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-row strong,
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-value,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-value{
+  color:#f7f9fc!important;
+}
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-heading small,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-heading small,
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-row span,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-row span{
+  color:#aeb8c6!important;
+}
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-row,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-row{
+  background:#111821!important;
+  border-color:#2a3442!important;
+}
+body.main-tab-statistics.collection-theme-ligaeste .album-progress-track,
+body.main-tab-statistics.collection-theme-megacracks .album-progress-track{
+  background:#252e3a!important;
+}
+
+/* Refuerzo de contraste para textos secundarios de todas las tarjetas estadísticas. */
+body.main-tab-statistics.collection-theme-ligaeste #statisticsView small,
+body.main-tab-statistics.collection-theme-ligaeste #statisticsView em,
+body.main-tab-statistics.collection-theme-megacracks #statisticsView small,
+body.main-tab-statistics.collection-theme-megacracks #statisticsView em{
+  opacity:1!important;
+}

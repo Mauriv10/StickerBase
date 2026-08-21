@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.6";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.7";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2444,7 +2444,13 @@ function setMainTab(tab){
 
  window.scrollTo({top:0,behavior:"auto"});
  const appScroll=$("#appScroll");
- if(appScroll)appScroll.scrollTo({top:0,left:0,behavior:"auto"});
+ if(appScroll){
+   appScroll.scrollTo({top:0,left:0,behavior:"auto"});
+   if(tab==="collection"){
+     requestAnimationFrame(()=>appScroll.scrollTo({top:0,left:0,behavior:"auto"}));
+     setTimeout(()=>appScroll.scrollTo({top:0,left:0,behavior:"auto"}),60);
+   }
+ }
 }
 
 function renderAll(){

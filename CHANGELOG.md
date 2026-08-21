@@ -1,3 +1,11 @@
+# 704.14.7
+
+- Liga Este y Megacracks: la cabecera premium se muestra exclusivamente en Cromos.
+- Eliminada la cabecera de Estadísticas, Cambiar y Colecciones.
+- Cromos: refuerzo del reset de scroll al entrar para que buscador y filtros no queden ocultos bajo la cabecera.
+- Estadísticas: corregido el contraste de Progreso por álbum y textos secundarios.
+- Sin cambios en inventario, checklist, datos ni sincronización.
+
 # 704.14.6
 
 - Liga Este y Megacracks (Cromos): estructura visual fijada al mockup aprobado.
