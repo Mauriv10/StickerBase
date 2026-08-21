@@ -1,3 +1,10 @@
+# 704.14.8
+
+- Liga Este y Megacracks: las sugerencias del buscador se muestran en una capa flotante por encima de filtros y acordeones.
+- El desplegable ya no queda oculto detrás del contenido al escribir.
+- Las sugerencias adoptan la estética oscura propia de Liga Este y Megacracks.
+- Sin cambios en la lógica del buscador, inventario, checklist, datos ni sincronización.
+
 # 704.14.7
 
 - Liga Este y Megacracks: la cabecera premium se muestra exclusivamente en Cromos.

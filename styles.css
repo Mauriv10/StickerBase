@@ -7825,3 +7825,102 @@ body.main-tab-statistics.collection-theme-megacracks #statisticsView small,
 body.main-tab-statistics.collection-theme-megacracks #statisticsView em{
   opacity:1!important;
 }
+
+
+/* =========================================================
+   704.14.8 · Buscador Panini: sugerencias siempre por delante
+   ========================================================= */
+
+/* Crea una capa de búsqueda por encima de filtros, acordeones y navegación. */
+body.main-tab-collection.collection-theme-ligaeste .premium-search,
+body.main-tab-collection.collection-theme-megacracks .premium-search{
+  position:relative!important;
+  z-index:5000!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .premium-search .search-wrap,
+body.main-tab-collection.collection-theme-megacracks .premium-search .search-wrap{
+  position:relative!important;
+  z-index:5001!important;
+  overflow:visible!important;
+}
+
+/* El desplegable vuelve a ser flotante: no empuja la interfaz ni queda detrás. */
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions.suggestions,
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions.suggestions{
+  position:absolute!important;
+  top:calc(100% + 8px)!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  z-index:999999!important;
+  margin:0!important;
+  max-height:min(330px,40dvh)!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  border-radius:16px!important;
+  box-sizing:border-box!important;
+  transform:none!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+
+/* Tema Liga Este */
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions.suggestions{
+  background:#11131b!important;
+  border:1px solid rgba(156,65,237,.72)!important;
+  box-shadow:0 20px 55px rgba(36,4,61,.58)!important;
+  color:#fff!important;
+}
+/* Tema Megacracks */
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions.suggestions{
+  background:#121820!important;
+  border:1px solid #566273!important;
+  box-shadow:0 20px 55px rgba(0,0,0,.58)!important;
+  color:#fff!important;
+}
+
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions .suggestion,
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions .suggestion{
+  position:relative!important;
+  z-index:1!important;
+  min-height:58px!important;
+  padding:9px 12px!important;
+  background:transparent!important;
+  color:#f7f8fb!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions .suggestion:last-child,
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions .suggestion:last-child{
+  border-bottom:0!important;
+}
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions .suggestion strong,
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions .suggestion strong{
+  color:#fff!important;
+}
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions .suggestion small,
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions .suggestion small{
+  color:#aeb7c4!important;
+}
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions .suggestion:hover,
+body.main-tab-collection.collection-theme-ligaeste #searchSuggestions .suggestion:active{
+  background:rgba(135,42,218,.22)!important;
+}
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions .suggestion:hover,
+body.main-tab-collection.collection-theme-megacracks #searchSuggestions .suggestion:active{
+  background:rgba(190,200,214,.10)!important;
+}
+
+/* Todo lo que viene después queda deliberadamente en una capa inferior. */
+body.main-tab-collection.collection-theme-ligaeste .collection-toolbar,
+body.main-tab-collection.collection-theme-megacracks .collection-toolbar{
+  position:relative!important;
+  z-index:20!important;
+}
+body.main-tab-collection.collection-theme-ligaeste #globalCollectionList,
+body.main-tab-collection.collection-theme-megacracks #globalCollectionList{
+  position:relative!important;
+  z-index:10!important;
+}
