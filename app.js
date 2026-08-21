@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.9";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.11";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -1987,7 +1987,10 @@ function ligaEsteIsOpen(team){
  return !!p.ui.ligaEsteOpenTeams[team];
 }
 function toggleLigaEsteTeam(team){
- if(collectionTeamFilter!=="all"&&isLigaEsteInsertTeam(team)){selectTeam("all");return;}
+ // Si estamos viendo un único club/apartado como resultado de búsqueda o selección,
+ // la flecha actúa como “volver a Todos los clubes”. En esa vista el acordeón se
+ // fuerza abierto, por lo que intentar cerrarlo no tendría ningún efecto visible.
+ if(collectionTeamFilter!=="all"){selectTeam("all");return;}
  const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.ligaEsteOpenTeams=p.ui.ligaEsteOpenTeams||{};
  p.ui.ligaEsteOpenTeams[team]=!p.ui.ligaEsteOpenTeams[team];persistProjects();renderGlobalCollection();
 }
@@ -2083,7 +2086,7 @@ function renderLigaEsteCollection(){
 
 
 function megacracksIsOpen(team){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};if(collectionTeamFilter!=="all")return team===collectionTeamFilter;return !!p.ui.megacracksOpenTeams[team]}
-function toggleMegacracksTeam(team){if(collectionTeamFilter!=="all"&&isMegacracksSpecialTeam(team)){selectTeam("all");return;}const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};p.ui.megacracksOpenTeams[team]=!p.ui.megacracksOpenTeams[team];persistProjects();renderGlobalCollection()}
+function toggleMegacracksTeam(team){if(collectionTeamFilter!=="all"){selectTeam("all");return;}const p=projects?.[activeProjectId];if(!p)return;p.ui=p.ui||{};p.ui.megacracksOpenTeams=p.ui.megacracksOpenTeams||{};p.ui.megacracksOpenTeams[team]=!p.ui.megacracksOpenTeams[team];persistProjects();renderGlobalCollection()}
 function renderMegacracksCollection(){
  const list=$("#globalCollectionList");if(!list)return;list.innerHTML="";
  let teams=currentTeamOrder().filter(team=>collectionFilter!=="all"||!isMegacracksSpecialTeam(team)||(collectionTeamFilter!=="all"&&team===collectionTeamFilter));

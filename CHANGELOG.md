@@ -1,3 +1,20 @@
+# 704.14.11
+
+- Liga Este y Megacracks: corregida la flecha de retorno después de entrar a un club desde el buscador.
+- Si la vista está filtrada a un único club o especial, pulsar su flecha vuelve a “Todos los clubes”.
+- El comportamiento queda unificado para clubes normales y apartados especiales.
+- Actualizado `PROJECT-STATE.md`.
+- Sin cambios en inventario, checklist, datos ni sincronización.
+
+# 704.14.10
+
+- Reescrito `PROJECT-STATE.md` como memoria maestra completa de StickerBase.
+- Añadida documentación exhaustiva de Pokémon TCG, World Cup 2026, Liga Este 2026/27 y Megacracks 2026/27.
+- Documentadas sincronización Supabase, copias/restauración, intercambios, QR, traspaso de inventario, exportaciones, estadísticas, navegación y decisiones visuales.
+- Documentadas las cuatro expansiones Pokémon, variantes Base/Holo/Inverse Holo, rarezas, visor de cartas, portadas representativas y temas visuales.
+- Documentadas incidencias históricas y regresiones que no deben reintroducirse.
+- Sin cambios funcionales en la app.
+
 # 704.14.9
 
 - Liga Este y Megacracks: corregidas las sugerencias del buscador en iOS.
