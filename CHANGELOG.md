@@ -1,3 +1,10 @@
+# 704.14.9
+
+- Liga Este y Megacracks: corregidas las sugerencias del buscador en iOS.
+- Cuando existen resultados, el buscador crece y las sugerencias empujan los filtros hacia abajo, evitando que queden ocultas.
+- Añadido `PROJECT-STATE.md` como estado maestro del proyecto para continuar futuras conversaciones desde el último ZIP completo.
+- Sin cambios en inventario, checklist, datos de colecciones ni sincronización Supabase.
+
 # 704.14.8
 
 - Liga Este y Megacracks: las sugerencias del buscador se muestran en una capa flotante por encima de filtros y acordeones.
