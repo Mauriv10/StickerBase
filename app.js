@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.11";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.12";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -620,10 +620,10 @@ async function saveCloudState({force=false}={}){
  remote=checkedRemote;
  const remoteRevision=Number(remote?.revision)||0;
  if(remote?.payload?.projects&&remoteRevision>cloudRevision&&!force){
-   const choice=await askCloudConflict(remote,{reason:"before-save"});
-   if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");await applyCloudPayload(remote);return false}
-   if(choice==="local"){saveExternalCloudBackup(remote,"antes-de-reemplazar-nube");cloudRevision=remoteRevision;cloudLastUpdatedAt=remote.updated_at||null;setCloudBaseline(stateFingerprint(remote.payload.projects,remote.payload.activeProjectId));return saveCloudState({force:true})}
-   setCloudStatus("Sin sincronizar: elige una copia","error");return false;
+   // 704.14.12: una revisión remota más nueva no implica por sí sola un conflicto.
+   // Pasamos por la reconciliación por fingerprints/baseline y solo preguntamos al
+   // usuario cuando local y nube han divergido realmente desde el mismo baseline.
+   return reconcileCloudRow(remote,{reason:"before-save"});
  }
  // Nunca escribimos sobre una revisión diferente a la que esta pestaña conoce.
  // Esto evita que una pestaña antigua pueda ganar una carrera contra otra más reciente.
@@ -742,7 +742,11 @@ async function initialCloudSync(session){
  if(error){setCloudStatus("Falta preparar la base de datos","error");console.error(error);hideAppSplash();return}
  cloudReady=true;
  if(data?.payload?.projects&&Object.keys(data.payload.projects).length){
-   const meta=cloudMeta(),localFp=stateFingerprint(),remoteFp=stateFingerprint(data.payload.projects,data.payload.activeProjectId);if(cloudBaselineFingerprint===null)setCloudBaseline(meta.fingerprint||null);const baseline=cloudBaselineFingerprint;
+   const meta=cloudMeta(),localFp=stateFingerprint(),remoteFp=stateFingerprint(data.payload.projects,data.payload.activeProjectId);
+   // El baseline persistido solo es válido para la misma cuenta. Un meta antiguo de
+   // otro usuario/navegador no debe convertir una sincronización normal en conflicto.
+   if(cloudBaselineFingerprint===null)setCloudBaseline(meta.userId===session.user.id?(meta.fingerprint||null):null);
+   const baseline=cloudBaselineFingerprint;
    if(localFp===remoteFp){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;setCloudBaseline(localFp);writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:session.user.id,fingerprint:localFp,writerTabId:cloudMeta().writerTabId||null});setCloudStatus("✓ Sincronizado","synced")}
    else if(baseline&&localFp===baseline){createAutoBackup("antes-de-actualizar-desde-nube");await applyCloudPayload(data,{silent:true})}
    else if(baseline&&remoteFp===baseline){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;saveExternalCloudBackup(data,"nube-anterior");await saveCloudState({force:true})}

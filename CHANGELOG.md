@@ -1,3 +1,12 @@
+# 704.14.12
+
+- Sincronización: corregido un falso conflicto recurrente en PC cuando Supabase tenía una revisión más nueva pero no existía una divergencia real de inventario.
+- `saveCloudState()` ya no abre directamente el diálogo solo por detectar una revisión superior: reutiliza `reconcileCloudRow()` y sus comprobaciones de fingerprint/baseline.
+- El baseline persistido en el navegador solo se reutiliza si pertenece al mismo usuario autenticado.
+- Se mantienen las copias preventivas y la protección CAS/multipestaña; no se cambia el criterio de seguridad ante conflictos reales.
+- Sin cambios en inventarios, checklists ni datos de colecciones.
+- Actualizado `PROJECT-STATE.md`.
+
 # 704.14.11
 
 - Liga Este y Megacracks: corregida la flecha de retorno después de entrar a un club desde el buscador.
