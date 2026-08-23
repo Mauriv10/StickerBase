@@ -1,3 +1,9 @@
+# Build 704.14.15
+
+- Liga Este 2026/27: el nº 02 del Elche CF pasa a `Pendiente` y queda excluido de las estadísticas mediante el mecanismo existente para referencias pendientes.
+- El cambio afecta exclusivamente al nº 02 del Elche CF; no se modifican los nº 02 de ningún otro club, apartados especiales ni Megacracks.
+- Sin cambios en cantidades de inventario, Supabase, sincronización ni otras funcionalidades.
+
 # Build 704.14.14
 
 - Sincronización: corregida la causa común que podía impedir aplicar «Usar datos de la nube»: una copia automática que excedía la cuota de `localStorage` podía abortar la operación antes de aplicar Supabase.
