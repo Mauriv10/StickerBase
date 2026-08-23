@@ -511,18 +511,34 @@ function canonicalize(value){
  if(value&&typeof value==="object")return Object.fromEntries(Object.keys(value).sort().map(key=>[key,canonicalize(value[key])]));
  return value;
 }
+function normalizedCollectionOptionsForComparison(raw){
+ const source=raw&&typeof raw==="object"&&!Array.isArray(raw)?raw:{};
+ return {
+   collaborationEnabled:typeof source.collaborationEnabled==="boolean"?source.collaborationEnabled:true,
+   ligaEsteExtrasEnabled:typeof source.ligaEsteExtrasEnabled==="boolean"?source.ligaEsteExtrasEnabled:true,
+   extra:{epic:false,bronze:false,silver:false,gold:false,...(source.extra&&typeof source.extra==="object"?source.extra:{})}
+ };
+}
+function normalizedProjectsForComparison(source=projects){
+ const clone=structuredClone(source||{});
+ Object.values(clone).forEach(project=>{
+   ensureProjectTeamOrder(project);
+   project.collectionOptions=normalizedCollectionOptionsForComparison(project.collectionOptions);
+ });
+ return clone;
+}
 function comparableProjects(source=projects){
- return Object.fromEntries(Object.entries(source||{}).map(([id,p])=>[id,{
+ const normalized=normalizedProjectsForComparison(source);
+ return Object.fromEntries(Object.entries(normalized).map(([id,p])=>[id,{
    id:p.id,name:p.name,target:Number(p.target)||1,seedType:p.seedType||"custom",collectionType:inferCollectionType(p),collectionOrder:Number(p.collectionOrder)||0,
-   inventory:p.inventory||{},pokemonVariants:p.pokemonVariants||{},collectionOptions:p.collectionOptions||{},
+   inventory:p.inventory||{},pokemonVariants:p.pokemonVariants||{},collectionOptions:p.collectionOptions||normalizedCollectionOptionsForComparison(),
    exchange:p.exchange||{give:{},receive:{}},createdAt:p.createdAt||null
  }]));
 }
 function hashText(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,"0")}
-// 704.14.13: el fingerprint de conflicto representa datos persistentes de las
-// colecciones, no navegación local. activeProjectId, selectedTeam y teamOrder
-// pueden variar entre PC/iPhone o normalizarse al renderizar y no deben abrir
-// el diálogo «Hay dos inventarios diferentes».
+// 704.14.14: local y nube se comparan sobre clones normalizados con las mismas
+// migraciones/esquema/defaults. La normalización nunca modifica el payload remoto
+// ni el estado vivo. Navegación y estructura derivada siguen fuera del conflicto.
 function stateFingerprint(sourceProjects=projects){return hashText(JSON.stringify(canonicalize({projects:comparableProjects(sourceProjects)})))}
 function projectTotals(sourceProjects,sourceActive){
  const p=sourceProjects?.[sourceActive]||Object.values(sourceProjects||{})[0];if(!p)return {missing:0,duplicates:0,stickers:0};
@@ -530,29 +546,80 @@ function projectTotals(sourceProjects,sourceActive){
  Object.values(p.inventory||{}).forEach(team=>Object.values(team||{}).forEach(raw=>{const n=Math.max(0,Number(raw)||0);stickers+=n;missing+=Math.max(0,target-n);duplicates+=Math.max(0,n-target)}));
  return {missing,duplicates,stickers};
 }
+const AUTO_BACKUP_KEY="panini-mercat-auto-backups-v5";
+const AUTO_BACKUP_LIMIT=3;
+function isStorageQuotaError(error){
+ return Boolean(error&&(error.name==="QuotaExceededError"||error.name==="NS_ERROR_DOM_QUOTA_REACHED"||error.code===22||error.code===1014));
+}
+function backupSafeProjects(source=projects,{minimal=false}={}){
+ const clone=structuredClone(source||{});
+ Object.values(clone).forEach(project=>{
+   delete project.pokemonMeta;
+   if(minimal){
+     delete project.history;delete project.finishedSessions;delete project.sessionStats;
+     delete project.pendingSync;delete project.lastSyncedAt;delete project.ui;
+     delete project.teamOrder;delete project.selectedTeam;delete project.updatedAt;
+   }
+ });
+ return clone;
+}
+function automaticBackupSnapshot(reason="antes-de-sincronizar",{minimal=false}={}){
+ commitProjectStateLocalOnly();
+ return {
+   format:"panini-mercat-backup",schemaVersion:DATA_SCHEMA_VERSION,version:APP_VERSION,
+   createdAt:new Date().toISOString(),reason,activeProjectId,
+   projects:backupSafeProjects(projects,{minimal}),
+   backupLevel:minimal?"inventario-seguro":"completo-sin-datos-derivados"
+ };
+}
+function storeAutomaticBackup(backup){
+ const existing=readJSON(AUTO_BACKUP_KEY,[]);
+ const snapshots=Array.isArray(existing)?existing.slice():[];
+ snapshots.push(backup);
+ while(snapshots.length>AUTO_BACKUP_LIMIT)snapshots.shift();
+ const attempts=[snapshots];
+ if(snapshots.length>1)attempts.push([snapshots[snapshots.length-1]]);
+ const minimal={...structuredClone(backup),projects:backupSafeProjects(backup.projects||{},{minimal:true}),backupLevel:"inventario-seguro"};
+ attempts.push([minimal]);
+ let lastError=null;
+ for(const candidate of attempts){
+   try{localStorage.setItem(AUTO_BACKUP_KEY,JSON.stringify(candidate));return candidate[candidate.length-1]}
+   catch(error){lastError=error;if(!isStorageQuotaError(error))throw error}
+ }
+ const error=new Error("No hay espacio local suficiente para crear la copia de seguridad previa.");
+ error.cause=lastError;throw error;
+}
+function pruneAutomaticBackups(){
+ const saved=readJSON(AUTO_BACKUP_KEY,[]);if(!Array.isArray(saved)||!saved.length)return;
+ const trimmed=saved.slice(-AUTO_BACKUP_LIMIT).map(snapshot=>{
+   const copy=structuredClone(snapshot);if(copy?.projects)copy.projects=backupSafeProjects(copy.projects);return copy;
+ });
+ try{localStorage.setItem(AUTO_BACKUP_KEY,JSON.stringify(trimmed))}catch(error){
+   if(!isStorageQuotaError(error))console.warn("No se pudieron podar las copias automáticas",error);
+   else{try{const latest=trimmed[trimmed.length-1];if(latest)localStorage.setItem(AUTO_BACKUP_KEY,JSON.stringify([latest]))}catch{}}
+ }
+}
 function saveExternalCloudBackup(row,reason="cloud-conflict"){
  if(!row?.payload?.projects)return;
- const snapshots=readJSON("panini-mercat-auto-backups-v5",[]);
- snapshots.push({format:"panini-mercat-backup",schemaVersion:DATA_SCHEMA_VERSION,createdAt:new Date().toISOString(),reason,activeProjectId:row.payload.activeProjectId,projects:structuredClone(row.payload.projects)});
- localStorage.setItem("panini-mercat-auto-backups-v5",JSON.stringify(snapshots.slice(-10)));
+ const backup={format:"panini-mercat-backup",schemaVersion:DATA_SCHEMA_VERSION,version:APP_VERSION,createdAt:new Date().toISOString(),reason,activeProjectId:row.payload.activeProjectId,projects:backupSafeProjects(row.payload.projects),backupLevel:"completo-sin-datos-derivados"};
+ storeAutomaticBackup(backup);
 }
 function createAutoBackup(reason="antes-de-sincronizar"){
- // Copia estrictamente local: no llama a commitProjectState(), porque esa función
- // programa una subida a Supabase y podría competir con la descarga elegida.
- commitProjectStateLocalOnly();
- const snapshots=readJSON("panini-mercat-auto-backups-v5",[]);
- const snapshot={
-   format:"panini-mercat-backup",
-   version:APP_VERSION,
-   schemaVersion:DATA_SCHEMA_VERSION,
-   createdAt:new Date().toISOString(),
-   reason,
-   activeProjectId,
-   projects:structuredClone(projects)
- };
- snapshots.push(snapshot);
- localStorage.setItem("panini-mercat-auto-backups-v5",JSON.stringify(snapshots.slice(-10)));
- return snapshot;
+ return storeAutomaticBackup(automaticBackupSnapshot(reason));
+}
+async function applyCloudRowSafely(row,{backupReason="antes-de-usar-nube",silent=false}={}){
+ try{
+   createAutoBackup(backupReason);
+   return await applyCloudPayload(row,{silent});
+ }catch(error){
+   console.error("No se pudo aplicar la copia de la nube",error);
+   setCloudStatus("No se pudo aplicar la nube","error");
+   showToast("No se pudo aplicar la nube · tus datos locales siguen intactos");
+   if(!silent)alert(`No se pudo aplicar la copia de la nube. Tus datos locales no se han modificado.
+
+${error?.message||"Error desconocido"}`);
+   return false;
+ }
 }
 function ensureCloudConflictDialog(){
  let dialog=$("#cloudConflictDialog");if(dialog)return dialog;
@@ -681,15 +748,16 @@ async function applyCloudPayload(row,{silent=false}={}){
  if(!row?.payload?.projects)return false;
  cloudApplying=true;
  try{
+   clearTimeout(cloudSaveTimer);cloudSaveTimer=null;
    projects=structuredClone(row.payload.projects);
-   // Supabase es la fuente de verdad. El código de la build nunca reinicia inventarios ni objetivos.
    Object.values(projects).forEach(ensureProjectTeamOrder);
    activeProjectId=row.payload.activeProjectId&&projects[row.payload.activeProjectId]?row.payload.activeProjectId:Object.keys(projects)[0];
    cloudRevision=Number(row.revision)||0;cloudLastUpdatedAt=row.updated_at||null;
    localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects));localStorage.setItem(ACTIVE_PROJECT_KEY,activeProjectId);
+   loadProjectState();renderProjectsList();
+   commitProjectStateLocalOnly();
    const appliedFp=stateFingerprint();setCloudBaseline(appliedFp);
    writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:appliedFp,writerTabId:cloudMeta().writerTabId||null});
-   loadProjectState();renderProjectsList();
    if(!silent)showToast("Datos actualizados desde la nube");
    setCloudStatus("✓ Sincronizado","synced");return true;
  }finally{cloudApplying=false}
@@ -752,11 +820,11 @@ async function initialCloudSync(session){
    if(cloudBaselineFingerprint===null)setCloudBaseline(meta.userId===session.user.id?(meta.fingerprint||null):null);
    const baseline=cloudBaselineFingerprint;
    if(localFp===remoteFp){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;setCloudBaseline(localFp);writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:session.user.id,fingerprint:localFp,writerTabId:cloudMeta().writerTabId||null});setCloudStatus("✓ Sincronizado","synced")}
-   else if(baseline&&localFp===baseline){createAutoBackup("antes-de-actualizar-desde-nube");await applyCloudPayload(data,{silent:true})}
+   else if(baseline&&localFp===baseline){await applyCloudRowSafely(data,{backupReason:"antes-de-actualizar-desde-nube",silent:true})}
    else if(baseline&&remoteFp===baseline){cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;saveExternalCloudBackup(data,"nube-anterior");await saveCloudState({force:true})}
    else{
      const choice=await askCloudConflict(data,{reason:"initial"});
-     if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");await applyCloudPayload(data,{silent:true})}
+     if(choice==="cloud"){await applyCloudRowSafely(data,{backupReason:"antes-de-usar-nube",silent:false})}
      else if(choice==="local"){saveExternalCloudBackup(data,"antes-de-reemplazar-nube");cloudRevision=Number(data.revision)||0;cloudLastUpdatedAt=data.updated_at||null;await saveCloudState({force:true})}
      else setCloudStatus("Sin sincronizar: elige una copia","error");
    }
@@ -772,8 +840,9 @@ function startRealtime(){
 }
 window.addEventListener("wc-auth-ready",event=>{if(event.detail?.session)initialCloudSync(event.detail.session).catch(console.error)});
 window.addEventListener("wc-auth-changed",event=>{
- const session=event.detail?.session;if(session&&!cloudReady)initialCloudSync(session).catch(console.error);
- if(!session){cloudSession=null;cloudReady=false;if(cloudSubscription)cloudClient()?.removeChannel(cloudSubscription);cloudSubscription=null}
+ const session=event.detail?.session;
+ if(session&&!cloudReady){const meta=cloudMeta();setCloudBaseline(meta.userId===session.user.id?(meta.fingerprint||null):null);initialCloudSync(session).catch(console.error)}
+ if(!session){cloudSession=null;cloudReady=false;setCloudBaseline(null);cloudRevision=0;cloudLastUpdatedAt=null;if(cloudSubscription)cloudClient()?.removeChannel(cloudSubscription);cloudSubscription=null}
 });
 function hasLocalPendingChanges(){
  return Boolean(cloudBaselineFingerprint&&stateFingerprint()!==cloudBaselineFingerprint)||Object.values(projects||{}).some(project=>Object.keys(project?.pendingSync||{}).length>0)||Object.keys(pendingSync||{}).length>0;
@@ -782,10 +851,10 @@ async function reconcileCloudRow(row,{reason="manual"}={}){
  if(!row?.payload?.projects||cloudConflictOpen)return false;
  const localFp=stateFingerprint(),remoteFp=stateFingerprint(row.payload.projects,row.payload.activeProjectId),baseline=cloudBaselineFingerprint;
  if(localFp===remoteFp){cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;setCloudBaseline(localFp);writeCloudMeta({revision:cloudRevision,updatedAt:cloudLastUpdatedAt,userId:cloudSession?.user?.id||null,fingerprint:localFp,writerTabId:cloudMeta().writerTabId||null});setCloudStatus("✓ Sincronizado","synced");return true}
- if(baseline&&localFp===baseline){createAutoBackup("antes-de-actualizar-desde-nube");return applyCloudPayload(row,{silent:reason!=="manual"})}
+ if(baseline&&localFp===baseline)return applyCloudRowSafely(row,{backupReason:"antes-de-actualizar-desde-nube",silent:reason!=="manual"})
  if(baseline&&remoteFp===baseline){cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;saveExternalCloudBackup(row,"nube-anterior");return saveCloudState({force:true})}
  const choice=await askCloudConflict(row,{reason});
- if(choice==="cloud"){createAutoBackup("antes-de-usar-nube");return applyCloudPayload(row)}
+ if(choice==="cloud")return applyCloudRowSafely(row,{backupReason:"antes-de-usar-nube",silent:false})
  if(choice==="local"){saveExternalCloudBackup(row,"antes-de-reemplazar-nube");cloudRevision=Number(row.revision)||cloudRevision;cloudLastUpdatedAt=row.updated_at||cloudLastUpdatedAt;return saveCloudState({force:true})}
  setCloudStatus("Sin sincronizar: elige una copia","error");return false;
 }
@@ -903,6 +972,7 @@ async function loadData(){
  originalInventory=await i.json();flags=await f.json();teamGroups=await g.json();
  const seedData=await s.json();
  projects=readJSON(PROJECTS_KEY,null);
+ pruneAutomaticBackups();
  activeProjectId=localStorage.getItem(ACTIVE_PROJECT_KEY)||"";
  bootstrapProjectsFromSeed(seedData);
  if(!projects||!Object.keys(projects).length||!projects[activeProjectId])migrateLegacy(seedData.projects);
@@ -3312,6 +3382,7 @@ function adjustAllEditedCollection(delta){
  showToast(`${delta>0?"+1":"−1"} aplicado a ${changed} referencias`);
 }
 
+function inventoryFingerprint(project){return hashText(JSON.stringify(canonicalize(project?.inventory||{})))}
 function inventorySummary(project){
  let references=0,units=0,positive=0;
  Object.values(project?.inventory||{}).forEach(stickers=>Object.values(stickers||{}).forEach(raw=>{
@@ -3392,29 +3463,49 @@ function executeTransferInventory(){
  const {sourceId,destinationId,action,mode}=transferInventorySelection();
  let source=projects[sourceId],destination=projects[destinationId];
  if(!source||!destination||sourceId===destinationId){showToast("Selecciona una colección destino válida");return;}
- // Captura cualquier cambio todavía vivo en la colección activa antes de leer
- // los inventarios que se van a copiar/mover.
  if(sourceId===activeProjectId||destinationId===activeProjectId)commitProjectStateLocalOnly();
  source=projects[sourceId];destination=projects[destinationId];
  const src=inventorySummary(source),dst=inventorySummary(destination);
  const actionLabel=action==="move"?"MOVER":"COPIAR",modeLabel=mode==="replace"?"REEMPLAZAR":"SUMAR";
- const message=`${actionLabel} inventario\n\nOrigen: ${source.name}\nDestino: ${destination.name}\nUnidades origen: ${src.units}\nUnidades actuales destino: ${dst.units}\nModo: ${modeLabel}\n\n${action==="move"?"El origen quedará a cero.\n":""}${mode==="replace"?"El inventario actual del destino será reemplazado.\n":""}\n¿Confirmar la operación?`;
- if(!confirm(message))return;
- createAutomaticBackup("antes-de-traspasar-inventario");
- const beforeSource=structuredClone(source.inventory||{}),beforeDestination=structuredClone(destination.inventory||{});
- destination.inventory=mode==="replace"?structuredClone(source.inventory||{}):addInventories(destination.inventory,source.inventory);
- ensureProjectInventorySchema(destination);ensureProjectTeamOrder(destination);
- if(action==="move")zeroProjectInventory(source);
- registerTransferHistory(destination,beforeDestination,"traspaso-inventario-destino");
- if(action==="move")registerTransferHistory(source,beforeSource,"traspaso-inventario-origen");
- persistProjects();
- const result=inventorySummary(destination);
- if(activeProjectId===sourceId||activeProjectId===destinationId)loadProjectState();
- renderAll();renderProjectsList();renderCollections();closeTransferInventory();
- navigator.vibrate?.([25,30,25]);
- showToast(`${action==="move"?"Inventario movido":"Inventario copiado"} · ${destination.name}: ${result.units} unidades`);
-}
+ const message=`${actionLabel} inventario
 
+Origen: ${source.name}
+Destino: ${destination.name}
+Unidades origen: ${src.units}
+Unidades actuales destino: ${dst.units}
+Modo: ${modeLabel}
+
+${action==="move"?"El origen quedará a cero.\n":""}${mode==="replace"?"El inventario actual del destino será reemplazado.\n":""}
+¿Confirmar la operación?`;
+ if(!confirm(message))return;
+ const beforeSourceProject=structuredClone(source),beforeDestinationProject=structuredClone(destination);
+ try{
+   createAutomaticBackup("antes-de-traspasar-inventario");
+   destination.inventory=mode==="replace"?structuredClone(source.inventory||{}):addInventories(destination.inventory,source.inventory);
+   ensureProjectInventorySchema(destination);ensureProjectTeamOrder(destination);
+   if(action==="move")zeroProjectInventory(source);
+   registerTransferHistory(destination,beforeDestinationProject.inventory||{},"traspaso-inventario-destino");
+   if(action==="move")registerTransferHistory(source,beforeSourceProject.inventory||{},"traspaso-inventario-origen");
+   persistProjects();
+   const persisted=readJSON(PROJECTS_KEY,{}),persistedDestination=persisted?.[destinationId];
+   if(!persistedDestination||inventoryFingerprint(persistedDestination)!==inventoryFingerprint(destination))throw new Error("El inventario transferido no quedó persistido correctamente.");
+   const result=inventorySummary(destination);
+   if(activeProjectId===sourceId||activeProjectId===destinationId)loadProjectState();
+   renderAll();renderProjectsList();renderCollections();closeTransferInventory();
+   navigator.vibrate?.([25,30,25]);
+   showToast(`${action==="move"?"Inventario movido":"Inventario copiado"} · ${destination.name}: ${result.units} unidades`);
+ }catch(error){
+   console.error("No se pudo completar el traspaso de inventario",error);
+   projects[sourceId]=beforeSourceProject;projects[destinationId]=beforeDestinationProject;
+   try{localStorage.setItem(PROJECTS_KEY,JSON.stringify(projects))}catch{}
+   if(activeProjectId===sourceId||activeProjectId===destinationId)loadProjectState();
+   renderAll();renderProjectsList();renderCollections();
+   showToast("No se pudo completar el traspaso · inventario restaurado");
+   alert(`No se pudo completar el traspaso de inventario. No se ha aplicado ningún cambio.
+
+${error?.message||"Error desconocido"}`);
+ }
+}
 function renderProjectsList(){
  const list=$("#projectsList");
  if(!list)return;
@@ -3602,12 +3693,7 @@ function downloadBackup(data,fileName){
  setTimeout(()=>URL.revokeObjectURL(url),1200);
 }
 function createAutomaticBackup(reason){
- const backup=buildFullBackup(reason);
- const snapshots=readJSON("panini-mercat-auto-backups-v5",[]);
- snapshots.push(backup);
- while(snapshots.length>10)snapshots.shift();
- localStorage.setItem("panini-mercat-auto-backups-v5",JSON.stringify(snapshots));
- return backup;
+ return storeAutomaticBackup(automaticBackupSnapshot(reason));
 }
 function validateBackup(data){
  if(!data||data.format!=="panini-mercat-backup"||!data.projects||typeof data.projects!=="object"){

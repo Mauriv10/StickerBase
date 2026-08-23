@@ -1,3 +1,14 @@
+# Build 704.14.14
+
+- Sincronización: corregida la causa común que podía impedir aplicar «Usar datos de la nube»: una copia automática que excedía la cuota de `localStorage` podía abortar la operación antes de aplicar Supabase.
+- Backups automáticos: máximo de 3 snapshots, exclusión de `pokemonMeta` derivado y fallback a una copia mínima de inventario si el navegador está cerca de su cuota.
+- Sincronización: el fingerprint compara clones normalizados de local y nube con las mismas migraciones, esquema y defaults, sin modificar ninguno de los estados originales.
+- Sincronización: `applyCloudPayload()` fija baseline y `cloudMeta` después de cargar/renderizar/consolidar la copia cloud, evitando que el baseline nazca obsoleto.
+- Sincronización: baseline aislado por usuario y limpiado al cerrar sesión.
+- Traspasar inventario: ejecución protegida por `try/catch`, backup resistente a cuota, verificación exacta del inventario persistido y rollback de origen/destino ante cualquier fallo.
+- Se mantiene el sistema CAS, revisión creciente, protección multipestaña y backups preventivos.
+- Sin cambios en checklists, datos maestros, cantidades de inventario ni configuración de Supabase.
+
 # Build 704.14.13
 
 - Intercambio manual: Liga Este y Megacracks muestran el stock actual (`Stock xN`) en cada fila mientras se preparan unidades para dar/recibir.

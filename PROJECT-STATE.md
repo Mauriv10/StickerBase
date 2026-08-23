@@ -1,179 +1,1332 @@
-# StickerBase — PROJECT STATE
+# StickerBase — PROJECT STATE MAESTRO
 
-Última actualización: 21/08/2026
-Build de referencia: 704.14.9
+Última actualización: 23/08/2026
+Build de referencia: 704.14.13
+Proyecto: StickerBase
+URL conocida: https://mauriv10.github.io/StickerBase/
 
-## 1. Fuente de verdad y forma de trabajo
+> ESTE ARCHIVO ES LA MEMORIA MAESTRA DEL PROYECTO.
+> En una conversación nueva, leer este archivo antes de modificar el código.
+> El ZIP COMPLETO de la build indicada es siempre la fuente de verdad del código.
 
-- Trabajar SIEMPRE desde el ZIP COMPLETO de la última build entregada.
-- No reconstruir el proyecto desde versiones antiguas ni desde fragmentos del historial del chat.
-- Mantener inventario, sincronización Supabase, datos de colecciones y funciones existentes salvo petición expresa.
-- Cada entrega debe incluir:
-  1. ZIP COMPLETO.
-  2. ZIP SOLO CAMBIOS.
-  3. Lista de archivos modificados, añadidos y eliminados.
-- `PROJECT-STATE.md` debe actualizarse e incluirse en cada ZIP COMPLETO futuro.
-- El ZIP SOLO CAMBIOS debe incluir `PROJECT-STATE.md` cuando este archivo haya sido actualizado.
+---
 
-## 2. Producto
+# 1. REGLAS DE TRABAJO Y ENTREGA
 
-Nombre: StickerBase
-PWA / web app para gestionar colecciones de cromos y cartas, inventario, faltantes,
-repetidos, estadísticas e intercambios.
+## Fuente de verdad
+- Trabajar SIEMPRE sobre el ZIP COMPLETO de la última build entregada.
+- No reconstruir desde builds antiguas ni desde fragmentos del historial del chat.
+- No asumir que una solución histórica sigue vigente.
+- Si hay conflicto entre este documento y el código actual, inspeccionar primero el código de la build vigente.
+- No modificar inventario, datos, Supabase, checklists o lógica de negocio salvo petición expresa.
 
-URL conocida del proyecto:
-`https://mauriv10.github.io/StickerBase/`
+## Entrega obligatoria
+Cada build debe devolver:
+1. ZIP COMPLETO.
+2. ZIP SOLO CAMBIOS.
+3. Lista de archivos modificados.
+4. Lista de archivos añadidos.
+5. Lista de archivos eliminados.
+6. Actualizar `PROJECT-STATE.md` si cambia una decisión funcional, visual, de datos o de arquitectura relevante.
 
-La app sincroniza datos mediante Supabase. No sustituir esta sincronización por
-almacenamiento local ni modificar su comportamiento sin una petición explícita.
+## Versionado
+- Formato actual: `704.xx.xx`.
+- La build vigente al actualizar este documento es `704.14.13`.
+- `version.json`, `app-config.js`, `app.js`, `service-worker.js` y cualquier referencia de build visible deben mantenerse coherentes.
 
-## 3. Colecciones principales actualmente trabajadas
+---
 
-### World Cup 2026
-- Colección Panini del Mundial 2026.
-- Estructura por selecciones, numeración propia por selección.
-- Soporta múltiples álbumes/proyectos.
-- Incluye Extra Stickers y opciones específicas ya implementadas.
+# 2. DESCRIPCIÓN DEL PRODUCTO
 
-### Liga Este 2026/27
-- Colección Panini Liga Este 2026/27.
-- Identidad visual premium morada.
-- La cabecera premium debe aparecer en la pestaña `Cromos`.
-- NO debe aparecer en `Estadísticas`, `Cambiar` ni `Colecciones`.
-- La cabecera utiliza la portada real de la colección.
-- NO se muestran imágenes individuales de los cromos.
-- Clubes y especiales utilizan sus escudos/iconos correspondientes.
-- Los iconos/escudos deben quedar perfectamente centrados.
-- Vista de Cromos:
-  - cabecera premium;
-  - buscador;
-  - filtros `Todos / Me faltan / Repetidos`;
-  - selector `Orden del álbum`;
-  - tarjetas/acordeones por club o apartado especial;
-  - botones - / stock / +.
-- El diseño aprobado es oscuro con degradados morados, sin líneas blancas decorativas
-  extrañas entre cabecera, buscador o tarjetas.
-- Estadísticas debe mantener contraste alto y toda la información legible.
+StickerBase es una PWA/web app para gestionar colecciones de cromos y cartas.
 
-### Megacracks 2026/27
-- Colección Panini Megacracks 2026/27, 25.º aniversario.
-- Identidad visual premium grafito/plata.
-- Sigue el mismo patrón estructural de Liga Este, usando sus propios colores.
-- La cabecera premium debe aparecer en `Cromos`.
-- NO debe aparecer en `Estadísticas`, `Cambiar` ni `Colecciones`.
-- Cabecera con imagen real de la colección/producto.
-- NO se muestran imágenes individuales de las cartas.
-- Estadísticas debe mantener contraste alto y toda la información legible.
-- Orden de especiales deseado:
-  ENJOY → ENJOY POWER → ZONA VIP → ZONA VIP POWER → MASTER ROOKIE →
-  STARS ON 25 → ÉLITE → ÉLITE POWER → SPECIAL ONE BLACK →
-  SPECIAL ONE GOLD → LIMITED EDITION.
+Funciones principales:
+- Inventario por referencia.
+- Faltantes.
+- Repetidos.
+- Múltiples álbumes/proyectos.
+- Objetivo de 1 o más álbumes.
+- Estadísticas.
+- Intercambio manual.
+- Analizar listas de otra persona.
+- Favoritos/protegidos.
+- QR y comparación entre colecciones.
+- Exportaciones.
+- Importación/restauración.
+- Traspaso de inventario.
+- Sincronización en nube mediante Supabase.
+- Uso multidispositivo (PC, iPhone, etc.).
 
-## 4. Navegación inferior
+---
 
-Pestañas principales:
+# 3. SINCRONIZACIÓN Y DATOS
+
+## Supabase
+Tabla principal conocida:
+- `wc_user_state`
+
+Campos conocidos:
+- `user_id`
+- `payload`
+- `revision`
+- `updated_at`
+
+Formato del payload:
+- `"format": "world-cup-2026-cloud-state"`
+
+El sistema usa revisiones crecientes para sincronizar estado.
+
+## Riesgo histórico importante
+Hubo una pérdida de datos por:
+- tener StickerBase abierta en múltiples pestañas;
+- una pestaña antigua sobrescribió un estado más nuevo;
+- el cierre/última sincronización provocó que desaparecieran álbumes recientes.
+
+Consecuencia:
+- NO reintroducir lógica que permita sobrescritura silenciosa de estados más nuevos por una pestaña vieja.
+- Preservar las protecciones actuales de sincronización.
+- No tocar Supabase salvo petición explícita.
+
+## Copias/restauración
+Ajustes > Seguridad:
+- Exportar copia.
+- Restaurar copia.
+- Restauración puede:
+  - reemplazar todos los proyectos;
+  - añadir como proyectos nuevos.
+
+El usuario ya recuperó una pérdida de datos mediante copia exportada y restauración.
+
+---
+
+# 4. NAVEGACIÓN PRINCIPAL
+
+Pestañas:
 - Cromos
 - Estadísticas
 - Cambiar
 - Colecciones
 - Ajustes
 
-La barra inferior es fija/flotante y no debe romperse por cambios en cabeceras,
-buscadores, scroll o acordeones.
+La barra inferior debe:
+- permanecer fija;
+- respetar safe-area de iPhone;
+- no tapar contenido importante;
+- conservar la pestaña activa;
+- no romperse al abrir teclado, buscadores, acordeones o modales.
 
-## 5. Funciones que deben preservarse
+---
 
-- Inventario +1 / -1.
-- Faltantes y repetidos.
-- Múltiples proyectos/álbumes.
-- Ordenación de colecciones.
-- Exportaciones existentes.
-- Compartir listas.
-- Comparación mediante QR.
-- Traspasar inventario: copiar/mover/sumar/reemplazar.
-- Favoritos y protegidos.
-- Intercambio manual.
-- Analizar lista.
-- QR y lectura desde galería.
-- Sincronización Supabase entre dispositivos.
-- Persistencia de inventario existente.
+# 5. PANTALLA COLECCIONES
 
-## 6. Buscador — comportamiento actual requerido
+Objetivo:
+- Organizar muchos álbumes por familia/colección.
+- Las carpetas deben estar cerradas por defecto.
+- Deben recordar si el usuario dejó cada carpeta abierta o cerrada.
 
-Liga Este y Megacracks permiten buscar por club, número y jugador.
+Familias actuales:
+- World Cup 2026.
+- Liga Este 2026/27.
+- Megacracks 2026/27.
+- Pokémon TCG.
 
+Dentro de cada familia:
+- mostrar álbumes/proyectos.
+- botones de subir/bajar orden.
+- menú `•••`.
+- indicar `Activa`.
+- porcentaje/progreso.
+- objetivo del álbum.
+
+## Pokémon en Colecciones
+Diseño premium propio por expansión.
+Cada expansión usa una carta representativa como portada:
+
+1. Pitch Black → Mega Darkrai ex #116/084
+2. Chaos Rising → Mega Greninja ex #116/086
+3. Perfect Order → Meowth ex #121/088
+4. Surging Sparks → Pikachu ex #219/191
+
+No sustituir estas portadas salvo petición expresa.
+
+Cada tarjeta Pokémon debe mostrar:
+- imagen representativa;
+- nombre completo;
+- serie/set;
+- progreso;
+- cartas conseguidas;
+- controles de orden;
+- `•••`;
+- `Activa` si corresponde.
+
+Problema histórico:
+- `Activa` llegó a quedar detrás de las flechas.
+- No reintroducir ese solapamiento.
+
+## Liga Este / Megacracks en Colecciones
+- No usar solo iconos `LE` / `MC` como representación de álbum.
+- Usar portada real de la colección/proyecto cuando corresponda.
+- Liga Este: identidad morada.
+- Megacracks: identidad grafito/plata.
+- Mantener coherencia premium, pero sin copiar literalmente Pokémon.
+
+---
+
+# 6. MENÚ DE LOS TRES PUNTOS
+
+En Pokémon:
+- se convirtió a pantalla completa;
+- debe mantener estética oscura premium;
+- debe heredar el tema de color de la expansión;
+- no volver a la estética blanca antigua.
+
+Para Liga Este/Megacracks:
+- mantener coherencia con su identidad visual si el menú se tematiza.
+- No sacrificar legibilidad.
+
+---
+
+# 7. POKÉMON TCG — ESTADO COMPLETO
+
+StickerBase incluye un apartado/familia POKÉMON TCG.
+
+Colecciones actuales:
+1. Pitch Black
+2. Chaos Rising
+3. Perfect Order
+4. Surging Sparks
+
+## 7.1 Pitch Black
+- Serie: Mega Evolution
+- Código: ME05
+- Tema visual: negro + dorado.
+- Esta fue la interfaz de referencia premium original.
+
+## 7.2 Chaos Rising
+- Serie: Mega Evolution
+- Código: ME04
+- Tema visual: negro + azul eléctrico + rosa/magenta.
+
+## 7.3 Perfect Order
+- Serie: Mega Evolution
+- Código: ME03
+- Tema visual: negro + verde eléctrico.
+
+## 7.4 Surging Sparks
+- Serie: Scarlet & Violet
+- Código: SV08
+- Tema visual: negro + amarillo/naranja eléctrico.
+
+## 7.5 Estructura de cartas Pokémon
+
+La colección debe organizarse en acordeones/categorías, no en una cuadrícula simple.
+
+### Base Set
+Para cartas normales del Base Set:
+- permitir variantes:
+  - Básica
+  - Holo
+  - Inverse Holo
+
+Al sumar unidad:
+- el usuario elige la variante.
+
+### EX dentro del Base Set
+Las cartas EX que pertenecen a la colección base:
+- NO deben permitir elegir Básica/Holo/Inverse Holo.
+- Se registran directamente como el tipo que son.
+
+### Secretas / rarezas
+Separar en acordeones por rareza/categoría, al estilo Megacracks:
+- Illustration Rare
+- Special Illustration Rare
+- Ultra Rare
+- Double Rare (EX)
+- Mega Hyper Rare
+- otras categorías que defina el checklist de cada expansión.
+
+No mezclar todas las cartas en una única lista.
+
+## 7.6 Imágenes de cartas Pokémon
+Cada carta muestra miniatura real.
+
+Comportamiento:
+- tocar/clicar la miniatura abre la carta en grande;
+- fondo de StickerBase visible detrás, oscurecido/desenfocado;
+- usar la mejor resolución disponible;
+- cerrar con X;
+- cerrar tocando fuera;
+- cerrar con Esc en PC.
+
+Esta interacción es una característica aprobada y debe preservarse.
+
+## 7.7 Buscador Pokémon
+Buscar por:
+- carta;
+- número;
+- Pokémon;
+- rareza cuando corresponda.
+
+Bug histórico:
+- en iPhone, al enfocar el buscador, Safari hacía zoom;
+- al cerrar teclado, la app podía quedarse ampliada/cortada.
+La solución actual no debe reintroducir ese problema.
+
+## 7.8 Navegación Pokémon
+Por ahora:
+- NO mostrar pestaña `Cambiar` dentro de colecciones Pokémon.
+- La idea era mantener Pokémon en modo colección/Pokédex.
+- Se quitó la barra `Todos / Pedir / Entregar`.
+
+La navegación Pokémon actual:
+- Cromos
+- Estadísticas
+- Colecciones
+- Ajustes
+
+No añadir `Cambiar` sin petición expresa.
+
+## 7.9 Estadísticas Pokémon
+Debe tener estética idéntica al tema premium de la expansión.
+
+Información esperada:
+- progreso general;
+- cartas distintas;
+- Base Set;
+- copias totales;
+- repetidas;
+- variantes del Base Set:
+  - Básica
+  - Holo
+  - Inverse Holo
+- progresos por rareza/categoría;
+- objetivo de álbum(es), si aplica.
+
+No mostrar datos del Mundial en una colección Pokémon.
+
+## 7.10 Diseño Pokémon
+La interfaz premium aprobada incluye:
+- cabecera oscura;
+- nombre de expansión;
+- código de set;
+- búsqueda;
+- resumen:
+  - Total
+  - Completadas
+  - Pendientes
+  - % completado
+- acordeones;
+- fotos de cartas;
+- botones +/-;
+- barra inferior oscura;
+- acento de color según expansión.
+
+---
+
+# 8. LIGA ESTE 2026/27 — ESTADO COMPLETO
+
+Colección Panini Liga Este 2026/27.
+
+## Identidad visual
+- Tema premium morado/violeta.
+- Cabecera con portada real 2026/27.
+- Fondo oscuro.
+- Detalles morados.
+- Textos de alto contraste.
+- No usar estilo blanco antiguo.
+
+## Cabecera
+Debe aparecer:
+- SOLO en `Cromos`.
+
+NO debe aparecer en:
+- Estadísticas
+- Cambiar
+- Colecciones
+
+Cabecera incluye:
+- portada real Liga Este 2026/27;
+- título;
+- subtítulo Panini / LaLiga EA Sports;
+- estadísticas rápidas;
+- botón volver.
+
+## Cromos
+Orden visual aprobado:
+1. cabecera premium;
+2. buscador;
+3. filtros:
+   - Todos
+   - Me faltan
+   - Repetidos
+4. selector `Orden del álbum`;
+5. acordeones por club / especial;
+6. filas de cromos.
+
+No mostrar:
+- barra antigua `Todos / Pedir / Entregar`.
+
+## Clubes
+Cada acordeón:
+- escudo centrado;
+- nombre;
+- número de cromos;
+- estado completo/pendientes;
+- chevron.
+
+Fila:
+- número;
+- jugador/cromo;
+- tipo/posición;
+- stock;
+- botón -;
+- valor;
+- botón +.
+
+## Especiales
 Ejemplos:
-- `Lamine Yamal` debe encontrar FC Barcelona y, cuando corresponda, apartados
-  especiales que contengan a Lamine.
-- Las sugerencias deben verse completas mientras se escribe.
-- En iPhone/iOS, con el teclado abierto, las sugerencias NO pueden quedar detrás de
-  `Todos / Me faltan / Repetidos`, `Orden del álbum` ni de las tarjetas.
-- Build 704.14.9 cambia específicamente este comportamiento: cuando hay sugerencias,
-  el bloque del buscador crece y los resultados forman parte del flujo, empujando los
-  filtros hacia abajo. Se evita depender de superposiciones/z-index frágiles.
+- ADN / LALIGA PRIME
+- LALIGA FANTASY
+- DRAFT 23
+- DRAFT 23 KROMIX
+- EXTRA STICKER ORO
+- EXTRA STICKER PLATA
+- EXTRA STICKER BRONCE
+- otros apartados oficiales existentes.
 
-## 7. Decisiones visuales importantes
+Los iconos de especiales deben:
+- estar centrados;
+- comportarse visualmente como los escudos.
 
-- Mantener estética premium, especialmente en Liga Este y Megacracks.
-- Liga Este: morado/violeta.
-- Megacracks: negro/grafito/plata.
-- Evitar líneas blancas no intencionadas.
-- Buscadores y selectores deben mantener proporciones y bordes coherentes.
-- Escudos de clubes centrados dentro de sus contenedores.
-- Iconos de especiales centrados.
-- No añadir imágenes de cromos/cartas individuales a Liga Este o Megacracks.
-- La portada/imagen de colección sí se usa en cabeceras y tarjetas de proyectos cuando
-  corresponde.
+## Extra Stickers
+Deben ser opcionales.
+- Usuario puede activarlos/desactivarlos.
+- Si están activos:
+  - cuentan para estadísticas.
+- Si están desactivados:
+  - NO cuentan para estadísticas.
 
-## 8. Estadísticas
+## Imágenes individuales
+DECISIÓN IMPORTANTE:
+- NO añadir imágenes individuales de cromos de Liga Este.
+- Solo se usan portada real e iconos/escudos.
 
-- Prioridad absoluta a la legibilidad.
-- Textos principales blancos/alto contraste sobre fondos oscuros.
-- Textos secundarios suficientemente claros.
-- Mostrar progreso general, cromos disponibles, faltantes, repetidos y especiales
-  según la colección.
-- No permitir que la barra inferior tape información crítica: debe existir espacio de
-  scroll suficiente.
+## Estadísticas Liga Este
+Debe ser legible y premium.
 
-## 9. Intercambios
+Información:
+- progreso general;
+- cromos que tienes;
+- cromos base;
+- me faltan;
+- repetidas;
+- progreso por especiales;
+- clubes completos;
+- progreso por álbum si objetivo >1.
 
-Apartado `Cambiar`:
+## Objetivo múltiple de álbumes
+Para cualquier colección con objetivo >=2:
+- mostrar avance por álbum individual.
+Ejemplo:
+- Álbum 1: 99%
+- Álbum 2: 96%
+- Álbum 3: etc.
+
+---
+
+# 9. MEGACRACKS 2026/27 — ESTADO COMPLETO
+
+Colección Panini Megacracks 2026/27.
+Subtítulo visual:
+- 25.º aniversario.
+
+## Identidad visual
+- Tema premium negro/grafito/plata.
+- Cabecera con imagen real del producto/colección 2026/27.
+- Fondo oscuro.
+- Detalles plata.
+- Alto contraste.
+
+## Cabecera
+Debe aparecer:
+- SOLO en `Cromos`.
+
+NO debe aparecer:
+- Estadísticas
+- Cambiar
+- Colecciones
+
+## Cromos
+Mismo patrón estructural que Liga Este:
+1. cabecera;
+2. buscador;
+3. filtros;
+4. orden;
+5. acordeones;
+6. filas.
+
+## Especiales Megacracks
+Orden deseado:
+1. ENJOY
+2. ENJOY POWER
+3. ZONA VIP
+4. ZONA VIP POWER
+5. MASTER ROOKIE
+6. STARS ON 25
+7. ÉLITE
+8. ÉLITE POWER
+9. SPECIAL ONE BLACK
+10. SPECIAL ONE GOLD
+11. LIMITED EDITION
+
+No eliminar:
+- Special One
+- Limited Edition
+
+aunque se revisen checklists oficiales.
+
+## Imágenes individuales
+DECISIÓN IMPORTANTE:
+- NO añadir imágenes individuales de cards de Megacracks.
+- Portada real sí.
+- Escudos/iconos sí.
+
+## Estadísticas
+Debe tener:
+- buen contraste;
+- progreso general;
+- repetidas;
+- faltantes;
+- especiales;
+- progreso por álbum si objetivo >1.
+
+---
+
+# 10. BUSCADOR LIGA ESTE / MEGACRACKS
+
+Buscar por:
+- jugador;
+- club;
+- número;
+- especiales cuando corresponda.
+
+Ejemplo:
+- `Lamine Yamal` debe devolver coincidencias relevantes.
+
+## Bugs históricos
+1. Las sugerencias quedaban detrás de:
+   - filtros;
+   - `Orden del álbum`;
+   - acordeones.
+2. En 704.14.8:
+   - se intentó usar z-index flotante.
+3. En 704.14.9:
+   - se cambia a enfoque de flujo:
+   - cuando hay sugerencias, el buscador crece;
+   - el panel empuja filtros hacia abajo;
+   - evitar dependencia de stacking/z-index frágil en iOS.
+
+No reintroducir:
+- sugerencias invisibles;
+- panel detrás de filtros;
+- desplazamiento extraño por teclado.
+
+---
+
+
+## 10.1 Retorno desde resultados aislados (704.14.11)
+- Cuando una búsqueda o selección deja visible un único club o apartado, el acordeón queda forzado abierto.
+- La flecha de ese acordeón debe actuar como “volver a Todos los clubes”, tanto para clubes normales como para especiales.
+- Este comportamiento aplica por igual a Liga Este y Megacracks.
+- No volver a limitar el retorno únicamente a apartados especiales.
+
+# 11. WORLD CUP 2026 — ESTADO COMPLETO
+
+Colección Panini Mundial 2026.
+
+Estructura:
+- 48 selecciones + especiales/FWC.
+- Numeración interna por selección.
+- No numeración global 1-980.
+
+Funciones:
+- múltiples álbumes;
+- objetivo de álbumes;
+- repetidos;
+- faltantes;
+- Extra Stickers;
+- exportación;
+- comparación;
+- traspaso inventario;
+- QR.
+
+## Extra Stickers Mundial
+- opción específica ya implementada.
+- referencia visual/funcional para la opción de Extra Stickers de Liga Este.
+
+## Organización histórica
+El proyecto nació como `World Cup 2026`.
+Posteriormente se renombró a `StickerBase`.
+
+---
+
+# 12. INTERCAMBIOS
+
+Pestaña `Cambiar`.
+
+Funciones:
 - Intercambio manual.
 - Analizar lista.
-- Favoritos y protegidos.
-- Funciones QR existentes.
-- No mostrar la cabecera premium de Liga Este/Megacracks en esta pestaña.
+- Favoritos.
+- Protegidos.
+- QR.
+- Comparar inventarios/listas.
+- Descargar QR.
+- Leer QR desde galería.
 
-## 10. Incidencias históricas que NO deben reintroducirse
+## Analizar lista
+Ha tenido incidencias históricas:
+- Megacracks: `lamine` detectaba resultados sin detalle.
+- `lamine gold` no detectaba.
+No romper mejoras existentes.
 
-- Cabecera premium apareciendo en Estadísticas, Cambiar o Colecciones.
-- Cabecera de Liga Este tapando buscador/filtros.
-- Línea blanca encima/debajo del buscador.
-- `Orden del álbum` deformado o cortado.
-- Escudos/iconos descentrados.
-- Barra inferior dejando de ser fija.
-- Sugerencias del buscador ocultas detrás de filtros/acordeones.
-- Pérdida o sobrescritura del inventario sincronizado.
-- Cambios visuales que alteren lógica de datos.
+## Favoritos / Protegidos
+- permiten excluir cartas/cromos del asistente de intercambio.
+- iconos tuvieron problemas de recorte históricos.
 
-## 11. Build actual — 704.14.9
+---
 
-Objetivo de esta build:
-- Reparar las sugerencias del buscador de Liga Este y Megacracks.
-- En 704.14.8 las sugerencias podían existir pero quedar visualmente ocultas/solapadas
-  en iOS.
-- En 704.14.9, al haber resultados, el contenedor del buscador aumenta de altura y el
-  panel de sugerencias queda en el flujo normal de la página.
-- Los filtros se desplazan hacia abajo mientras las sugerencias están abiertas.
-- No se modifica la lógica de búsqueda, inventario, checklist, datos ni Supabase.
-- Se añade este `PROJECT-STATE.md` como documento maestro para continuar el desarrollo
-  en conversaciones nuevas sin depender del historial completo.
+# 13. TRASPASAR INVENTARIO
 
-## 12. Regla para próximas conversaciones
+Función existente:
+- copiar;
+- mover;
+- sumar;
+- reemplazar.
 
-Si este archivo se entrega junto al último ZIP COMPLETO:
-1. Leer `PROJECT-STATE.md`.
-2. Considerar el ZIP adjunto como código fuente vigente.
-3. Aplicar únicamente los cambios solicitados sobre esa build.
-4. No asumir que una build histórica refleja el estado actual.
-5. Actualizar este documento si una decisión funcional o visual importante cambia.
+Debe:
+- conservar inventario origen/destino según modo.
+- registrar correctamente historial.
+- no perder datos.
+
+---
+
+# 14. EXPORTACIONES
+
+Funciones existentes:
+- exportar faltantes;
+- exportar repetidos;
+- exportar álbum completo;
+- formatos:
+  - banderas;
+  - texto;
+  - compacto;
+- exportar solo stock cuando corresponda.
+
+No eliminar formatos existentes.
+
+---
+
+# 15. QR / COMPARTIR
+
+- Compartir StickerBase mediante QR.
+- Comparar colecciones.
+- Descargar QR.
+- Leer desde galería.
+- No usar entrada manual de código si fue eliminada.
+
+---
+
+# 16. AJUSTES
+
+Secciones conocidas:
+- Cuenta
+- Sincronización
+- Seguridad
+- Actividad
+- Colecciones visibles
+- Compartir StickerBase
+- Información
+
+Seguridad:
+- Exportar copia.
+- Restaurar copia.
+
+Información:
+- mostrar build actual.
+
+Histórico:
+- hubo incidencias donde la versión visual no se actualizaba aunque la build sí cambiara.
+
+---
+
+# 17. COLECCIONES VISIBLES
+
+Ajustes permite definir qué familias se muestran.
+
+Separación esperada:
+- Mundial
+- Liga Este
+- Megacracks
+- Pokémon
+
+No mezclar visibilidad de colecciones con eliminación de datos.
+
+---
+
+# 18. UI / UX GENERAL
+
+## Elementos fijos
+- cabecera cuando corresponda;
+- navegación inferior.
+
+## Reglas
+- esquinas coherentes;
+- safe-area iPhone;
+- evitar solapamientos;
+- buscadores sin zoom permanente;
+- acordeones fluidos;
+- estados abiertos/cerrados persistentes cuando aplique.
+
+## Diseño
+StickerBase debe sentirse como una app premium, no una web genérica.
+
+---
+
+# 19. BUGS / REGRESIONES QUE NO DEBEN VOLVER
+
+- Sobrescritura de inventario desde una pestaña antigua.
+- Cabecera Panini en Estadísticas/Cambiar/Colecciones.
+- Cabecera Liga Este tapando buscador.
+- Buscador invisible bajo header.
+- Línea blanca encima o debajo del buscador.
+- `Orden del álbum` deformado.
+- Escudos descentrados.
+- Iconos de especiales descentrados.
+- Barra inferior no fija.
+- Barra inferior tapando contenido sin margen final.
+- Sugerencias del buscador detrás de filtros.
+- Zoom de iPhone persistente tras usar buscador Pokémon.
+- Estadísticas mostrando datos de otra colección.
+- Títulos blancos sobre fondo blanco.
+- `Activa` detrás de controles.
+- Pérdida de Special One o Limited Edition.
+- Reordenación incorrecta de especiales.
+- Inventario local reemplazando Supabase.
+- Versiones que no actualizan el número visible.
+
+---
+
+# 20. DECISIONES DE DISEÑO POKÉMON APROBADAS
+
+Pitch Black:
+- negro/dorado.
+
+Chaos Rising:
+- azul eléctrico + rosa/magenta.
+
+Perfect Order:
+- verde.
+
+Surging Sparks:
+- amarillo/naranja.
+
+Todos:
+- fondo oscuro;
+- tarjetas premium;
+- fotos reales;
+- acordeones;
+- estadísticas temáticas;
+- navegación temática;
+- vista ampliada de carta.
+
+---
+
+# 21. PORTADAS REPRESENTATIVAS POKÉMON
+
+Estas son las imágenes acordadas para `Colecciones`:
+
+- Pitch Black:
+  - Mega Darkrai ex #116/084
+- Chaos Rising:
+  - Mega Greninja ex #116/086
+- Perfect Order:
+  - Meowth ex #121/088
+- Surging Sparks:
+  - Pikachu ex #219/191
+
+No volver a:
+- Zygarde dorado como portada Perfect Order;
+- cartas oro genéricas en todas las expansiones.
+
+---
+
+# 22. CHECKLISTS
+
+Liga Este y Megacracks:
+- se revisaron contra checklists oficiales Panini.
+- Las correcciones deben respetar la estructura vigente.
+- No eliminar cartas pertenecientes realmente a la colección por intentar "limpiar" pendientes.
+
+Pokémon:
+- cada expansión tiene su checklist completa en la app.
+- mantener rarezas y categorías correctamente separadas.
+
+---
+
+# 23. NOMENCLATURA Y BRANDING
+
+Nombre del producto:
+- StickerBase
+
+No usar como nombre principal:
+- World Cup 2026
+
+`World Cup 2026` es una colección dentro de StickerBase.
+
+---
+
+# 24. BUILD 704.14.9 → 704.14.10
+
+704.14.9:
+- reparó la visibilidad de sugerencias del buscador Liga Este/Megacracks;
+- añadió el primer PROJECT-STATE.md.
+
+Problema del primer PROJECT-STATE:
+- era incompleto;
+- apenas documentaba Pokémon y otros módulos.
+
+704.14.10:
+- NO cambia funcionalidad de la app.
+- Reescribe `PROJECT-STATE.md` como documento maestro completo.
+- Incluye Pokémon, Mundial, Liga Este, Megacracks, sincronización, intercambios,
+  estadísticas, UI, checklists, bugs históricos y reglas de desarrollo.
+
+---
+
+# 25. REGLA PARA CONTINUAR EN UN CHAT NUEVO
+
+En una conversación nueva:
+
+1. Adjuntar el último ZIP COMPLETO.
+2. Decir:
+   `Continuamos StickerBase. Lee PROJECT-STATE.md y trabaja sobre este ZIP completo.`
+3. El asistente debe:
+   - leer `PROJECT-STATE.md`;
+   - inspeccionar el código actual;
+   - no depender de chats antiguos;
+   - no usar builds históricas;
+   - mantener todas las decisiones descritas aquí.
+4. Tras cada cambio importante:
+   - actualizar `PROJECT-STATE.md`.
+
+---
+
+# 26. PRIORIDAD DE PRESERVACIÓN
+
+Orden de prioridad cuando se modifica StickerBase:
+
+1. NO perder datos/inventario.
+2. NO romper Supabase/sincronización.
+3. NO romper funciones existentes.
+4. Respetar checklists.
+5. Respetar navegación.
+6. Respetar diseño aprobado.
+7. Mejorar estética/UX sin regresiones.
+
+---
+
+# 27. ARQUITECTURA REAL DE LA BUILD 704.14.12
+
+Esta sección documenta la estructura observada directamente en el ZIP COMPLETO 704.14.12, derivado quirúrgicamente de 704.14.11. Sirve para evitar modificaciones a ciegas en chats futuros.
+
+## Archivos raíz críticos
+- `index.html`: estructura principal de vistas, diálogos y navegación de la PWA.
+- `styles.css`: estilos globales, responsive, temas de colección, cabeceras premium, acordeones, estadísticas, buscadores y navegación inferior.
+- `app.js`: núcleo funcional. Contiene modelo de proyectos, inventario, renderizado de colecciones, estadísticas, buscadores, intercambio, exportaciones, importación, QR, traspasos y sincronización.
+- `megacracks-data.js`: datos/checklist específicos de Megacracks y estructuras relacionadas. No modificar sin validar el checklist.
+- `auth.js`: autenticación y enlace con la sesión/Supabase.
+- `supabase-config.js`: configuración de Supabase. No modificar salvo necesidad explícita.
+- `app-config.js`: versión pública, nombre de caché y frecuencia de comprobación de actualizaciones.
+- `version.json`: número de build publicado.
+- `service-worker.js`: caché PWA y política network-first/no-cache.
+- `manifest.webmanifest`: metadatos de instalación PWA.
+- `PROJECT-STATE.md`: memoria maestra funcional/técnica.
+- `CHANGELOG.md`: historial de cambios.
+- `README.md`: documentación general.
+- `SETUP-SUPABASE.md` y `SUPABASE-700.4.sql`: documentación/esquema histórico de Supabase; tratarlos como archivos sensibles.
+
+## Datos y assets
+- `data/inventory.json`: inventario/estructura maestra histórica del Mundial.
+- `data/projects-seed.json`: proyectos/semillas iniciales.
+- `data/team-groups.json`: agrupaciones de selecciones/equipos.
+- `data/flags.json` y `data/flags-v4.json`: banderas.
+- `assets/club-crests/`: escudos de clubes usados por Liga Este/Megacracks.
+- `assets/ligaeste-specials/`: iconos de apartados especiales de Liga Este.
+- `assets/`: portadas, iconos, logos y dependencias empaquetadas.
+
+## Regla práctica al corregir bugs
+- Bug puramente visual: inspeccionar primero `styles.css` y el HTML generado por `app.js`; evitar alterar datos.
+- Bug de renderizado/interacción: inspeccionar `app.js` y después CSS relacionado.
+- Bug de checklist/datos: identificar primero la fuente concreta (`app.js`, `megacracks-data.js` o `data/*`) y preservar cantidades existentes.
+- Bug PWA/versionado: revisar conjuntamente `version.json`, `app-config.js`, `service-worker.js` y referencias visibles.
+- Bug de sincronización: NO parchear sin estudiar las funciones cloud y las protecciones multi-pestaña existentes.
+
+---
+
+# 28. MAPA FUNCIONAL DE `app.js`
+
+Funciones/zonas críticas presentes en 704.14.12:
+
+## Identidad y colección
+- `COLLECTION_DEFINITIONS`: catálogo de familias/tipos y temas.
+- `inferCollectionType(...)`: determina el tipo de colección/proyecto.
+- `collectionDefinition(...)`: devuelve definición visual/funcional.
+- `applyCollectionIdentity(...)`: aplica identidad de colección.
+- `syncCollectionChrome(...)`: sincroniza elementos globales de interfaz.
+- `syncPaniniPremiumHeader(...)`: controla la cabecera premium Panini. Debe respetar que Liga Este/Megacracks solo la muestran en `Cromos`.
+
+## Proyectos e inventario
+- `defaultProject(...)`: estructura base de un proyecto.
+- `ensureProjectInventorySchema(...)`: migraciones/correcciones del inventario sin perder cantidades.
+- `ensureProjectTeamOrder(...)`: orden de equipos/apartados.
+- `migrateLegacy(...)`: compatibilidad con estados antiguos.
+- `bootstrapProjectsFromSeed(...)`: inicialización desde seeds.
+- `ensurePokemonProjects(...)` / `hydratePokemonProjects(...)`: creación e hidratación de Pokémon.
+- `persistProjects(...)`: persistencia local del estado.
+- `orderedProjects(...)` / `ensureCollectionOrder(...)`: orden de proyectos/familias.
+
+## Renderizado principal
+- `renderGlobalCollection()`: router de la vista `Cromos` según colección activa.
+- `renderLigaEsteCollection()`: render de Liga Este.
+- `renderMegacracksCollection()`: render de Megacracks.
+- `renderPokemonCollection()`: render de Pokémon.
+- `renderStatistics()`: estadísticas Mundial/Liga Este/Megacracks y delegación Pokémon.
+- `renderPokemonStatistics()`: estadísticas Pokémon.
+- `renderCollections()`: pantalla `Colecciones`.
+- `setMainTab(...)`: cambio entre Cromos/Estadísticas/Cambiar/Colecciones/Ajustes.
+
+## Acordeones y búsqueda Panini
+- `toggleLigaEsteTeam(team)`: apertura/cierre y retorno desde resultado aislado en Liga Este.
+- `toggleMegacracksTeam(team)`: equivalente Megacracks.
+- `ligaEsteTeamSearchText(team)` y `megacracksTeamSearchText(team)`: texto indexable de cada bloque.
+- La búsqueda puede dejar un único club/apartado visible; en ese estado la flecha debe devolver a `Todos`, no quedar bloqueada.
+
+## Intercambio
+- `openTradeAnalyzer()` / `renderTradeAnalyzerResult()`: Analizar lista.
+- `renderExchangeStep(...)`, `renderExchangeSummary()`, `renderExchangeList()`: intercambio manual.
+- Favoritos/protegidos tienen render/gestión propios; preservar exclusiones.
+
+## Colecciones y traspasos
+- `renderCollections()`: familias y proyectos.
+- `switchProject(id)`: activa proyecto.
+- `openCreateProject()`: nuevo proyecto.
+- `openTransferInventory()` y funciones asociadas: traspaso.
+
+## QR
+- `renderQrMatrix(...)`: QR.
+- `openShareStickerBase()`: compartir app.
+- `showQrComparison(...)` / `openQrCompare()`: comparación.
+
+---
+
+# 29. MODELO DE DATOS DEL PROYECTO
+
+La estructura creada por `defaultProject(...)` incluye como mínimo:
+- `id`
+- `name`
+- `target`: objetivo de álbumes; mínimo conceptual 1.
+- `seedType`
+- `collectionType`
+- `collectionOrder`
+- `inventory`
+- `history`
+- `finishedSessions`
+- `sessionStats`
+- `exchange.give`
+- `exchange.receive`
+- `teamOrder`
+- `selectedTeam`
+- `pendingSync`
+- `lastSyncedAt`
+- `ui`
+- `createdAt`
+
+`ui` contiene estado de interfaz como filtros, orden, pestaña principal y scroll. Algunas colecciones añaden estado específico de acordeones.
+
+## Opciones de colección
+`collectionOptions` conserva opciones que NO deben confundirse con borrar datos:
+- `collaborationEnabled`
+- opciones de Extra Stickers Mundial (`extra`)
+- `ligaEsteExtrasEnabled`
+
+Desactivar una opción de visibilidad/participación no equivale a eliminar el inventario asociado.
+
+## Orden oficial
+`projectTeamOrder(...)` prioriza el orden maestro oficial. Un `teamOrder` antiguo procedente de nube no debe reordenar arbitrariamente el álbum oficial.
+
+---
+
+# 30. PERSISTENCIA LOCAL Y SINCRONIZACIÓN — CONTRATO DE SEGURIDAD
+
+Constantes actuales observadas:
+- `DATA_SCHEMA_VERSION = 2`
+- `DATA_REVISION = "2026-07-17-collections-v70111"`
+- `PROJECTS_KEY = "world-cup-2026-projects-v600"`
+- `ACTIVE_PROJECT_KEY = "world-cup-2026-active-project-v600"`
+
+Los nombres históricos `world-cup-2026-*` siguen existiendo por compatibilidad. NO renombrarlos solo por branding sin una migración segura.
+
+## Funciones cloud críticas
+- `stateFingerprint(...)`: huella del estado comparable.
+- `cloudMeta()` / `writeCloudMeta(...)`: metadatos locales de revisión.
+- `setCloudBaseline(...)`: baseline para detectar divergencias.
+- `saveExternalCloudBackup(...)`: copia preventiva ante conflicto.
+- `createAutoBackup(...)`: copia automática antes de operaciones sensibles.
+- `notifyOtherTabs(...)` / `warnOtherTab()`: coordinación/advertencia multi-pestaña.
+- `cloudPayload()`: serialización enviada a nube.
+- `scheduleCloudSave(...)`: guardado diferido.
+- `saveCloudState(...)`: escritura cloud.
+- `applyCloudPayload(...)`: aplicación de estado cloud.
+
+## Regla absoluta
+Nunca simplificar este sistema a “local gana” o “última pestaña que cierre gana”. Una pestaña vieja no puede sobrescribir silenciosamente una revisión más reciente.
+
+Antes de modificar sincronización, validar al menos:
+1. un solo dispositivo;
+2. dos pestañas con una antigua;
+3. PC + iPhone;
+4. estado local más nuevo que cloud;
+5. cloud más nuevo que local;
+6. conflicto real;
+7. recarga después de sincronizar;
+8. cierre de pestaña antigua.
+
+## Corrección 704.14.12 — falso conflicto recurrente en escritorio
+Se detectó que `saveCloudState()` abría directamente el diálogo de conflicto cuando la revisión de Supabase era mayor que `cloudRevision`, aunque una revisión mayor por sí sola no demuestra divergencia de inventarios. Esto podía provocar que en PC reapareciera «Hay dos inventarios diferentes» incluso después de elegir «Usar datos de la nube».
+
+Contrato desde 704.14.12:
+- una revisión remota superior debe pasar primero por `reconcileCloudRow(...)`;
+- `reconcileCloudRow(...)` compara fingerprint local, fingerprint remoto y baseline;
+- si local y remoto son iguales, solo se adopta la revisión nueva;
+- si solo uno cambió respecto al baseline, se aplica/guarda automáticamente según corresponda;
+- el diálogo se reserva para una divergencia real de ambos estados;
+- el baseline de `cloudMeta()` solo se reutiliza si `meta.userId` coincide con el usuario autenticado;
+- se mantienen CAS, backups preventivos y protección multipestaña.
+
+---
+
+## Corrección 704.14.13 — conflicto PC, intercambio manual y traspaso
+
+### Sincronización PC / nube
+Se confirmó que el fingerprint usado para decidir si había una divergencia incluía estado de navegación/estructura derivada (`activeProjectId`, `selectedTeam` y `teamOrder`). Esos valores pueden variar legítimamente entre PC e iPhone o normalizarse al renderizar sin que el inventario haya cambiado. Eso podía reabrir el diálogo «Hay dos inventarios diferentes» después de escoger la nube.
+
+Contrato desde 704.14.13:
+- `stateFingerprint(...)` compara el conjunto de proyectos persistentes, pero NO incluye `activeProjectId`;
+- `comparableProjects(...)` NO incluye `selectedTeam` ni `teamOrder`;
+- abrir otra colección, otro club o recalcular el orden oficial no constituye por sí solo un conflicto de inventario;
+- inventario, variantes Pokémon, objetivo, opciones de colección, orden de colecciones, intercambio persistente y existencia de proyectos siguen formando parte de la comparación;
+- ante una divergencia real se mantienen el diálogo, CAS, backups y protección multipestaña.
+
+### Intercambio manual Liga Este / Megacracks
+En las filas de intercambio manual se muestra también `Stock xN` junto a la información del jugador/cromo. Los botones −1/+1 siguen representando las unidades preparadas para dar/recibir y no modifican el stock hasta completar el flujo correspondiente.
+
+### Traspasar inventario
+El formulario de traspaso deja de depender del submit nativo de un `<form method="dialog">`. El botón de confirmación ejecuta explícitamente `executeTransferInventory()`, evitando que el navegador cierre el diálogo sin completar la operación. Antes del cálculo se consolida el estado de la colección activa; al finalizar se persisten proyectos, historial y pendientes de sincronización y el aviso confirma las unidades resultantes del destino.
+
+# 31. PWA, CACHÉ Y VERSIONADO
+
+En 704.14.14:
+- `version.json` = `704.14.14`.
+- `app-config.js` = `704.14.14`.
+- caché = `wc26-build-704-14-14`.
+- `app.js` obtiene `APP_VERSION` desde `WC26_CONFIG`.
+
+`service-worker.js` usa:
+- archivos `NO_CACHE_FILES` para configuración/versionado sensible;
+- `NETWORK_FIRST_FILES` para núcleo de la aplicación;
+- `ASSETS` para recursos empaquetados.
+
+## Cada nueva build debe
+1. incrementar versión de forma coherente;
+2. actualizar `version.json`;
+3. actualizar `app-config.js`;
+4. cambiar `cacheName`;
+5. revisar cualquier fallback/referencia de versión;
+6. comprobar que `Información` muestra la versión nueva;
+7. evitar que el iPhone quede atrapado en recursos de una build anterior.
+
+No cambiar nombres históricos de caché/keys por estética sin estudiar compatibilidad.
+
+---
+
+# 32. POKÉMON — CONTRATO DE DATOS EXACTO EN 704.14.12
+
+Tipos definidos:
+- `pokemon-pitch-black`
+- `pokemon-chaos-rising`
+- `pokemon-perfect-order`
+- `pokemon-surging-sparks`
+
+## Pitch Black — ME05
+- Base oficial: 84.
+- Total numerado: 120.
+- BASE: 001–084.
+- ILLUSTRATION RARE: 085–095.
+- ULTRA RARE: 096–113.
+- SPECIAL ILLUSTRATION RARE: 114–119.
+- MEGA HYPER RARE: 120.
+
+## Chaos Rising — ME04
+- Base oficial: 86.
+- Total: 122.
+- BASE: 001–086.
+- ILLUSTRATION RARE: 087–097.
+- ULTRA RARE: 098–115.
+- SPECIAL ILLUSTRATION RARE: 116–121.
+- MEGA HYPER RARE: 122.
+
+## Perfect Order — ME03
+- Base oficial: 88.
+- Total: 124.
+- BASE: 001–088.
+- ILLUSTRATION RARE: 089–099.
+- ULTRA RARE: 100–117.
+- SPECIAL ILLUSTRATION RARE: 118–123.
+- MEGA HYPER RARE: 124.
+
+## Surging Sparks — SV08
+- Base oficial: 191.
+- Total: 252.
+- BASE: 001–191.
+- ILLUSTRATION RARE: 192–214.
+- ULTRA RARE: 215–235.
+- SPECIAL ILLUSTRATION RARE: 236–246.
+- HYPER RARE: 247–252.
+
+## Metadatos e imágenes
+- `pokemonMeta` contiene metadatos de cartas por proyecto.
+- Las imágenes se construyen actualmente con Scrydex mediante `pokemonDirectImageUrl(...)` y `setId` (`me5`, `me4`, `me3`, `sv8`).
+- La metadata se hidrata desde las fuentes configuradas en `POKEMON_SET_DEFS`.
+- No sustituir el proveedor/formato sin probar miniaturas, visor ampliado, carga inicial y funcionamiento offline/degradado.
+
+## Cálculo Pokémon
+- Una carta numerada cuenta como “distinta” cuando existe al menos una copia/variante poseída.
+- En Base Set, las variantes elegibles se contabilizan por separado para Básica/Holo/Inverse Holo.
+- Las copias totales incluyen variantes.
+- Las repetidas son copias extra por encima de la primera de cada variante/tipo contabilizado.
+- El progreso general se calcula sobre el total numerado del set.
+
+---
+
+# 33. ESTADÍSTICAS — REGLAS QUE NO DEBEN CAMBIAR ACCIDENTALMENTE
+
+## Liga Este / Megacracks
+La vista específica debe priorizar legibilidad y mostrar:
+- `Cromos que tienes`: unidades totales.
+- `Cromos base`: referencias base conseguidas / disponibles.
+- `Me faltan`: faltantes de clubes/base según la lógica vigente.
+- `Repetidas`: unidades extra.
+- `Especiales`: progreso por apartado.
+- resumen general y clubes completos.
+- progreso por álbum cuando el objetivo sea >=2.
+
+Los especiales visibles para estadísticas deben respetar `teamVisibleForProject(...)` y las opciones activas de la colección.
+
+## Objetivo múltiple
+No calcular únicamente “tengo/no tengo”. Para objetivo 2, 3, etc., el progreso por álbum debe reflejar cuántas referencias alcanzan cada nivel de copia requerido.
+
+## Pokémon
+Usar `renderPokemonStatistics()` y su cálculo específico; no reutilizar a ciegas las métricas Panini.
+
+---
+
+# 34. RESPONSIVE / iPHONE — REGLAS DE REGRESIÓN
+
+StickerBase se usa intensivamente como PWA en iPhone. Antes de aprobar cambios de UI comprobar:
+- safe-area superior e inferior;
+- barra inferior fija;
+- espacio final suficiente para que la barra no oculte filas;
+- teclado abierto en buscador;
+- cierre del teclado;
+- búsqueda con sugerencias;
+- scroll mientras hay sugerencias;
+- acordeón abierto y cerrado;
+- retorno desde un único resultado de búsqueda;
+- ausencia de zoom persistente de Safari;
+- ausencia de líneas/blancos residuales entre header/buscador/filtros;
+- iconos y escudos centrados en cajas de tamaños distintos.
+
+No resolver problemas de stacking únicamente aumentando `z-index` sin comprobar iOS. El enfoque aprobado para sugerencias Panini es que el resultado forme parte del flujo y empuje el contenido inferior cuando sea necesario.
+
+---
+
+# 35. ASSETS Y DEPENDENCIAS
+
+Regla:
+- Preferir assets locales empaquetados para elementos estructurales de la UI (escudos, especiales, portadas cuando ya existen).
+- No borrar un asset porque parezca no usado sin buscar referencias en HTML/CSS/JS/service worker.
+- Si se añade un asset necesario offline/PWA, revisar si debe incorporarse a `ASSETS` del service worker.
+- Pokémon actualmente depende también de imágenes/metadatos externos; preservar fallback y funcionamiento aunque una imagen no cargue.
+
+---
+
+# 36. CHECKLIST DE REGRESIÓN OBLIGATORIO ANTES DE ENTREGAR
+
+Toda build que toque UI o lógica común debe comprobar, como mínimo:
+
+1. Arranque limpio de la app.
+2. Proyecto activo correcto después de recargar.
+3. Inventario intacto.
+4. `+` y `−` funcionan y persisten.
+5. Cambio entre proyectos funciona.
+6. World Cup abre y conserva funciones existentes.
+7. Liga Este abre.
+8. Megacracks abre.
+9. Las cuatro colecciones Pokémon abren.
+10. `Cromos` muestra la identidad correcta.
+11. Liga Este/Megacracks: cabecera premium SOLO en `Cromos`.
+12. `Estadísticas` sin cabecera Panini premium y con texto legible.
+13. `Cambiar` sin cabecera Panini premium.
+14. `Colecciones` sin cabecera Panini premium.
+15. Buscador Liga Este por jugador.
+16. Buscador Megacracks por jugador.
+17. Sugerencias visibles por encima/en flujo correcto, sin quedar detrás de filtros.
+18. Seleccionar un resultado abre el bloque correcto.
+19. Flecha del bloque aislado devuelve a todos los clubes tanto en Liga Este como Megacracks.
+20. Especiales también abren/cierran correctamente.
+21. Escudos centrados.
+22. Iconos de especiales centrados.
+23. `Orden del álbum` mantiene tamaño/alineación correctos.
+24. Pokémon: búsqueda sin zoom persistente en iPhone.
+25. Pokémon: selección de variante Base funciona.
+26. Pokémon: EX/directas no muestran selector de variante incorrecto.
+27. Pokémon: visor de carta abre/cierra correctamente.
+28. Estadísticas corresponden a la colección activa.
+29. Objetivo múltiple muestra progreso por álbum cuando procede.
+30. `Colecciones`: carpetas, orden, Activa y `•••` funcionan.
+31. `Cambiar`: manual, Analizar lista y favoritos/protegidos siguen accesibles donde corresponde.
+32. QR/compartir no se rompe.
+33. Exportaciones existentes siguen disponibles.
+34. Restaurar/exportar copia sigue accesible.
+35. Sincronización no genera conflicto artificial ni pérdida de datos.
+36. Versión visible coincide con build.
+37. Service worker/cache apunta a la nueva build.
+38. Probar viewport móvil estrecho y escritorio.
+
+Si una build toca solo documentación, no es necesario alterar funcionalidad ni inventario.
+
+---
+
+# 37. CAMBIOS HISTÓRICOS RECIENTES RELEVANTES
+
+## 704.14.9
+- Corrige visibilidad de sugerencias Liga Este/Megacracks usando enfoque de flujo.
+- Introduce `PROJECT-STATE.md`.
+
+## 704.14.10
+- Amplía el PROJECT STATE para cubrir el proyecto completo.
+
+## 704.14.13
+- Intercambio manual de Liga Este/Megacracks muestra `Stock xN` en cada fila.
+- Traspasar inventario ejecuta la confirmación mediante botón explícito, sin depender de `method="dialog"`, y confirma las unidades finales del destino.
+- El fingerprint de conflicto ya no incluye `activeProjectId`, `selectedTeam` ni `teamOrder`; navegar de forma distinta en PC/iPhone no se considera divergencia de inventario.
+- Mantiene la protección CAS, backups, revisión remota y protección multipestaña.
+
+## 704.14.12
+- Corrige el falso conflicto recurrente de sincronización observado en PC.
+- Las revisiones remotas más nuevas se reconcilian por fingerprint/baseline antes de mostrar un conflicto.
+- El baseline persistido se valida contra el usuario autenticado.
+- No altera inventarios, colecciones ni la protección CAS/multipestaña.
+
+## 704.14.11
+- Corrige el retorno desde resultados de búsqueda aislados.
+- La flecha de un club normal filtrado vuelve a la vista completa, igual que ya ocurría con especiales.
+- Aplica a Liga Este y Megacracks.
+- El buscador y sus sugerencias quedan funcionales en la build de referencia.
+
+---
+
+# 38. REGLA DE CONTINUIDAD PARA EL PRÓXIMO CHAT
+
+El próximo chat debe tratar el ZIP COMPLETO 704.14.13 (o una build posterior explícitamente entregada) como fuente de verdad.
+
+Orden de trabajo:
+1. Leer este `PROJECT-STATE.md` completo.
+2. Inspeccionar el ZIP y confirmar la versión real.
+3. Localizar la implementación actual antes de editar.
+4. Hacer el cambio mínimo necesario.
+5. No reescribir módulos estables por comodidad.
+6. Ejecutar comprobaciones/regresión relacionadas.
+7. Incrementar build.
+8. Actualizar PROJECT STATE y CHANGELOG cuando proceda.
+9. Entregar ZIP COMPLETO + ZIP SOLO CAMBIOS + listas de archivos.
+
+Si el usuario aporta una captura que contradice este documento, la captura describe el comportamiento real observado y debe investigarse; no asumir que el documento demuestra que la UI funciona.
+
+---
+
+# 39. PRINCIPIO FINAL DE PRESERVACIÓN
+
+StickerBase ya contiene muchas capas desarrolladas durante numerosas iteraciones. Una mejora local no justifica perder comportamiento existente.
+
+Antes de tocar una zona, preguntarse:
+- ¿afecta al inventario?
+- ¿afecta a Supabase?
+- ¿afecta a otra colección?
+- ¿afecta a iPhone/PWA?
+- ¿afecta a estadísticas?
+- ¿afecta a intercambio/exportación/QR?
+- ¿afecta al cache/versionado?
+
+Priorizar siempre cambios pequeños, verificables y reversibles.
+
+---
+
+FIN DEL PROJECT STATE MAESTRO — BUILD DE REFERENCIA 704.14.13
+
+---
+
+# 34. CORRECCIÓN 704.14.14 — BACKUPS, CONFLICTO RECURRENTE Y TRASPASO ATÓMICO
+
+## Causa raíz confirmada
+Las rutas «Usar datos de la nube» y «Traspasar inventario» crean una copia automática antes de sustituir/mover datos. Hasta 704.14.13 se podían conservar 10 snapshots completos en `localStorage`. Con varias colecciones e historiales, esa clave puede alcanzar la cuota del navegador. Si `localStorage.setItem(...)` lanza `QuotaExceededError`, JavaScript interrumpe la operación justo antes de aplicar la nube o antes de mutar el inventario. El síntoma es que el usuario confirma, el diálogo se cierra, pero no ocurre nada y el conflicto puede reaparecer.
+
+## Contrato de backups automáticos desde 704.14.14
+- Se conserva la clave histórica `panini-mercat-auto-backups-v5`.
+- Máximo de snapshots automáticos: 3.
+- `pokemonMeta` queda fuera de snapshots automáticos porque es catálogo derivado/recuperable, no inventario del usuario.
+- Si la cuota no admite los 3 snapshots, se intenta conservar solo el más reciente.
+- Si tampoco cabe, se guarda una copia mínima de seguridad del mismo snapshot, centrada en colecciones e inventarios y sin historial/UI derivables.
+- Si ni siquiera la copia mínima puede persistirse, la operación protegida se aborta mostrando error; nunca debe fallar silenciosamente.
+- Al arrancar se podan snapshots antiguos para liberar cuota sin tocar `projects` ni inventarios.
+- Las copias previas a una operación usan `commitProjectStateLocalOnly()` y no programan una subida cloud prematura.
+
+## Sincronización local/nube
+`stateFingerprint(...)` compara clones normalizados de local y nube. La normalización aplica a ambos lados el mismo esquema/migraciones/defaults y nunca modifica ni el payload remoto ni el estado vivo durante la comparación.
+
+`applyCloudPayload(...)` debe:
+1. cancelar cualquier guardado cloud diferido anterior;
+2. clonar y adaptar la copia elegida de Supabase a la build actual;
+3. persistir/cargar/renderizar esa copia;
+4. consolidar localmente los defaults persistentes que haya generado el render;
+5. calcular después el fingerprint final y fijar `cloudBaselineFingerprint` + `cloudMeta`.
+
+El baseline se carga únicamente para el usuario autenticado y se limpia al cerrar sesión.
+
+## Traspasar inventario
+Desde 704.14.14 el traspaso es una operación protegida:
+- captura clones completos de origen y destino antes de modificar;
+- crea backup preventivo resistente a cuota;
+- aplica copiar/mover y sumar/reemplazar;
+- registra historial y pendientes;
+- persiste `projects`;
+- relee `PROJECTS_KEY` y compara un fingerprint exacto del inventario destino con el inventario en memoria.
+
+Si cualquiera de esos pasos falla, se restauran origen y destino desde los clones previos, se intenta persistir el rollback y se informa al usuario. Nunca debe quedar un traspaso parcial ni mostrarse éxito si el inventario no quedó escrito.
+
+## 704.14.14
+- Corrige la causa común de fallo silencioso en «Usar datos de la nube» y «Traspasar inventario» cuando las copias automáticas agotaban la cuota de `localStorage`.
+- Backups automáticos limitados/podados de forma segura y con fallback de inventario.
+- Fingerprint local/nube normalizado simétricamente y baseline fijado después de completar la aplicación real del payload cloud.
+- Traspaso verificado contra persistencia exacta y con rollback ante fallo.
