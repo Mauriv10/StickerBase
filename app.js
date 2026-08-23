@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.12";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.13";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -514,12 +514,16 @@ function canonicalize(value){
 function comparableProjects(source=projects){
  return Object.fromEntries(Object.entries(source||{}).map(([id,p])=>[id,{
    id:p.id,name:p.name,target:Number(p.target)||1,seedType:p.seedType||"custom",collectionType:inferCollectionType(p),collectionOrder:Number(p.collectionOrder)||0,
-   inventory:p.inventory||{},pokemonVariants:p.pokemonVariants||{},collectionOptions:p.collectionOptions||{},teamOrder:p.teamOrder||[],selectedTeam:p.selectedTeam||"",
+   inventory:p.inventory||{},pokemonVariants:p.pokemonVariants||{},collectionOptions:p.collectionOptions||{},
    exchange:p.exchange||{give:{},receive:{}},createdAt:p.createdAt||null
  }]));
 }
 function hashText(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,"0")}
-function stateFingerprint(sourceProjects=projects,sourceActive=activeProjectId){return hashText(JSON.stringify(canonicalize({activeProjectId:sourceActive||"",projects:comparableProjects(sourceProjects)})))}
+// 704.14.13: el fingerprint de conflicto representa datos persistentes de las
+// colecciones, no navegación local. activeProjectId, selectedTeam y teamOrder
+// pueden variar entre PC/iPhone o normalizarse al renderizar y no deben abrir
+// el diálogo «Hay dos inventarios diferentes».
+function stateFingerprint(sourceProjects=projects){return hashText(JSON.stringify(canonicalize({projects:comparableProjects(sourceProjects)})))}
 function projectTotals(sourceProjects,sourceActive){
  const p=sourceProjects?.[sourceActive]||Object.values(sourceProjects||{})[0];if(!p)return {missing:0,duplicates:0,stickers:0};
  const target=Math.max(1,Number(p.target)||1);let missing=0,duplicates=0,stickers=0;
@@ -2005,7 +2009,7 @@ function ligaEsteRow(team,code,qty){
  const exchangeMode=currentView==="exchange";
  const giveQty=getExchangeQty("give",team,code),receiveQty=getExchangeQty("receive",team,code);
  const row=document.createElement("div");row.className=`ligaeste-player-row ${st.kind}${pending?" ligaeste-pending-row":""}${exchangeMode?" ligaeste-exchange-row":""}`;row.dataset.code=code;
- row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}</span></div>
+ row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}${exchangeMode?`${position?" · ":""}Stock x${qty}`:""}</span></div>
  <div class="ligaeste-row-stock ${exchangeMode?"exchange":""}">
  ${exchangeMode
    ? `<button type="button" class="ligaeste-exchange-step give" aria-label="Dar una unidad">−1${giveQty?`<small>✓x${giveQty}</small>`:""}</button><button type="button" class="ligaeste-exchange-step receive" aria-label="Recibir una unidad">+1${receiveQty?`<small>✓x${receiveQty}</small>`:""}</button>`
@@ -3386,9 +3390,12 @@ function registerTransferHistory(project,beforeInventory,source="traspaso-invent
 }
 function executeTransferInventory(){
  const {sourceId,destinationId,action,mode}=transferInventorySelection();
- const source=projects[sourceId],destination=projects[destinationId];
+ let source=projects[sourceId],destination=projects[destinationId];
  if(!source||!destination||sourceId===destinationId){showToast("Selecciona una colección destino válida");return;}
- if(sourceId===activeProjectId)commitProjectState();
+ // Captura cualquier cambio todavía vivo en la colección activa antes de leer
+ // los inventarios que se van a copiar/mover.
+ if(sourceId===activeProjectId||destinationId===activeProjectId)commitProjectStateLocalOnly();
+ source=projects[sourceId];destination=projects[destinationId];
  const src=inventorySummary(source),dst=inventorySummary(destination);
  const actionLabel=action==="move"?"MOVER":"COPIAR",modeLabel=mode==="replace"?"REEMPLAZAR":"SUMAR";
  const message=`${actionLabel} inventario\n\nOrigen: ${source.name}\nDestino: ${destination.name}\nUnidades origen: ${src.units}\nUnidades actuales destino: ${dst.units}\nModo: ${modeLabel}\n\n${action==="move"?"El origen quedará a cero.\n":""}${mode==="replace"?"El inventario actual del destino será reemplazado.\n":""}\n¿Confirmar la operación?`;
@@ -3401,10 +3408,11 @@ function executeTransferInventory(){
  registerTransferHistory(destination,beforeDestination,"traspaso-inventario-destino");
  if(action==="move")registerTransferHistory(source,beforeSource,"traspaso-inventario-origen");
  persistProjects();
+ const result=inventorySummary(destination);
  if(activeProjectId===sourceId||activeProjectId===destinationId)loadProjectState();
  renderAll();renderProjectsList();renderCollections();closeTransferInventory();
  navigator.vibrate?.([25,30,25]);
- showToast(`${action==="move"?"Inventario movido":"Inventario copiado"} a ${destination.name}`);
+ showToast(`${action==="move"?"Inventario movido":"Inventario copiado"} · ${destination.name}: ${result.units} unidades`);
 }
 
 function renderProjectsList(){
@@ -4497,7 +4505,8 @@ document.addEventListener("DOMContentLoaded",()=>{
  $("#removeOneFromAllButton")?.addEventListener("click",()=>adjustAllEditedCollection(-1));
  $("#transferInventoryButton")?.addEventListener("click",openTransferInventory);
  $("#closeTransferInventoryDialog")?.addEventListener("click",closeTransferInventory);
- $("#transferInventoryForm")?.addEventListener("submit",event=>{event.preventDefault();executeTransferInventory()});
+ $("#transferInventoryForm")?.addEventListener("submit",event=>event.preventDefault());
+ $("#confirmTransferInventoryButton")?.addEventListener("click",executeTransferInventory);
  $("#transferDestinationCollection")?.addEventListener("change",updateTransferInventoryPreview);
  $("#transferInventoryDialog")?.addEventListener("change",event=>{if(event.target.matches('input[name="transferAction"],input[name="transferMode"]'))updateTransferInventoryPreview()});
  $("#transferInventoryDialog")?.addEventListener("click",event=>{if(event.target===$("#transferInventoryDialog"))closeTransferInventory()});

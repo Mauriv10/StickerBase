@@ -1,3 +1,10 @@
+# Build 704.14.13
+
+- Intercambio manual: Liga Este y Megacracks muestran el stock actual (`Stock xN`) en cada fila mientras se preparan unidades para dar/recibir.
+- Traspasar inventario: la confirmación deja de depender de `method="dialog"` y ejecuta explícitamente el traspaso; se consolida antes el estado activo y el aviso final incluye las unidades del destino.
+- Sincronización: el fingerprint de conflicto deja de incluir navegación/estructura derivada (`activeProjectId`, `selectedTeam`, `teamOrder`), evitando falsos conflictos entre PC y móvil por tener abierta otra colección/club o por normalización del orden.
+- Se conservan CAS, backups, revisión remota, protección multipestaña y el diálogo para divergencias reales.
+
 # 704.14.12
 
 - Sincronización: corregido un falso conflicto recurrente en PC cuando Supabase tenía una revisión más nueva pero no existía una divergencia real de inventario.
