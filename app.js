@@ -2079,10 +2079,10 @@ function ligaEsteRow(team,code,qty){
  const exchangeMode=currentView==="exchange";
  const giveQty=getExchangeQty("give",team,code),receiveQty=getExchangeQty("receive",team,code);
  const row=document.createElement("div");row.className=`ligaeste-player-row ${st.kind}${pending?" ligaeste-pending-row":""}${exchangeMode?" ligaeste-exchange-row":""}`;row.dataset.code=code;
- row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}${exchangeMode?`${position?" · ":""}Stock x${qty}`:""}</span></div>
+ row.innerHTML=`<div class="ligaeste-player-number">${collectionSafeText(code.replace(/^0(?=\d)/,""))}</div><div class="ligaeste-player-copy"><strong>${collectionSafeText(name)}</strong><span>${collectionSafeText(position||"")}</span></div>
  <div class="ligaeste-row-stock ${exchangeMode?"exchange":""}">
  ${exchangeMode
-   ? `<button type="button" class="ligaeste-exchange-step give" aria-label="Dar una unidad">−1${giveQty?`<small>✓x${giveQty}</small>`:""}</button><button type="button" class="ligaeste-exchange-step receive" aria-label="Recibir una unidad">+1${receiveQty?`<small>✓x${receiveQty}</small>`:""}</button>`
+   ? `<strong class="ligaeste-exchange-current-stock" aria-label="Stock actual: ${qty}"><small>Stock</small><b>${qty}</b></strong><button type="button" class="ligaeste-exchange-step give" aria-label="Dar una unidad">−1${giveQty?`<small>✓x${giveQty}</small>`:""}</button><button type="button" class="ligaeste-exchange-step receive" aria-label="Recibir una unidad">+1${receiveQty?`<small>✓x${receiveQty}</small>`:""}</button>`
    : `<button type="button" class="ligaeste-row-step minus" aria-label="Restar ${collectionSafeText(name)}">−</button><strong>${qty}</strong><button type="button" class="ligaeste-row-step plus" aria-label="Sumar ${collectionSafeText(name)}">+</button>`}
  </div>`;
  if(exchangeMode){

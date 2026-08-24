@@ -7999,3 +7999,242 @@ body.main-tab-collection.collection-theme-megacracks .premium-search.has-search-
   color:#aeb7c4!important;
   margin-left:auto!important;
 }
+
+
+/* =========================================================
+   704.14.16 · Liga Este / Megacracks — densidad móvil + stock visible
+   Reduce el scroll sin alterar lógica ni áreas táctiles críticas.
+   ========================================================= */
+body.main-tab-collection.collection-theme-ligaeste #globalCollectionList,
+body.main-tab-collection.collection-theme-megacracks #globalCollectionList{
+  gap:7px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-accordion,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-accordion{
+  margin-bottom:8px!important;
+  border-radius:17px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-toggle,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-toggle{
+  min-height:76px!important;
+  padding:10px 14px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading{
+  gap:11px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading img,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading img{
+  width:48px!important;
+  height:48px!important;
+  padding:4px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading strong,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading strong{
+  font-size:19px!important;
+  line-height:1.05!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading span,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading span{
+  margin-top:3px!important;
+  font-size:11px!important;
+  line-height:1.15!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-chevron,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-team-chevron{
+  width:42px!important;
+  height:42px!important;
+  font-size:20px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-list-head,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-list-head{
+  grid-template-columns:44px minmax(0,1fr) 142px!important;
+  padding:7px 12px!important;
+  font-size:9px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-row,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-row{
+  grid-template-columns:44px minmax(0,1fr) 142px!important;
+  min-height:60px!important;
+  padding:6px 12px!important;
+  gap:6px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-number,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-number{
+  font-size:15px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-copy strong,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-copy strong{
+  font-size:15px!important;
+  line-height:1.08!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-copy span,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-player-copy span{
+  margin-top:3px!important;
+  font-size:10px!important;
+  line-height:1.08!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-row-stock,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-row-stock{
+  grid-template-columns:44px 28px 44px!important;
+  gap:7px!important;
+}
+body.main-tab-collection.collection-theme-ligaeste .ligaeste-row-step,
+body.main-tab-collection.collection-theme-megacracks .ligaeste-row-step{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  min-height:44px!important;
+  border-radius:11px!important;
+  font-size:18px!important;
+}
+
+/* Intercambio manual: stock actual como dato primario, separado de −1/+1. */
+body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row,
+body.collection-theme-megacracks .ligaeste-player-row.ligaeste-exchange-row{
+  grid-template-columns:38px minmax(0,1fr) 142px!important;
+  min-height:60px!important;
+  padding:6px 10px!important;
+  gap:5px!important;
+}
+body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row .ligaeste-row-stock.exchange,
+body.collection-theme-megacracks .ligaeste-player-row.ligaeste-exchange-row .ligaeste-row-stock.exchange{
+  width:142px!important;
+  min-width:142px!important;
+  max-width:142px!important;
+  grid-template-columns:42px 46px 46px!important;
+  gap:4px!important;
+  align-items:center!important;
+  justify-self:end!important;
+  overflow:visible!important;
+}
+.ligaeste-exchange-current-stock{
+  width:42px!important;
+  height:44px!important;
+  border:1px solid #394352!important;
+  border-radius:10px!important;
+  background:#151b24!important;
+  color:#fff!important;
+  display:grid!important;
+  grid-template-rows:auto auto!important;
+  place-content:center!important;
+  text-align:center!important;
+  line-height:1!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.ligaeste-exchange-current-stock small{
+  display:block!important;
+  margin:0 0 2px!important;
+  color:#aab4c2!important;
+  font-size:8px!important;
+  font-weight:800!important;
+  letter-spacing:.02em!important;
+  text-transform:uppercase!important;
+}
+.ligaeste-exchange-current-stock b{
+  display:block!important;
+  color:#fff!important;
+  font-size:17px!important;
+  font-weight:950!important;
+}
+body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row .ligaeste-exchange-step,
+body.collection-theme-megacracks .ligaeste-player-row.ligaeste-exchange-row .ligaeste-exchange-step{
+  width:46px!important;
+  min-width:46px!important;
+  max-width:46px!important;
+  height:44px!important;
+  min-height:44px!important;
+  padding:3px 1px!important;
+  border-radius:10px!important;
+  font-size:14px!important;
+  line-height:1!important;
+  overflow:hidden!important;
+}
+body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row .ligaeste-exchange-step small,
+body.collection-theme-megacracks .ligaeste-player-row.ligaeste-exchange-row .ligaeste-exchange-step small{
+  display:block!important;
+  margin-top:2px!important;
+  font-size:7px!important;
+  line-height:1!important;
+}
+
+@media(max-width:430px){
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-toggle,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-team-toggle{
+    min-height:70px!important;
+    padding:8px 11px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading img,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading img{
+    width:46px!important;
+    height:46px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-heading strong,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-team-heading strong{
+    font-size:18px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-team-chevron,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-team-chevron{
+    width:40px!important;
+    height:40px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-list-head,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-list-head,
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-row,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-player-row{
+    grid-template-columns:36px minmax(0,1fr) 132px!important;
+    padding-left:9px!important;
+    padding-right:9px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-row,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-player-row{
+    min-height:56px!important;
+    padding-top:5px!important;
+    padding-bottom:5px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-player-copy strong,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-player-copy strong{
+    font-size:14px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-row-stock,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-row-stock{
+    grid-template-columns:42px 26px 42px!important;
+    gap:6px!important;
+  }
+  body.main-tab-collection.collection-theme-ligaeste .ligaeste-row-step,
+  body.main-tab-collection.collection-theme-megacracks .ligaeste-row-step{
+    width:42px!important;
+    height:42px!important;
+    min-width:42px!important;
+    min-height:42px!important;
+  }
+  body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row,
+  body.collection-theme-megacracks .ligaeste-player-row.ligaeste-exchange-row{
+    grid-template-columns:30px minmax(0,1fr) 134px!important;
+    min-height:56px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row .ligaeste-row-stock.exchange,
+  body.collection-theme-megacracks .ligaeste-player-row.ligaeste-exchange-row .ligaeste-row-stock.exchange{
+    width:134px!important;
+    min-width:134px!important;
+    max-width:134px!important;
+    grid-template-columns:38px 44px 44px!important;
+    gap:4px!important;
+  }
+  .ligaeste-exchange-current-stock{
+    width:38px!important;
+    height:42px!important;
+  }
+  .ligaeste-exchange-current-stock b{font-size:16px!important}
+  body.collection-theme-ligaeste .ligaeste-player-row.ligaeste-exchange-row .ligaeste-exchange-step,
+  body.collection-theme-megacracks .ligaeste-player-row.ligaeste-exchange-row .ligaeste-exchange-step{
+    width:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    height:42px!important;
+    min-height:42px!important;
+    font-size:13px!important;
+  }
+}

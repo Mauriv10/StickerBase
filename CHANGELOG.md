@@ -1,3 +1,10 @@
+# Build 704.14.16
+
+- Liga Este y Megacracks: compactadas las tarjetas de clubes para reducir significativamente el scroll vertical manteniendo la estética premium.
+- Liga Este y Megacracks: filas de jugadores/cromos más densas, conservando controles táctiles cómodos para −/+.
+- Intercambio manual: el stock actual deja de aparecer como texto secundario bajo el nombre y pasa a un bloque propio visible junto a −1/+1.
+- No se modifica lógica de inventario, estadísticas, intercambio, Supabase, navegación ni checklists.
+
 # Build 704.14.15
 
 - Liga Este 2026/27: el nº 02 del Elche CF pasa a `Pendiente` y queda excluido de las estadísticas mediante el mecanismo existente para referencias pendientes.
