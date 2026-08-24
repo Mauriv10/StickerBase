@@ -1,3 +1,14 @@
+# Build 704.14.17
+
+- Añadidas tres colecciones Pokémon TCG nativas: **151**, **Phantasmal Flames** y **Ascended Heroes**.
+- Se integran en el mismo motor Pokémon existente: acordeones, inventario, variantes del Base Set, estadísticas, buscador, visor ampliado, miniaturas y sincronización.
+- Añadidos los catálogos remotos de metadata/imágenes: `sv3pt5`, `me2` y `me2pt5`.
+- Checklists numeradas: 151 (165 base / 207 total), Phantasmal Flames (94 base / 130 total) y Ascended Heroes (216 cartas base antes de las rarezas especiales / 295 total).
+- Ascended Heroes incorpora el apartado **MEGA ATTACK RARE** (264–270).
+- Nuevas identidades visuales: 151 blanco/perla + turquesa; Phantasmal Flames negro/azul + cian/violeta; Ascended Heroes petróleo/turquesa + amarillo/magenta.
+- La migración Pokémon pasa a `stickerbase.pokemon.collections.v2` para añadir las tres expansiones a instalaciones existentes sin recrear ni alterar los cuatro álbumes Pokémon previos.
+- Actualizadas las cartas representativas de la biblioteca: Mew ex #205 (151), Mega Charizard X ex #125 (Phantasmal Flames) y Mega Dragonite ex #295 (Ascended Heroes).
+
 # Build 704.14.16
 
 - Liga Este y Megacracks: compactadas las tarjetas de clubes para reducir significativamente el scroll vertical manteniendo la estética premium.

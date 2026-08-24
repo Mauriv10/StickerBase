@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.13";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.17";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -13,14 +13,20 @@ const COLLECTION_DEFINITIONS={
   "pokemon-pitch-black":{label:"POKÉMON · PITCH BLACK",subtitle:"Mega Evolution · ME05",icon:"PB",theme:"pokemon"},
   "pokemon-chaos-rising":{label:"POKÉMON · CHAOS RISING",subtitle:"Mega Evolution · ME04",icon:"CR",theme:"pokemon"},
   "pokemon-perfect-order":{label:"POKÉMON · PERFECT ORDER",subtitle:"Mega Evolution · ME03",icon:"PO",theme:"pokemon"},
-  "pokemon-surging-sparks":{label:"POKÉMON · SURGING SPARKS",subtitle:"Scarlet & Violet · SV08",icon:"SS",theme:"pokemon"}
+  "pokemon-surging-sparks":{label:"POKÉMON · SURGING SPARKS",subtitle:"Scarlet & Violet · SV08",icon:"SS",theme:"pokemon"},
+  "pokemon-151":{label:"POKÉMON · 151",subtitle:"Scarlet & Violet · 151",icon:"151",theme:"pokemon"},
+  "pokemon-phantasmal-flames":{label:"POKÉMON · PHANTASMAL FLAMES",subtitle:"Mega Evolution · ME02",icon:"PF",theme:"pokemon"},
+  "pokemon-ascended-heroes":{label:"POKÉMON · ASCENDED HEROES",subtitle:"Mega Evolution · ME2.5",icon:"AH",theme:"pokemon"}
 };
 
 const POKEMON_SET_DEFS={
  "pokemon-pitch-black":{name:"Pitch Black",seedType:"pokemon-pitch-black",setId:"me5",official:84,total:120,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me5.json",ranges:[["BASE",1,84],["ILLUSTRATION RARE",85,95],["ULTRA RARE",96,113],["SPECIAL ILLUSTRATION RARE",114,119],["MEGA HYPER RARE",120,120]]},
  "pokemon-chaos-rising":{name:"Chaos Rising",seedType:"pokemon-chaos-rising",setId:"me4",official:86,total:122,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me4.json",ranges:[["BASE",1,86],["ILLUSTRATION RARE",87,97],["ULTRA RARE",98,115],["SPECIAL ILLUSTRATION RARE",116,121],["MEGA HYPER RARE",122,122]]},
  "pokemon-perfect-order":{name:"Perfect Order",seedType:"pokemon-perfect-order",setId:"me3",official:88,total:124,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me3.json",ranges:[["BASE",1,88],["ILLUSTRATION RARE",89,99],["ULTRA RARE",100,117],["SPECIAL ILLUSTRATION RARE",118,123],["MEGA HYPER RARE",124,124]]},
- "pokemon-surging-sparks":{name:"Surging Sparks",seedType:"pokemon-surging-sparks",setId:"sv8",official:191,total:252,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/sv8.json",ranges:[["BASE",1,191],["ILLUSTRATION RARE",192,214],["ULTRA RARE",215,235],["SPECIAL ILLUSTRATION RARE",236,246],["HYPER RARE",247,252]]}
+ "pokemon-surging-sparks":{name:"Surging Sparks",seedType:"pokemon-surging-sparks",setId:"sv8",official:191,total:252,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/sv8.json",ranges:[["BASE",1,191],["ILLUSTRATION RARE",192,214],["ULTRA RARE",215,235],["SPECIAL ILLUSTRATION RARE",236,246],["HYPER RARE",247,252]]},
+ "pokemon-151":{name:"151",seedType:"pokemon-151",setId:"sv3pt5",official:165,total:207,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/sv3pt5.json",ranges:[["BASE",1,165],["ILLUSTRATION RARE",166,181],["ULTRA RARE",182,197],["SPECIAL ILLUSTRATION RARE",198,204],["HYPER RARE",205,207]]},
+ "pokemon-phantasmal-flames":{name:"Phantasmal Flames",seedType:"pokemon-phantasmal-flames",setId:"me2",official:94,total:130,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me2.json",ranges:[["BASE",1,94],["ILLUSTRATION RARE",95,107],["ULTRA RARE",108,124],["SPECIAL ILLUSTRATION RARE",125,129],["MEGA HYPER RARE",130,130]]},
+ "pokemon-ascended-heroes":{name:"Ascended Heroes",seedType:"pokemon-ascended-heroes",setId:"me2pt5",official:216,total:295,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me2pt5.json",ranges:[["BASE",1,216],["ILLUSTRATION RARE",217,249],["ULTRA RARE",250,263],["MEGA ATTACK RARE",264,270],["SPECIAL ILLUSTRATION RARE",271,292],["MEGA HYPER RARE",293,295]]}
 };
 function isPokemonCollectionType(type){return Boolean(POKEMON_SET_DEFS[type])}
 function pokemonCode(n){return String(n).padStart(3,"0")}
@@ -30,7 +36,7 @@ function pokemonCardMeta(code,project=projects?.[activeProjectId]){return pokemo
 function pokemonRarityLabel(rarity=""){return String(rarity||"").replace(/^Rare Holo$/i,"Rare · Holo").replace(/^Rare$/i,"Rare · Holo")}
 function pokemonDirectImageUrl(type,code,size="small"){const def=POKEMON_SET_DEFS[type];if(!def?.setId)return "";return `https://images.scrydex.com/pokemon/${def.setId}-${Number(code)}/${size}`;}
 function pokemonSectionLabel(section){return section==="BASE"?"BASE SET":section;}
-function pokemonSectionSubtitle(section){const labels={"BASE":"Cartas principales de la colección","ILLUSTRATION RARE":"Cartas Illustration Rare","ULTRA RARE":"Cartas Ultra Rare","SPECIAL ILLUSTRATION RARE":"Cartas Special Illustration Rare","MEGA HYPER RARE":"Cartas Mega Hyper Rare","HYPER RARE":"Cartas Hyper Rare"};return labels[section]||`Cartas ${section}`;}
+function pokemonSectionSubtitle(section){const labels={"BASE":"Cartas principales de la colección","ILLUSTRATION RARE":"Cartas Illustration Rare","ULTRA RARE":"Cartas Ultra Rare","MEGA ATTACK RARE":"Cartas Mega Attack Rare","SPECIAL ILLUSTRATION RARE":"Cartas Special Illustration Rare","MEGA HYPER RARE":"Cartas Mega Hyper Rare","HYPER RARE":"Cartas Hyper Rare"};return labels[section]||`Cartas ${section}`;}
 function pokemonSectionTone(section){if(section==="BASE")return "base";if(section.includes("SPECIAL"))return "gold";if(section.includes("HYPER"))return "orange";if(section.includes("ULTRA"))return "violet";return "purple";}
 
 
@@ -215,7 +221,7 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  syncCollectionChrome(project.collectionType);
  const def=collectionDefinition(project);
  document.body.dataset.collectionType=project.collectionType;
- document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks","collection-theme-pokemon","pokemon-theme-pitch-black","pokemon-theme-chaos-rising","pokemon-theme-perfect-order","pokemon-theme-surging-sparks");
+ document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks","collection-theme-pokemon","pokemon-theme-pitch-black","pokemon-theme-chaos-rising","pokemon-theme-perfect-order","pokemon-theme-surging-sparks","pokemon-theme-151","pokemon-theme-phantasmal-flames","pokemon-theme-ascended-heroes");
  document.body.classList.add(`collection-theme-${def.theme}`);
  if(isPokemonCollectionType(project.collectionType)) document.body.classList.add(`pokemon-theme-${project.collectionType.replace(/^pokemon-/,"")}`);
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
@@ -447,7 +453,7 @@ function bootstrapProjectsFromSeed(seedData){
  localStorage.setItem(MASTER_SEED_KEY,seedData.revision||DATA_REVISION);
 }
 
-const POKEMON_SEED_MIGRATION_KEY="stickerbase.pokemon.collections.v1";
+const POKEMON_SEED_MIGRATION_KEY="stickerbase.pokemon.collections.v2";
 function ensurePokemonProjects(){
  if(localStorage.getItem(POKEMON_SEED_MIGRATION_KEY))return false;
  let changed=false;
@@ -3222,7 +3228,7 @@ function renderCollections(){
       const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
       const pokemonDef=isPokemon?POKEMON_SET_DEFS[ptype]:null;
       const pokemonTotal=isPokemon?Object.values(p.inventory||{}).reduce((n,cards)=>n+Object.keys(cards||{}).length,0):0;
-      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219};
+      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":295};
       const pokemonThumb=isPokemon?pokemonDirectImageUrl(ptype,pokemonLibraryChase[ptype]||1,"small"):"";
       return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${isPokemon?`pokemon-library-card pokemon-library-${ptype.replace(/^pokemon-/,'')}`:''} ${active?"active":""}" data-collection-id="${p.id}">
        <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
