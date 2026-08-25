@@ -1494,3 +1494,25 @@ Contrato visual actualizado de 151:
 
 ## Colecciones
 La jerarquía `Football Cards` / `Pokémon TCG` de 704.14.21 queda sin cambios y continúa siendo la referencia vigente.
+
+
+# 42. BUILD 704.14.23 — SINCRONIZACIÓN SEGURA DURANTE CAMBIOS RÁPIDOS
+
+## Condición de carrera corregida
+Una escritura a Supabase representa una fotografía inmutable del estado tomada antes de iniciar la petición. El usuario puede seguir modificando inventario mientras la red responde; esos cambios posteriores nunca pueden atribuirse a la petición anterior.
+
+Comportamiento obligatorio:
+- `saveCloudState()` serializa las escrituras por pestaña mediante `cloudSaveInFlight`; no debe haber dos escrituras cloud simultáneas desde la misma pestaña.
+- `cloudPayload()` genera el snapshot a enviar y se calcula `savedFingerprint` a partir de ese snapshot exacto.
+- Al confirmar Supabase una escritura, `cloudBaselineFingerprint` debe avanzar a `savedFingerprint`, nunca al fingerprint del estado vivo si éste cambió durante el `await`.
+- Si `stateFingerprint()` al finalizar es distinto de `savedFingerprint`, significa que hubo cambios posteriores: no se vacía `pendingSync`, no se marca la colección como totalmente sincronizada y se encola una nueva subida inmediata.
+- Solo cuando el estado vivo coincide con el snapshot confirmado pueden vaciarse `pendingSync` y actualizarse `lastSyncedAt`.
+- Los eventos realtime/focus/foreground que llegan durante una escritura se difieren; el eco realtime de la propia escritura no debe abrir un conflicto antes de recibir la respuesta HTTP.
+
+## Regresión prohibida
+Al pulsar rápidamente varias veces `+` o `−` (especialmente en Liga Este/Megacracks), el valor local final debe conservarse. Por ejemplo, si el usuario pasa de x0 a x5 mientras una petición anterior salió cuando estaba en x3, la nube puede guardar x3 temporalmente, pero StickerBase debe detectar que existen cambios posteriores y enviar x5 inmediatamente después. Nunca puede:
+- reducir x5 a x3 al recibir realtime/focus;
+- borrar los cambios pendientes posteriores;
+- mostrar `Hay dos inventarios diferentes` como consecuencia de su propia escritura anterior.
+
+Esta protección afecta al motor común de persistencia y debe mantenerse para Mundial, Liga Este, Megacracks y Pokémon.

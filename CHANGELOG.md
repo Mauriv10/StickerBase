@@ -1,3 +1,13 @@
+# Build 704.14.23
+
+- Sincronización: corregida una condición de carrera al añadir/restar cromos rápidamente mientras una subida a Supabase ya estaba en curso.
+- Cada petición cloud conserva ahora el fingerprint exacto del snapshot realmente enviado; nunca marca como guardados cambios realizados después de crear ese snapshot.
+- Si el inventario cambia durante una subida, esos cambios mantienen su estado pendiente y se lanza automáticamente una segunda sincronización al terminar la primera.
+- Las escrituras a Supabase quedan serializadas: no pueden existir dos `saveCloudState()` compitiendo en paralelo desde la misma pestaña.
+- Los eventos realtime/focus recibidos mientras se está escribiendo se difieren hasta finalizar la operación para evitar que el eco de la propia escritura genere un falso conflicto.
+- Regresión protegida: una secuencia rápida como x0 → x5 no puede volver a x3 por una escritura anterior ni abrir un conflicto nube/local causado por esa misma secuencia.
+- Sin cambios en checklists, inventarios iniciales, interfaz, colecciones ni estructura de Supabase.
+
 # Build 704.14.18
 
 - «Crear nuevo proyecto» muestra ahora todas las colecciones disponibles, incluidas las siete expansiones Pokémon: Pitch Black, Chaos Rising, Perfect Order, Surging Sparks, 151, Phantasmal Flames y Ascended Heroes.

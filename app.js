@@ -284,6 +284,10 @@ let pendingExcelImport=null;
 const CLOUD_STATE_TABLE="wc_user_state";
 const CLOUD_LOCAL_META_KEY="world-cup-2026-cloud-meta-v7007";
 let cloudSession=null,cloudSubscription=null,cloudSaveTimer=null,cloudApplying=false,cloudReady=false,cloudRevision=0,cloudLastUpdatedAt=null,cloudConflictOpen=false,cloudBaselineFingerprint=null;
+// 704.14.23: las escrituras cloud se serializan. Si el usuario sigue pulsando +/-
+// mientras una subida está en curso, esos cambios se conservan y se envían en una
+// segunda pasada; nunca se consideran guardados por una petición que salió antes.
+let cloudSaveInFlight=false,cloudSaveQueued=false,cloudSaveQueuedForce=false,cloudRefreshAfterSave=false;
 const CLOUD_TAB_ID=sessionStorage.getItem("stickerbase-cloud-tab-id")||crypto.randomUUID();
 sessionStorage.setItem("stickerbase-cloud-tab-id",CLOUD_TAB_ID);
 const cloudTabChannel=typeof BroadcastChannel!=="undefined"?new BroadcastChannel("stickerbase-cloud-sync-v1"):null;
@@ -686,10 +690,16 @@ function setCloudStatus(text,state="idle"){
 }
 function scheduleCloudSave(delay=450){
  if(!cloudReady||!cloudSession||cloudApplying)return;
+ // Si ya hay una petición escribiendo, no arrancamos otra en paralelo. Marcamos
+ // que existe trabajo posterior y se ejecutará en cuanto termine la actual.
+ if(cloudSaveInFlight){cloudSaveQueued=true;return;}
  clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(()=>saveCloudState().catch(console.error),delay);
 }
 async function saveCloudState({force=false}={}){
  const client=cloudClient();if(!client||!cloudSession||!navigator.onLine||cloudApplying||cloudConflictOpen)return false;
+ if(cloudSaveInFlight){cloudSaveQueued=true;cloudSaveQueuedForce=cloudSaveQueuedForce||force;return false;}
+ cloudSaveInFlight=true;
+ try{
  clearTimeout(cloudSaveTimer);cloudSaveTimer=null;setCloudStatus("Comprobando la nube…","syncing");
  let remote=null;
  const {data:checkedRemote,error:readError}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
@@ -710,7 +720,10 @@ async function saveCloudState({force=false}={}){
    return reconcileCloudRow(remote,{reason:"cas-precheck"});
  }
  setCloudStatus("Sincronizando…","syncing");
+ // payload es una fotografía inmutable del estado que ESTA petición va a enviar.
+ // Su fingerprint, y no el estado vivo al terminar la red, será el baseline real.
  const payload=cloudPayload();
+ const savedFingerprint=stateFingerprint(payload.projects);
  const nextRevision=expectedRevision+1;
  const writeAt=new Date().toISOString();
  let data=null,error=null;
@@ -742,13 +755,37 @@ async function saveCloudState({force=false}={}){
    if(latest?.payload?.projects){setCloudStatus("Otra pestaña guardó primero","error");return reconcileCloudRow(latest,{reason:"cas-rejected"})}
    return false;
  }
- cloudRevision=Number(data.revision)||nextRevision;cloudLastUpdatedAt=data.updated_at;lastSyncedAt=data.updated_at;
- Object.values(projects).forEach(p=>{p.pendingSync={};p.lastSyncedAt=data.updated_at});pendingSync={};
+ cloudRevision=Number(data.revision)||nextRevision;cloudLastUpdatedAt=data.updated_at;
+ // La nube contiene exactamente savedFingerprint. Durante el await el usuario puede
+ // haber añadido/restado más cromos; esos cambios NO se borran ni se atribuyen a esta
+ // escritura. Si el estado vivo avanzó, queda pendiente una nueva sincronización.
  commitProjectStateLocalOnly();
- const fp=stateFingerprint();setCloudBaseline(fp);
- writeCloudMeta({revision:cloudRevision,updatedAt:data.updated_at,userId:cloudSession.user.id,fingerprint:fp,writerTabId:CLOUD_TAB_ID});
- notifyOtherTabs("cloud-updated",{fingerprint:fp});
- updateSyncUI();setCloudStatus("✓ Guardado en la nube","synced");return true;
+ const currentFingerprint=stateFingerprint();
+ const changedWhileSaving=currentFingerprint!==savedFingerprint;
+ setCloudBaseline(savedFingerprint);
+ writeCloudMeta({revision:cloudRevision,updatedAt:data.updated_at,userId:cloudSession.user.id,fingerprint:savedFingerprint,writerTabId:CLOUD_TAB_ID});
+ notifyOtherTabs("cloud-updated",{fingerprint:savedFingerprint});
+ if(!changedWhileSaving){
+   lastSyncedAt=data.updated_at;
+   Object.values(projects).forEach(p=>{p.pendingSync={};p.lastSyncedAt=data.updated_at});pendingSync={};
+   commitProjectStateLocalOnly();
+   updateSyncUI();setCloudStatus("✓ Guardado en la nube","synced");
+ }else{
+   cloudSaveQueued=true;
+   updateSyncUI();setCloudStatus("Guardando cambios nuevos…","syncing");
+ }
+ return true;
+ }finally{
+   cloudSaveInFlight=false;
+   const runQueued=cloudSaveQueued,forceQueued=cloudSaveQueuedForce,refreshQueued=cloudRefreshAfterSave;
+   cloudSaveQueued=false;cloudSaveQueuedForce=false;cloudRefreshAfterSave=false;
+   if(runQueued){
+     clearTimeout(cloudSaveTimer);
+     cloudSaveTimer=setTimeout(()=>saveCloudState({force:forceQueued}).catch(console.error),0);
+   }else if(refreshQueued&&cloudSession){
+     setTimeout(()=>refreshCloudState({reason:"after-save"}).catch(console.error),0);
+   }
+ }
 }
 async function applyCloudPayload(row,{silent=false}={}){
  if(!row?.payload?.projects)return false;
@@ -841,7 +878,11 @@ function startRealtime(){
  const client=cloudClient();if(!client||!cloudSession)return;
  if(cloudSubscription)client.removeChannel(cloudSubscription);
  cloudSubscription=client.channel(`wc-state-${cloudSession.user.id}`).on("postgres_changes",{event:"UPDATE",schema:"public",table:CLOUD_STATE_TABLE,filter:`user_id=eq.${cloudSession.user.id}`},payload=>{
-   const row=payload.new;if(!row||Number(row.revision)<=cloudRevision)return;reconcileCloudRow(row,{reason:"realtime"}).catch(console.error);
+   const row=payload.new;if(!row||Number(row.revision)<=cloudRevision)return;
+   // Un evento realtime puede ser el eco de nuestra propia escritura y llegar antes
+   // que la respuesta HTTP. Se difiere hasta terminar para evitar falsos conflictos.
+   if(cloudSaveInFlight){cloudRefreshAfterSave=true;return;}
+   reconcileCloudRow(row,{reason:"realtime"}).catch(console.error);
  }).subscribe();
 }
 window.addEventListener("wc-auth-ready",event=>{if(event.detail?.session)initialCloudSync(event.detail.session).catch(console.error)});
@@ -866,6 +907,7 @@ async function reconcileCloudRow(row,{reason="manual"}={}){
 }
 async function refreshCloudState({reason="manual"}={}){
  const client=cloudClient();if(!client||!cloudSession||!navigator.onLine||cloudApplying||cloudConflictOpen)return false;
+ if(cloudSaveInFlight){cloudRefreshAfterSave=true;return false;}
  const {data,error}=await client.from(CLOUD_STATE_TABLE).select("payload,revision,updated_at").eq("user_id",cloudSession.user.id).maybeSingle();
  if(error){console.error("No se pudo refrescar la nube",reason,error);setCloudStatus("Sin conexión con la nube","error");return false}
  if(!data?.payload?.projects)return false;
