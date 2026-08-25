@@ -1451,3 +1451,32 @@ La pestaña Colecciones adopta una galería visual compacta inspirada en portada
 - crear nueva colección se conserva como botón `+` compacto en la cabecera.
 
 Contrato de regresión: el rediseño de biblioteca es exclusivamente de presentación. No debe cambiar `projects`, orden persistido, inventarios, targets, Supabase ni las reglas de creación/duplicado/traspaso.
+
+
+# 40. BUILD 704.14.21 — COLECCIONES JERÁRQUICAS + BUSCADOR 151
+
+## Pokémon 151
+El buscador del tema 151 debe quedar completamente integrado en su identidad clara. No puede reaparecer el fondo/cápsula negra del tema Pokémon genérico alrededor del campo de búsqueda. La regla específica de 151 tiene prioridad sobre `.collection-theme-pokemon .search-wrap`.
+
+## Colecciones / jerarquía de biblioteca
+La pestaña Colecciones conserva la galería visual de portadas de 704.14.20, pero esa galería se muestra dentro de una jerarquía de acordeones para evitar scrolls largos y preparar nuevas familias futuras.
+
+Estructura aprobada:
+- `Football Cards` es el acordeón raíz de las colecciones de fútbol.
+  - `Mundial` muestra los proyectos `world-cup-2026` en la cuadrícula visual.
+  - `Liga Este` muestra los proyectos `liga-este-2026-27`.
+  - `Megacracks` muestra los proyectos `megacracks-2026-27`.
+  - futuras familias Topps deberán añadirse dentro de `Football Cards`, no como raíz separada salvo nueva decisión.
+- `Pokémon TCG` es un único acordeón raíz. Al abrirlo se muestran directamente todos los álbumes Pokémon en la cuadrícula visual; NO crear subcarpetas por expansión.
+
+El estado abierto/cerrado se guarda solo en `localStorage` mediante `COLLECTION_FOLDER_STATE_KEY`. Es navegación local de interfaz: no debe sincronizarse con Supabase ni entrar en fingerprints/conflictos de inventario.
+
+Contrato de regresión:
+- conservar tarjetas de portada, apertura, edición y controles de reordenación;
+- no cambiar `projects`, inventarios, targets, orden persistente ni sincronización;
+- no convertir Pokémon en una jerarquía por expansión;
+- futuras colecciones de fútbol deben integrarse conceptualmente en `Football Cards`.
+
+## 704.14.21
+- Corregido fondo negro residual del buscador de 151.
+- Biblioteca reorganizada en acordeones `Football Cards` / `Pokémon TCG`, con subacordeones únicamente para familias de fútbol.

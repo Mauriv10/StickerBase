@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.20";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.21";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3236,10 +3236,35 @@ function renderCollections(){
     </div>
    </article>`;
  };
+ const renderFolder=(key,label,count,content,level=1)=>{
+   const open=collectionFolderIsOpen(key);
+   return `<section class="collection-library-folder level-${level} ${open?'open':''}">
+    <button type="button" class="collection-library-folder-toggle" data-toggle-library-folder="${key}" aria-expanded="${open?'true':'false'}">
+      <span class="collection-library-folder-copy"><strong>${collectionSafeText(label)}</strong><small>${count} ${count===1?'álbum':'álbumes'}</small></span>
+      <span class="collection-library-folder-chevron" aria-hidden="true">⌄</span>
+    </button>
+    ${open?`<div class="collection-library-folder-body">${content}</div>`:''}
+   </section>`;
+ };
+ const footballTypes=[
+   ["world-cup-2026","Mundial"],
+   ["liga-este-2026-27","Liga Este"],
+   ["megacracks-2026-27","Megacracks"]
+ ];
+ const footballInner=footballTypes.map(([type,label])=>{
+   const group=football.filter(p=>inferCollectionType(p)===type);
+   if(!group.length)return "";
+   return renderFolder(`football-${type}`,label,group.length,`<div class="collection-gallery-grid">${group.map(renderCard).join('')}</div>`,2);
+ }).join('');
  const sections=[];
- if(football.length)sections.push(`<section class="collection-gallery-section collection-gallery-section-football"><div class="collection-gallery-heading"><strong>FÚTBOL</strong><span>${football.length} ${football.length===1?'álbum':'álbumes'}</span></div><div class="collection-gallery-grid">${football.map(p=>renderCard(p)).join('')}</div></section>`);
- if(pokemon.length)sections.push(`<section class="collection-gallery-section collection-gallery-section-pokemon"><div class="collection-gallery-heading"><strong>POKÉMON TCG</strong><span>${pokemon.length} ${pokemon.length===1?'álbum':'álbumes'}</span></div><div class="collection-gallery-grid">${pokemon.map(p=>renderCard(p)).join('')}</div></section>`);
- list.innerHTML=sections.join('');
+ if(football.length)sections.push(renderFolder("football","Football Cards",football.length,`<div class="collection-library-subfolders">${footballInner}</div>`,1));
+ if(pokemon.length)sections.push(renderFolder("pokemon","Pokémon TCG",pokemon.length,`<div class="collection-gallery-grid collection-gallery-grid-pokemon">${pokemon.map(renderCard).join('')}</div>`,1));
+ list.innerHTML=`<div class="collection-library-accordion">${sections.join('')}</div>`;
+ list.querySelectorAll("[data-toggle-library-folder]").forEach(button=>button.onclick=()=>{
+   const key=button.dataset.toggleLibraryFolder;
+   setCollectionFolderOpen(key,!collectionFolderIsOpen(key));
+   renderCollections();
+ });
  list.querySelectorAll("[data-open-collection]").forEach(button=>button.onclick=()=>{
    const id=button.dataset.openCollection;
    if(id!==activeProjectId)switchProject(id);

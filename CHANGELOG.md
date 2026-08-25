@@ -404,3 +404,11 @@
 - Se conservan abrir, editar y reordenar álbumes mediante controles discretos sobre cada tarjeta.
 - Ascended Heroes mantiene Mega Dragonite ex #271 como portada.
 - Sin cambios en checklists, inventarios, estadísticas, variantes ni sincronización.
+
+
+## 704.14.21 — 151 buscador limpio + Colecciones jerárquicas
+- Pokémon 151: elimina definitivamente el fondo/cápsula negra heredada alrededor del buscador mediante reglas específicas de mayor prioridad.
+- Colecciones: nueva jerarquía en acordeones. `Football Cards` agrupa Mundial, Liga Este y Megacracks; cada familia abre su galería de álbumes.
+- `Pokémon TCG` abre directamente la cuadrícula visual de todos los álbumes Pokémon, sin subcarpetas por expansión.
+- El estado abierto/cerrado de los acordeones es local al dispositivo y no forma parte de Supabase ni del fingerprint de inventario.
+- Se mantiene la galería de portadas, abrir, editar y reordenar álbumes.
