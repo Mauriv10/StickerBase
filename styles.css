@@ -8281,3 +8281,13 @@ body.pokemon-theme-151 .pokemon-step.plus{color:#fff!important}
 body.pokemon-theme-151 .bottom-nav{background:rgba(249,252,252,.96)!important;border-top-color:#d9e5e6!important}
 body.pokemon-theme-151 .bottom-nav-button{color:#6f8285!important}
 body.pokemon-theme-151 .bottom-nav-button.active{color:#0a9996!important}
+
+
+/* Build 704.14.18 · selector Nuevo proyecto con todas las colecciones Pokémon */
+.collection-type-pokemon{--picker-accent:#10bcd4}
+.collection-type-pokemon .collection-type-icon{background:linear-gradient(145deg,#08131f,#10283b);color:#5ee7ff;box-shadow:inset 0 0 0 1px rgba(94,231,255,.32)}
+.collection-type-151{--picker-accent:#17a9a7}.collection-type-151 .collection-type-icon{background:linear-gradient(145deg,#f7ffff,#d9f4f1);color:#118f8f;box-shadow:inset 0 0 0 1px rgba(17,143,143,.28)}
+.collection-type-phantasmal-flames{--picker-accent:#1687ff}.collection-type-phantasmal-flames .collection-type-icon{background:linear-gradient(145deg,#07111f,#102f59);color:#22d9ff;box-shadow:inset 0 0 0 1px rgba(34,217,255,.34)}
+.collection-type-ascended-heroes{--picker-accent:#00aaa8}.collection-type-ascended-heroes .collection-type-icon{background:linear-gradient(145deg,#06383d,#08797b);color:#ffd62e;box-shadow:inset 0 0 0 1px rgba(255,214,46,.36)}
+#createProjectDialog .collection-type-picker{max-height:min(46dvh,430px);overflow:auto;padding-right:4px;overscroll-behavior:contain}
+#createProjectDialog .collection-type-picker legend{position:sticky;top:0;z-index:2;padding:4px 0 8px;background:inherit}

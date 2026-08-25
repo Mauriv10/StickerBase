@@ -1,3 +1,11 @@
+# Build 704.14.18
+
+- «Crear nuevo proyecto» muestra ahora todas las colecciones disponibles, incluidas las siete expansiones Pokémon: Pitch Black, Chaos Rising, Perfect Order, Surging Sparks, 151, Phantasmal Flames y Ascended Heroes.
+- Los proyectos Pokémon creados desde este diálogo reutilizan su checklist, tema, variantes, estadísticas, buscador y visor nativos mediante el motor Pokémon existente.
+- El objetivo inicial de álbumes pasa automáticamente a 1 al seleccionar una colección Pokémon; Panini mantiene el valor 2 usado hasta ahora.
+- El selector se vuelve desplazable en móvil para alojar todas las colecciones sin desbordar el diálogo.
+- No se modifican inventarios ni proyectos ya existentes.
+
 # Build 704.14.17
 
 - Añadidas tres colecciones Pokémon TCG nativas: **151**, **Phantasmal Flames** y **Ascended Heroes**.

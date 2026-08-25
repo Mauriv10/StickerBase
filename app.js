@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.17";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.18";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3547,6 +3547,8 @@ function createEmptyInventoryFrom(sourceInventory){
 function selectedNewCollectionType(){return document.querySelector('#createProjectDialog input[name="newCollectionType"]:checked')?.value||"world-cup-2026";}
 function refreshCreateProjectSources(){
  const type=selectedNewCollectionType();
+ const targetInput=$("#newProjectTarget");
+ if(targetInput)targetInput.value=isPokemonCollectionType(type)?"1":"2";
  const select=$("#sourceProjectSelect");
  const repeatRadio=document.querySelector('#createProjectDialog input[name="projectSource"][value="repeats"]');
  const eligible=Object.values(projects).filter(p=>inferCollectionType(p)===type);
@@ -3560,8 +3562,8 @@ function openCreateProject(){
  const dialog=$("#createProjectDialog");
  if(!dialog)return;
  $("#newProjectName").value="";
- $("#newProjectTarget").value="2";
  const defaultType=inferCollectionType(projects?.[activeProjectId]);
+ $("#newProjectTarget").value=isPokemonCollectionType(defaultType)?"1":"2";
  const typeRadio=dialog.querySelector(`input[name="newCollectionType"][value="${defaultType}"]`)||dialog.querySelector('input[name="newCollectionType"]');
  if(typeRadio)typeRadio.checked=true;
  const emptyOption=dialog.querySelector('input[name="projectSource"][value="empty"]');
