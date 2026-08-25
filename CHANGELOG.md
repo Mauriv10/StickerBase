@@ -412,3 +412,9 @@
 - `Pokémon TCG` abre directamente la cuadrícula visual de todos los álbumes Pokémon, sin subcarpetas por expansión.
 - El estado abierto/cerrado de los acordeones es local al dispositivo y no forma parte de Supabase ni del fingerprint de inventario.
 - Se mantiene la galería de portadas, abrir, editar y reordenar álbumes.
+
+## 704.14.22 — Buscador 151 integrado en turquesa
+- Pokémon 151: el contenedor estructural exterior del buscador deja de heredar negro del tema Pokémon general y pasa a turquesa/perla translúcido, coherente con el degradado de 151.
+- El campo de búsqueda interior permanece blanco, con borde turquesa y contraste limpio.
+- Colecciones permanece exactamente como en 704.14.21; no se modifica su jerarquía ni galería.
+- Sin cambios en checklists, inventarios, estadísticas, navegación, proyectos ni sincronización.

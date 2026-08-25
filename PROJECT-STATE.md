@@ -1435,7 +1435,7 @@ La identidad clara de 151 se consolida con un fondo continuo perla/turquesa. La 
 Contrato visual de 151:
 - fondo de cabecera, contenido y zona previa a la navegación visualmente continuo;
 - degradado muy suave desde blanco/perla hacia turquesa claro detrás de estadísticas y acordeones;
-- buscador blanco independiente con borde turquesa, sin contenedor negro exterior;
+- buscador blanco con borde turquesa dentro de un contenedor exterior turquesa/perla translúcido;
 - acordeones y filas blancos/translúcidos sobre el degradado;
 - barra inferior clara;
 - la lógica Pokémon, checklist, variantes, estadísticas, inventario, visor y sincronización siguen compartiendo el motor común y no se especializan por este tema.
@@ -1456,7 +1456,7 @@ Contrato de regresión: el rediseño de biblioteca es exclusivamente de presenta
 # 40. BUILD 704.14.21 — COLECCIONES JERÁRQUICAS + BUSCADOR 151
 
 ## Pokémon 151
-El buscador del tema 151 debe quedar completamente integrado en su identidad clara. No puede reaparecer el fondo/cápsula negra del tema Pokémon genérico alrededor del campo de búsqueda. La regla específica de 151 tiene prioridad sobre `.collection-theme-pokemon .search-wrap`.
+El buscador del tema 151 debe quedar completamente integrado en su identidad clara. No puede reaparecer el negro del tema Pokémon genérico alrededor del campo de búsqueda. El contenedor estructural exterior se conserva en turquesa/perla translúcido y la regla específica de 151 tiene prioridad sobre el tema Pokémon general.
 
 ## Colecciones / jerarquía de biblioteca
 La pestaña Colecciones conserva la galería visual de portadas de 704.14.20, pero esa galería se muestra dentro de una jerarquía de acordeones para evitar scrolls largos y preparar nuevas familias futuras.
@@ -1480,3 +1480,17 @@ Contrato de regresión:
 ## 704.14.21
 - Corregido fondo negro residual del buscador de 151.
 - Biblioteca reorganizada en acordeones `Football Cards` / `Pokémon TCG`, con subacordeones únicamente para familias de fútbol.
+
+# 41. BUILD 704.14.22 — CONTENEDOR DEL BUSCADOR 151 EN TURQUESA
+
+## Pokémon 151
+La cápsula estructural exterior que rodea el campo de búsqueda se conserva porque forma parte del espaciado/composición del encabezado, pero en 151 nunca debe usar el negro heredado del tema Pokémon genérico.
+
+Contrato visual actualizado de 151:
+- el contenedor exterior del buscador usa turquesa/perla translúcido integrado con el degradado general;
+- el campo interior sigue siendo blanco con borde turquesa fino;
+- no debe existir ninguna superficie negra alrededor del buscador en 151;
+- esta excepción es exclusivamente visual y no altera el buscador, sugerencias, filtros ni su comportamiento.
+
+## Colecciones
+La jerarquía `Football Cards` / `Pokémon TCG` de 704.14.21 queda sin cambios y continúa siendo la referencia vigente.

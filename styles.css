@@ -8460,3 +8460,24 @@ body.collection-theme-pokemon.pokemon-theme-151 .search-icon{color:#7d9295!impor
  .collection-library-folder-body{padding-left:8px;padding-right:8px}
  .collection-library-folder.level-2 .collection-library-folder-body{padding-left:6px;padding-right:6px}
 }
+
+/* Build 704.14.22 · 151 contenedor del buscador integrado en turquesa */
+body.collection-theme-pokemon.pokemon-theme-151 .app-header,
+body.main-tab-collection.collection-theme-pokemon.pokemon-theme-151 .app-header{
+  background:
+    linear-gradient(135deg,rgba(216,247,243,.94) 0%,rgba(232,250,248,.92) 55%,rgba(205,242,238,.90) 100%)!important;
+}
+body.collection-theme-pokemon.pokemon-theme-151 .premium-search,
+body.main-tab-collection.collection-theme-pokemon.pokemon-theme-151 .premium-search{
+  background:rgba(202,241,237,.58)!important;
+  border:1px solid rgba(10,167,162,.18)!important;
+  border-radius:28px!important;
+  padding:10px!important;
+  box-shadow:0 8px 24px rgba(34,121,119,.055)!important;
+}
+body.collection-theme-pokemon.pokemon-theme-151 .search-wrap,
+body.main-tab-collection.collection-theme-pokemon.pokemon-theme-151 .search-wrap{
+  background:rgba(255,255,255,.96)!important;
+  border:1px solid rgba(10,167,162,.42)!important;
+  box-shadow:0 6px 18px rgba(34,121,119,.065)!important;
+}
