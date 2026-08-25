@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.18";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.19";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3228,7 +3228,7 @@ function renderCollections(){
       const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
       const pokemonDef=isPokemon?POKEMON_SET_DEFS[ptype]:null;
       const pokemonTotal=isPokemon?Object.values(p.inventory||{}).reduce((n,cards)=>n+Object.keys(cards||{}).length,0):0;
-      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":295};
+      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271};
       const pokemonThumb=isPokemon?pokemonDirectImageUrl(ptype,pokemonLibraryChase[ptype]||1,"small"):"";
       return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${isPokemon?`pokemon-library-card pokemon-library-${ptype.replace(/^pokemon-/,'')}`:''} ${active?"active":""}" data-collection-id="${p.id}">
        <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">

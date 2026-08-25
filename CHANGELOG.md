@@ -393,3 +393,7 @@
 ## 704.13.5
 - Identidad visual independiente para Pitch Black, Chaos Rising, Perfect Order y Surging Sparks.
 - Chaos Rising combina azul eléctrico y magenta; Perfect Order prioriza verde; Surging Sparks usa amarillo/naranja; Pitch Black conserva negro/dorado.
+
+## 704.14.19
+- Pokémon 151: tema claro completo y continuo aprobado; elimina superficies oscuras heredadas y franjas visuales discordantes en acordeones y navegación.
+- Ascended Heroes: la portada de la colección pasa a usar Mega Dragonite ex #271.

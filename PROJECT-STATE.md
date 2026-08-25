@@ -146,6 +146,9 @@ Cada expansión usa una carta representativa como portada:
 2. Chaos Rising → Mega Greninja ex #116/086
 3. Perfect Order → Meowth ex #121/088
 4. Surging Sparks → Pikachu ex #219/191
+5. 151 → Mew ex #205/165
+6. Phantasmal Flames → Mega Charizard X ex #125/094
+7. Ascended Heroes → Mega Dragonite ex #295/217
 
 No sustituir estas portadas salvo petición expresa.
 
@@ -195,6 +198,9 @@ Colecciones actuales:
 2. Chaos Rising
 3. Perfect Order
 4. Surging Sparks
+5. 151
+6. Phantasmal Flames
+7. Ascended Heroes
 
 ## 7.1 Pitch Black
 - Serie: Mega Evolution
@@ -217,7 +223,26 @@ Colecciones actuales:
 - Código: SV08
 - Tema visual: negro + amarillo/naranja eléctrico.
 
-## 7.5 Estructura de cartas Pokémon
+## 7.5 151
+- Serie: Scarlet & Violet.
+- Set ID: `sv3pt5`.
+- Tema visual: blanco/perla + turquesa, inspirado en la ETB.
+- Base numerada: 001–165. Total numerado: 207.
+
+## 7.6 Phantasmal Flames
+- Serie: Mega Evolution.
+- Código visual: ME02. Set ID: `me2`.
+- Tema visual: negro/azul noche + cian eléctrico + violeta.
+- Base: 001–094. Total: 130.
+
+## 7.7 Ascended Heroes
+- Serie: Mega Evolution.
+- Código visual: ME2.5. Set ID: `me2pt5`.
+- Tema visual: petróleo/turquesa + amarillo + magenta.
+- Base jugable previa a rarezas especiales: 001–216. Total numerado: 295.
+- Incluye apartado propio `MEGA ATTACK RARE` 264–270.
+
+## 7.8 Estructura de cartas Pokémon
 
 La colección debe organizarse en acordeones/categorías, no en una cuadrícula simple.
 
@@ -1036,10 +1061,10 @@ El formulario de traspaso deja de depender del submit nativo de un `<form method
 
 # 31. PWA, CACHÉ Y VERSIONADO
 
-En 704.14.14:
-- `version.json` = `704.14.14`.
-- `app-config.js` = `704.14.14`.
-- caché = `wc26-build-704-14-14`.
+En 704.14.15:
+- `version.json` = `704.14.15`.
+- `app-config.js` = `704.14.15`.
+- caché = `wc26-build-704-14-15`.
 - `app.js` obtiene `APP_VERSION` desde `WC26_CONFIG`.
 
 `service-worker.js` usa:
@@ -1067,6 +1092,9 @@ Tipos definidos:
 - `pokemon-chaos-rising`
 - `pokemon-perfect-order`
 - `pokemon-surging-sparks`
+- `pokemon-151`
+- `pokemon-phantasmal-flames`
+- `pokemon-ascended-heroes`
 
 ## Pitch Black — ME05
 - Base oficial: 84.
@@ -1283,7 +1311,7 @@ Priorizar siempre cambios pequeños, verificables y reversibles.
 
 ---
 
-FIN DEL PROJECT STATE MAESTRO — BUILD DE REFERENCIA 704.14.13
+FIN DEL PROJECT STATE MAESTRO — BUILD DE REFERENCIA 704.14.16
 
 ---
 
@@ -1330,3 +1358,71 @@ Si cualquiera de esos pasos falla, se restauran origen y destino desde los clone
 - Backups automáticos limitados/podados de forma segura y con fallback de inventario.
 - Fingerprint local/nube normalizado simétricamente y baseline fijado después de completar la aplicación real del payload cloud.
 - Traspaso verificado contra persistencia exacta y con rollback ante fallo.
+
+
+# 35. CORRECCIÓN 704.14.15 — LIGA ESTE / ELCHE CF Nº 02
+
+En Liga Este 2026/27, únicamente la referencia **02 del Elche CF** se considera actualmente pendiente. Su información maestra es `Pendiente / Pendiente`, por lo que reutiliza el mecanismo general `isPendingCollectionItemForProject()` y queda excluida del cálculo de faltantes, progreso y estadísticas que ya ignoran referencias pendientes.
+
+Contrato de regresión:
+- no convertir a pendiente el nº 02 del resto de clubes;
+- no aplicar esta excepción a apartados especiales de Liga Este;
+- no aplicar esta excepción a Megacracks;
+- no alterar cantidades de inventario existentes por este cambio de checklist.
+
+## 704.14.15
+- Elche CF nº 02: `Eder Saravia / Entrenador` → `Pendiente / Pendiente`.
+- La referencia deja de contar en las estadísticas de Liga Este mediante el mecanismo de pendientes ya existente.
+
+
+# 36. AJUSTE 704.14.16 — DENSIDAD VISUAL LIGA ESTE / MEGACRACKS
+
+En Liga Este 2026/27 y Megacracks 2026/27 la vista principal conserva el diseño premium, pero las tarjetas de clubes y las filas de cromos se compactan para reducir scroll vertical, especialmente en iPhone/PWA.
+
+Contrato visual:
+- las tarjetas de club usan menos altura, padding y separación vertical;
+- escudo, nombre, estado y chevron siguen siendo claramente legibles;
+- las filas de jugadores/cromos reducen altura y padding sin convertir los botones −/+ en objetivos táctiles pequeños;
+- el cambio es específico de Liga Este/Megacracks y no debe propagarse a Pokémon ni World Cup;
+- no se modifica ninguna lógica de inventario, estadísticas, filtros, Supabase o navegación.
+
+Intercambio manual:
+- el stock actual es información primaria y debe mostrarse en un bloque propio dentro de la zona de STOCK;
+- los botones −1/+1 representan únicamente lo que se prepara para dar/recibir;
+- no volver a esconder el stock como texto secundario en la línea de posición del jugador.
+
+## 704.14.16
+- Compactación de tarjetas de clubes y filas de cromos en Liga Este/Megacracks.
+- Stock actual destacado junto a controles de intercambio manual.
+- Sin cambios de datos ni comportamiento funcional.
+
+
+## Build 704.14.17 — ampliación Pokémon
+- Se añaden 151, Phantasmal Flames y Ascended Heroes como álbumes Pokémon nativos, no como proyectos genéricos.
+- Las instalaciones existentes reciben únicamente los proyectos que falten mediante la migración aditiva `stickerbase.pokemon.collections.v2`; no se reinicializan inventarios existentes.
+- Fuentes de metadata: PokemonTCG/pokemon-tcg-data; imágenes mantienen el proveedor Scrydex ya usado por StickerBase.
+- Rangos: 151 BASE 001–165, IR 166–181, UR 182–197, SIR 198–204, Hyper Rare 205–207. Phantasmal Flames BASE 001–094, IR 095–107, UR 108–124, SIR 125–129, Mega Hyper Rare 130. Ascended Heroes BASE 001–216, IR 217–249, UR 250–263, Mega Attack Rare 264–270, SIR 271–292, Mega Hyper Rare 293–295.
+- Las tres identidades visuales aprobadas deben conservar la misma UX/arquitectura de los demás álbumes Pokémon; solo cambia el tema visual.
+
+
+# 38. CORRECCIÓN 704.14.18 — CREAR NUEVO ÁLBUM / POKÉMON
+
+El flujo **Crear nuevo proyecto / Crear nuevo álbum** debe exponer todas las colecciones que StickerBase soporta de forma nativa. Desde 704.14.18 el selector incluye World Cup 2026, Liga Este 2026/27, Megacracks 2026/27 y las siete expansiones Pokémon disponibles: Pitch Black, Chaos Rising, Perfect Order, Surging Sparks, 151, Phantasmal Flames y Ascended Heroes.
+
+Contrato funcional:
+- una colección Pokémon creada desde este diálogo debe usar `collectionInventoryTemplate(type)` y `seedTypeForCollection(type)` igual que los proyectos Pokémon iniciales;
+- debe conservar la UX Pokémon completa: checklist/rangos, variantes Base Set, estadísticas, buscador, visor, metadata e identidad visual del tipo elegido;
+- las fuentes de repetidas solo pueden proceder de otro proyecto del mismo `collectionType`;
+- el objetivo inicial al seleccionar Pokémon es 1; Panini mantiene 2 como valor inicial del diálogo;
+- añadir una nueva colección Pokémon a `POKEMON_SET_DEFS`/`COLLECTION_DEFINITIONS` exige revisar también este selector para que pueda crearse manualmente;
+- el selector debe ser desplazable en móvil para no crecer fuera de la pantalla.
+
+## 704.14.18
+- Reparada la omisión de Pokémon en «Crear nuevo álbum».
+- Incluidas las 7 expansiones Pokémon actualmente soportadas.
+- Sin cambios en inventarios existentes ni en Supabase.
+
+### Build 704.14.19 — identidad visual 151 y portada Ascended Heroes
+- Pokémon 151 usa un tema claro integral inspirado en su ETB: fondo perla continuo, tarjetas/acordeones blancos, turquesa como acento, filas claras y navegación inferior clara. No deben reaparecer superficies negras heredadas del tema Pokémon genérico ni franjas blancas aisladas entre bloques.
+- Este cambio es exclusivamente visual: no altera checklist, variantes, inventario, buscador, estadísticas, visor ni sincronización Pokémon.
+- En la biblioteca de Colecciones, Ascended Heroes usa Mega Dragonite ex #271 como carta de portada/chase visual.
