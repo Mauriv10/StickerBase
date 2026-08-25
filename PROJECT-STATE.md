@@ -1516,3 +1516,13 @@ Al pulsar rápidamente varias veces `+` o `−` (especialmente en Liga Este/Mega
 - mostrar `Hay dos inventarios diferentes` como consecuencia de su propia escritura anterior.
 
 Esta protección afecta al motor común de persistencia y debe mantenerse para Mundial, Liga Este, Megacracks y Pokémon.
+
+
+# 43. BUILD 704.14.24 — PORTADAS OFICIALES EN COLECCIONES
+
+En la cuadrícula visual de la pestaña `Colecciones`, las familias de fútbol usan assets locales específicos de biblioteca:
+- Mundial 2026: portada oficial multicolor con trofeo (`world-cup-2026-library.webp`).
+- Liga Este 2026/27: portada oficial del álbum (`liga-este-2026-27-library.webp`).
+- Megacracks 2026/27: portada oficial 25 aniversario (`megacracks-2026-27-library.webp`).
+
+Estas imágenes son exclusivas de la vista de Colecciones. No sustituir con ellas las imágenes de cabecera internas salvo petición expresa. Mantenerlas locales para funcionamiento PWA/offline y evitar dependencias de URLs externas.

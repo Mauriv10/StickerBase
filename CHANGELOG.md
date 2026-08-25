@@ -1,3 +1,10 @@
+# Build 704.14.24
+
+- Colecciones: sustituidas las portadas de biblioteca de Mundial 2026, Liga Este 2026/27 y Megacracks 2026/27 por las imágenes oficiales aprobadas por el usuario.
+- Las tres imágenes se almacenan como assets locales WebP y no dependen de URLs externas.
+- El cambio afecta únicamente a las tarjetas de la pestaña Colecciones; las cabeceras internas de los proyectos permanecen intactas.
+- Sin cambios en inventarios, checklists, sincronización, orden ni lógica de proyectos.
+
 # Build 704.14.23
 
 - Sincronización: corregida una condición de carrera al añadir/restar cromos rápidamente mientras una subida a Supabase ya estaba en curso.

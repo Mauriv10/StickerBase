@@ -3257,7 +3257,7 @@ function renderCollections(){
  const football=items.filter(p=>!isPokemonCollectionType(inferCollectionType(p)));
  const pokemon=items.filter(p=>isPokemonCollectionType(inferCollectionType(p)));
  const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271};
- const footballCover={"world-cup-2026":"assets/icons/world-cup-2026-512-v522.png","liga-este-2026-27":"assets/collection-covers/liga-este-2026-27.jpg","megacracks-2026-27":"assets/collection-covers/megacracks-2026-27.webp"};
+ const footballCover={"world-cup-2026":"assets/collection-covers/world-cup-2026-library.webp","liga-este-2026-27":"assets/collection-covers/liga-este-2026-27-library.webp","megacracks-2026-27":"assets/collection-covers/megacracks-2026-27-library.webp"};
  const renderCard=(p)=>{
    const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
    const sameTypeItems=items.filter(item=>inferCollectionType(item)===ptype),index=sameTypeItems.findIndex(item=>item.id===p.id);
