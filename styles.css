@@ -8326,3 +8326,90 @@ body.pokemon-theme-151 .pokemon-fixed-badge{background:#f3eafa!important;border-
 body.pokemon-theme-151 .bottom-app-nav{background:rgba(250,253,252,.98)!important;border-top:1px solid #dce7e6!important;box-shadow:0 -5px 18px rgba(24,73,75,.06)!important;backdrop-filter:blur(16px)!important}
 body.pokemon-theme-151 .bottom-nav-button{color:#52696b!important;background:transparent!important}body.pokemon-theme-151 .bottom-nav-button.active,body.pokemon-theme-151 .bottom-nav-button.active .bottom-nav-icon{color:#079a96!important}
 body.pokemon-theme-151 .bottom-nav-button.active .bottom-nav-icon{filter:drop-shadow(0 0 6px rgba(10,167,162,.18))!important}
+
+/* Build 704.14.20 · 151 degradado turquesa + biblioteca visual de colecciones */
+body.pokemon-theme-151,
+body.pokemon-theme-151 .app-shell,
+body.pokemon-theme-151 #appShell,
+body.pokemon-theme-151 .app-scroll,
+body.pokemon-theme-151 #appScroll,
+body.pokemon-theme-151 .app-main,
+body.pokemon-theme-151 .main-content,
+body.pokemon-theme-151 .collection-view{
+  background:
+    radial-gradient(circle at 8% 38%,rgba(122,224,216,.24),transparent 34%),
+    radial-gradient(circle at 92% 58%,rgba(91,208,202,.18),transparent 32%),
+    linear-gradient(180deg,#fbfdfd 0%,#effaf8 46%,#e3f7f4 100%)!important;
+  color:#173b3d!important;
+}
+body.pokemon-theme-151 .app-main{padding-left:10px!important;padding-right:10px!important}
+body.pokemon-theme-151 .premium-search{background:transparent!important;padding:0!important}
+body.pokemon-theme-151 .search-wrap{
+  background:rgba(255,255,255,.94)!important;
+  border:1px solid rgba(10,167,162,.48)!important;
+  box-shadow:0 8px 25px rgba(34,121,119,.08)!important;
+}
+body.pokemon-theme-151 .pokemon-dashboard,
+body.pokemon-theme-151 .pokemon-accordion{
+  background:rgba(255,255,255,.94)!important;
+  box-shadow:0 8px 24px rgba(34,121,119,.075)!important;
+}
+body.pokemon-theme-151 #globalCollectionList{background:transparent!important}
+body.pokemon-theme-151 .pokemon-section-toggle,
+body.pokemon-theme-151 .pokemon-section-progress,
+body.pokemon-theme-151 .pokemon-section-body,
+body.pokemon-theme-151 .pokemon-card-row{background:rgba(255,255,255,.96)!important}
+body.pokemon-theme-151 .bottom-app-nav{background:rgba(252,254,254,.96)!important}
+
+/* Colecciones · galería compacta aprobada */
+body.main-tab-collections .app-main,
+body.main-tab-collections .app-scroll,
+body.main-tab-collections #appScroll{background:#f8fbfc!important;color:#102f33!important}
+.collection-gallery-v2{padding:14px 14px 112px!important;max-width:940px;margin:0 auto;width:100%;box-sizing:border-box}
+.collection-gallery-v2 .clean-collections-header{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin:0 0 18px!important;padding:2px 2px 7px!important}
+.collection-gallery-v2 .collections-eyebrow{display:none!important}
+.collection-gallery-v2 .clean-collections-header h2{margin:0!important;text-transform:uppercase;font-size:25px!important;letter-spacing:-.035em!important;color:#0e3034!important}
+.collection-gallery-v2 .clean-collections-header:after{display:none!important}
+.collection-gallery-v2 .create-collection-library-button{width:44px!important;height:44px!important;min-height:44px!important;min-width:44px!important;padding:0!important;border-radius:14px!important;border:1px solid #cde7e6!important;background:#fff!important;color:#079b97!important;display:grid!important;place-items:center!important;font-size:25px!important;font-weight:700!important;box-shadow:0 5px 16px rgba(25,90,92,.07)!important}
+.collection-gallery-v2 .collections-grid{display:grid!important;gap:22px!important}
+.collection-gallery-section{display:grid;gap:10px}
+.collection-gallery-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:0 2px}
+.collection-gallery-heading strong{font-size:12px;letter-spacing:.13em;color:#079b97;font-weight:950}
+.collection-gallery-heading span{font-size:10px;color:#849496;font-weight:700}
+.collection-gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:12px}
+.collection-gallery-card{position:relative;min-width:0;border-radius:17px;background:#fff;border:1px solid #dde8e8;box-shadow:0 7px 20px rgba(28,67,72,.065);overflow:hidden;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}
+.collection-gallery-card.active{border-color:#18aaa6;box-shadow:0 0 0 2px rgba(24,170,166,.13),0 8px 22px rgba(28,67,72,.08)}
+.collection-gallery-open{width:100%;border:0;background:transparent;color:inherit;padding:0 0 11px;text-align:center;display:grid;grid-template-rows:auto auto auto;min-width:0}
+.collection-gallery-open:active{transform:scale(.985)}
+.collection-gallery-cover{position:relative;width:100%;aspect-ratio:1.04/1;overflow:hidden;background:linear-gradient(145deg,#edf5f5,#f9fbfb);display:grid;place-items:center;border-bottom:1px solid #edf2f2}
+.collection-gallery-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.collection-gallery-football .collection-gallery-cover img{object-fit:contain;padding:7px;box-sizing:border-box;background:linear-gradient(145deg,#f7f9fa,#eef4f4)}
+.collection-gallery-name{display:block;margin:9px 7px 0;font-size:11px;line-height:1.12;font-weight:950;color:#122e32;text-transform:uppercase;min-height:25px;overflow:hidden}
+.collection-gallery-meta{display:block;margin:2px 6px 0;font-size:9.5px;line-height:1.15;color:#738285;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.collection-gallery-active{position:absolute;left:7px;top:7px;padding:4px 7px;border-radius:999px;background:rgba(6,153,149,.90);color:#fff;font-size:7.5px;font-weight:950;letter-spacing:.04em;z-index:2;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+.collection-gallery-actions{position:absolute;right:5px;top:5px;z-index:3;display:flex;gap:3px;padding:3px;border-radius:10px;background:rgba(7,20,23,.54);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.collection-gallery-actions button{width:24px;height:24px;padding:0;border:0;border-radius:7px;background:rgba(255,255,255,.92);color:#31575a;font-size:14px;line-height:1;font-weight:900;display:grid;place-items:center}
+.collection-gallery-actions button:last-child{font-size:9px;letter-spacing:-.08em}
+.collection-gallery-actions button:disabled{opacity:.32}
+.collection-gallery-pokemon{--gallery-accent:#0aa7a2}
+.collection-gallery-card.pokemon-library-pitch-black{--gallery-accent:#d6a000}.collection-gallery-card.pokemon-library-chaos-rising{--gallery-accent:#1bbce8}.collection-gallery-card.pokemon-library-perfect-order{--gallery-accent:#74be3d}.collection-gallery-card.pokemon-library-surging-sparks{--gallery-accent:#f5a000}.collection-gallery-card.pokemon-library-151{--gallery-accent:#0aa7a2}.collection-gallery-card.pokemon-library-phantasmal-flames{--gallery-accent:#168cff}.collection-gallery-card.pokemon-library-ascended-heroes{--gallery-accent:#00aaa8}
+.collection-gallery-pokemon .collection-gallery-cover{border-bottom:2px solid color-mix(in srgb,var(--gallery-accent) 58%,#dfe8e8)}
+.collection-gallery-pokemon .collection-gallery-cover img{object-fit:cover;transform:scale(1.025);filter:saturate(1.07) contrast(1.02)}
+@media(max-width:650px){
+ .collection-gallery-v2{padding-left:10px!important;padding-right:10px!important}
+ .collection-gallery-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .collection-gallery-card{border-radius:13px}
+ .collection-gallery-name{font-size:9.6px;margin-left:4px;margin-right:4px;min-height:22px}
+ .collection-gallery-meta{font-size:8.5px}
+ .collection-gallery-actions{right:3px;top:3px;gap:2px;padding:2px}
+ .collection-gallery-actions button{width:20px;height:20px;font-size:12px;border-radius:6px}
+ .collection-gallery-actions button:last-child{font-size:7.5px}
+ .collection-gallery-active{left:4px;top:4px;font-size:6.5px;padding:3px 5px}
+}
+body.main-tab-collections,
+body.main-tab-collections .app-shell,
+body.main-tab-collections #appShell{background:#f8fbfc!important;color:#102f33!important}
+body.main-tab-collections .bottom-app-nav{background:rgba(252,254,254,.98)!important;border-top:1px solid #dce8e8!important;box-shadow:0 -5px 18px rgba(28,67,72,.06)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important}
+body.main-tab-collections .bottom-nav-button{background:transparent!important;color:#5f7477!important}
+body.main-tab-collections .bottom-nav-button.active,body.main-tab-collections .bottom-nav-button.active .bottom-nav-icon{color:#079b97!important}
+.collection-gallery-actions button:disabled{display:none!important}

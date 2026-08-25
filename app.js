@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.19";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.20";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3212,49 +3212,34 @@ function setCollectionFolderOpen(type,isOpen){
 function renderCollections(){
  const list=$("#collectionsList");if(!list)return;
  const items=orderedProjects();
- const groups=collectionLibraryGroups().map(group=>({...group,items:items.filter(group.match)})).filter(group=>group.items.length);
- list.innerHTML=groups.map(group=>{
-   const activeInside=group.items.some(p=>p.id===activeProjectId);
-   const folderOpen=collectionFolderIsOpen(group.type);
-   return `<section class="collection-folder collection-folder-${group.theme} ${activeInside?"active":""} ${folderOpen?"":"collapsed"}" data-collection-folder="${group.type}">
-    <button type="button" class="collection-folder-header" data-toggle-collection-folder="${group.type}" aria-expanded="${folderOpen}">
-      <span class="collection-folder-icon">${group.short}</span>
-      <span class="collection-folder-copy"><strong>${collectionSafeText(group.label)}</strong><small>${group.items.length} ${group.items.length===1?"álbum":"álbumes"}</small></span>
-      ${activeInside?'<span class="collection-folder-active">Activa</span>':''}
-      <span class="collection-folder-chevron">⌄</span>
+ const football=items.filter(p=>!isPokemonCollectionType(inferCollectionType(p)));
+ const pokemon=items.filter(p=>isPokemonCollectionType(inferCollectionType(p)));
+ const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271};
+ const footballCover={"world-cup-2026":"assets/icons/world-cup-2026-512-v522.png","liga-este-2026-27":"assets/collection-covers/liga-este-2026-27.jpg","megacracks-2026-27":"assets/collection-covers/megacracks-2026-27.webp"};
+ const renderCard=(p)=>{
+   const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
+   const sameTypeItems=items.filter(item=>inferCollectionType(item)===ptype),index=sameTypeItems.findIndex(item=>item.id===p.id);
+   const pokemonTotal=isPokemon?Object.values(p.inventory||{}).reduce((n,cards)=>n+Object.keys(cards||{}).length,0):0;
+   const image=isPokemon?pokemonDirectImageUrl(ptype,chase[ptype]||1,"small"):(footballCover[ptype]||"");
+   const subtitle=isPokemon?`${s.progress}% · ${s.different}/${pokemonTotal}`:`${p.target} ${albumWord(p.target)} · ${s.progress}%`;
+   return `<article class="collection-gallery-card collection-gallery-${isPokemon?'pokemon':'football'} ${isPokemon?`pokemon-library-${ptype.replace(/^pokemon-/,'')}`:''} ${active?'active':''}" data-collection-id="${p.id}">
+    <button type="button" class="collection-gallery-open" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
+      <span class="collection-gallery-cover">${image?`<img src="${collectionSafeText(image)}" alt="" loading="lazy" decoding="async">`:`<span class="collection-gallery-fallback">${collectionSafeText(def.icon||'SB')}</span>`}</span>
+      <span class="collection-gallery-name">${collectionSafeText(p.name)}</span>
+      <span class="collection-gallery-meta">${collectionSafeText(subtitle)}</span>
+      ${active?'<span class="collection-gallery-active">Activa</span>':''}
     </button>
-    <div class="collection-folder-body">
-    ${group.items.map((p,index)=>{
-      const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
-      const pokemonDef=isPokemon?POKEMON_SET_DEFS[ptype]:null;
-      const pokemonTotal=isPokemon?Object.values(p.inventory||{}).reduce((n,cards)=>n+Object.keys(cards||{}).length,0):0;
-      const pokemonLibraryChase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271};
-      const pokemonThumb=isPokemon?pokemonDirectImageUrl(ptype,pokemonLibraryChase[ptype]||1,"small"):"";
-      return `<article class="collection-library-card clean-library-card collection-card-${def.theme} ${isPokemon?`pokemon-library-card pokemon-library-${ptype.replace(/^pokemon-/,'')}`:''} ${active?"active":""}" data-collection-id="${p.id}">
-       <button type="button" class="collection-card-main" data-open-collection="${p.id}" aria-label="Abrir ${collectionSafeText(p.name)}">
-        ${isPokemon?`<div class="pokemon-library-cover" aria-hidden="true">${pokemonThumb?`<img src="${collectionSafeText(pokemonThumb)}" alt="" loading="lazy">`:''}<span>${collectionSafeText(p.name)}</span></div>`:`<div class="collection-album-icon" aria-hidden="true"><span>${def.icon}</span></div>`}
-        <div class="collection-library-copy">
-         <div class="collection-title-line"><h3>${collectionSafeText(p.name)}</h3>${active?'<span class="collection-active-badge">Activa</span>':''}</div>
-         ${isPokemon?`<span class="pokemon-library-subtitle">${collectionSafeText(def.subtitle||'Pokémon TCG')}</span><span class="collection-brief">${s.progress}% completado · ${s.different}/${pokemonTotal} cartas</span>`:`<span class="collection-brief">${s.progress}% completado · Objetivo ${p.target} ${albumWord(p.target)}</span>`}
-         <div class="collection-progress-track"><div class="collection-progress-fill" style="width:${s.progress}%"></div></div>
-        </div>
-       </button>
-       <div class="collection-card-order" aria-label="Ordenar ${collectionSafeText(p.name)}">
-        <button type="button" data-move-collection="${p.id}" data-direction="-1" aria-label="Subir ${collectionSafeText(p.name)}" ${index===0?"disabled":""}>↑</button>
-        <button type="button" data-move-collection="${p.id}" data-direction="1" aria-label="Bajar ${collectionSafeText(p.name)}" ${index===group.items.length-1?"disabled":""}>↓</button>
-       </div>
-       <button type="button" class="collection-card-menu" data-edit-collection="${p.id}" aria-label="Editar ${collectionSafeText(p.name)}">•••</button>
-      </article>`;
-    }).join("")}
+    <div class="collection-gallery-actions" aria-label="Opciones de ${collectionSafeText(p.name)}">
+      <button type="button" data-move-collection="${p.id}" data-direction="-1" aria-label="Mover ${collectionSafeText(p.name)} a la izquierda" ${index===0?'disabled':''}>‹</button>
+      <button type="button" data-move-collection="${p.id}" data-direction="1" aria-label="Mover ${collectionSafeText(p.name)} a la derecha" ${index===sameTypeItems.length-1?'disabled':''}>›</button>
+      <button type="button" data-edit-collection="${p.id}" aria-label="Editar ${collectionSafeText(p.name)}">•••</button>
     </div>
-   </section>`;
- }).join("");
- list.querySelectorAll("[data-toggle-collection-folder]").forEach(button=>button.onclick=()=>{
-   const folder=button.closest(".collection-folder"),body=folder?.querySelector(".collection-folder-body");if(!folder||!body)return;
-   const collapsed=folder.classList.toggle("collapsed"),isOpen=!collapsed;
-   button.setAttribute("aria-expanded",String(isOpen));
-   setCollectionFolderOpen(folder.dataset.collectionFolder,isOpen);
- });
+   </article>`;
+ };
+ const sections=[];
+ if(football.length)sections.push(`<section class="collection-gallery-section collection-gallery-section-football"><div class="collection-gallery-heading"><strong>FÚTBOL</strong><span>${football.length} ${football.length===1?'álbum':'álbumes'}</span></div><div class="collection-gallery-grid">${football.map(p=>renderCard(p)).join('')}</div></section>`);
+ if(pokemon.length)sections.push(`<section class="collection-gallery-section collection-gallery-section-pokemon"><div class="collection-gallery-heading"><strong>POKÉMON TCG</strong><span>${pokemon.length} ${pokemon.length===1?'álbum':'álbumes'}</span></div><div class="collection-gallery-grid">${pokemon.map(p=>renderCard(p)).join('')}</div></section>`);
+ list.innerHTML=sections.join('');
  list.querySelectorAll("[data-open-collection]").forEach(button=>button.onclick=()=>{
    const id=button.dataset.openCollection;
    if(id!==activeProjectId)switchProject(id);
@@ -3264,28 +3249,10 @@ function renderCollections(){
    event.stopPropagation();openEditCollection(button.dataset.editCollection);
  });
  list.querySelectorAll("[data-move-collection]").forEach(button=>button.onclick=event=>{
-   event.stopPropagation();moveCollectionInLibrary(button.dataset.moveCollection,Number(button.dataset.direction));
+   event.stopPropagation();moveCollectionInLibrary(button.dataset.moveCollection,Number(button.dataset.direction)||0);
  });
 }
 
-function moveCollectionInLibrary(id,direction){
- if(!id||![1,-1].includes(direction))return;
- const currentProject=projects[id];if(!currentProject)return;
- const type=inferCollectionType(currentProject);
- const ordered=orderedProjects().filter(project=>inferCollectionType(project)===type);
- const index=ordered.findIndex(project=>project.id===id);
- const target=index+direction;
- if(index<0||target<0||target>=ordered.length)return;
- const current=ordered[index],other=ordered[target];
- const currentOrder=current.collectionOrder;
- current.collectionOrder=other.collectionOrder;
- other.collectionOrder=currentOrder;
- persistProjects();
- renderCollections();
- renderProjectsList();
- navigator.vibrate?.(15);
- showToast(direction<0?"Colección movida hacia arriba":"Colección movida hacia abajo");
-}
 function openEditCollection(id){
  const p=projects[id],dialog=$("#editCollectionDialog");if(!p||!dialog)return;
  $("#editCollectionId").value=id;

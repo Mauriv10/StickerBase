@@ -1426,3 +1426,28 @@ Contrato funcional:
 - Pokémon 151 usa un tema claro integral inspirado en su ETB: fondo perla continuo, tarjetas/acordeones blancos, turquesa como acento, filas claras y navegación inferior clara. No deben reaparecer superficies negras heredadas del tema Pokémon genérico ni franjas blancas aisladas entre bloques.
 - Este cambio es exclusivamente visual: no altera checklist, variantes, inventario, buscador, estadísticas, visor ni sincronización Pokémon.
 - En la biblioteca de Colecciones, Ascended Heroes usa Mega Dragonite ex #271 como carta de portada/chase visual.
+
+# 39. BUILD 704.14.20 — 151 DEGRADADO TURQUESA + GALERÍA DE COLECCIONES
+
+## Pokémon 151
+La identidad clara de 151 se consolida con un fondo continuo perla/turquesa. La zona central de la vista de cromos no puede recuperar el fondo negro heredado del tema Pokémon genérico ni una cápsula oscura alrededor del buscador.
+
+Contrato visual de 151:
+- fondo de cabecera, contenido y zona previa a la navegación visualmente continuo;
+- degradado muy suave desde blanco/perla hacia turquesa claro detrás de estadísticas y acordeones;
+- buscador blanco independiente con borde turquesa, sin contenedor negro exterior;
+- acordeones y filas blancos/translúcidos sobre el degradado;
+- barra inferior clara;
+- la lógica Pokémon, checklist, variantes, estadísticas, inventario, visor y sincronización siguen compartiendo el motor común y no se especializan por este tema.
+
+## Biblioteca / Colecciones
+La pestaña Colecciones adopta una galería visual compacta inspirada en portadas:
+- secciones `FÚTBOL` y `POKÉMON TCG`;
+- tarjetas en cuadrícula de tres columnas en móvil y auto-grid en pantallas mayores;
+- cada tarjeta prioriza portada, nombre y resumen breve del álbum;
+- las colecciones Pokémon usan su carta chase configurada como portada; Ascended Heroes usa específicamente Mega Dragonite ex #271;
+- Liga Este y Megacracks usan las portadas locales ya incluidas en `assets/collection-covers/`; World Cup usa su icono oficial local;
+- abrir, editar y reordenar colecciones sigue disponible desde cada tarjeta mediante controles superpuestos discretos;
+- crear nueva colección se conserva como botón `+` compacto en la cabecera.
+
+Contrato de regresión: el rediseño de biblioteca es exclusivamente de presentación. No debe cambiar `projects`, orden persistido, inventarios, targets, Supabase ni las reglas de creación/duplicado/traspaso.

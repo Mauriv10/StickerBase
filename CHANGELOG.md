@@ -397,3 +397,10 @@
 ## 704.14.19
 - Pokémon 151: tema claro completo y continuo aprobado; elimina superficies oscuras heredadas y franjas visuales discordantes en acordeones y navegación.
 - Ascended Heroes: la portada de la colección pasa a usar Mega Dragonite ex #271.
+
+## 704.14.20
+- Pokémon 151: el fondo central pasa a un degradado perla/turquesa continuo; desaparecen definitivamente el bloque negro residual y la cápsula oscura alrededor del buscador.
+- Colecciones: nueva biblioteca visual en formato galería, con tarjetas compactas de portada en cuadrícula y secciones FÚTBOL / POKÉMON TCG.
+- Se conservan abrir, editar y reordenar álbumes mediante controles discretos sobre cada tarjeta.
+- Ascended Heroes mantiene Mega Dragonite ex #271 como portada.
+- Sin cambios en checklists, inventarios, estadísticas, variantes ni sincronización.
