@@ -1,3 +1,11 @@
+# Build 704.14.26
+
+- Pokémon: las variantes del Base Set dejan de ser genéricas. Common/Uncommon muestran Normal + Reverse Holo; Rare muestran Holo + Reverse Holo; Pokémon ex y rarezas ocultas siguen como una única versión.
+- Ascended Heroes: los Pokémon no-ex muestran su tercera paralela real (Energy Reverse + Ball Reverse, o R Reverse para Team Rocket); Trainers/Energy conservan la reverse normal.
+- Ascended Heroes: corregido el checklist oficial a 217 cartas base / 295 totales y los rangos secretos, con migración conservadora de las referencias 217, 250, 264 y 293 para no perder inventario.
+- Añadida Pokémon First Partner: 27 promos MEP 037–063, organizadas en Series 1, 2 y 3, con una única versión Promo por carta.
+- Estadísticas Pokémon: denominadores por variante ahora cuentan solo las cartas realmente elegibles para cada acabado.
+
 # Build 704.14.25
 
 - Headers: Mundial 2026, Liga Este 2026/27 y Megacracks 2026/27 reutilizan las mismas portadas oficiales locales aprobadas para Colecciones.

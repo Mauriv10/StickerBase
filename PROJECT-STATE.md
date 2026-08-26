@@ -1533,3 +1533,25 @@ Estas imágenes son exclusivas de la vista de Colecciones. No sustituir con ella
 Las portadas locales oficiales usadas en la biblioteca de Colecciones para Mundial 2026, Liga Este 2026/27 y Megacracks 2026/27 se reutilizan también en el header de sus respectivos proyectos. Mundial conserva su composición clara/compacta; Liga Este y Megacracks conservan su header premium con estadísticas.
 
 En Megacracks, todos los acordeones especiales (ENJOY, ENJOY POWER y demás apartados definidos como especiales) deben mostrar en su subtítulo el total de cards y el estado `X pendientes` o `Completo`, usando el mismo criterio de objetivo/inventario que los clubes y excluyendo cualquier referencia marcada como `Pendiente`. No volver a dejar los especiales con solo `X cards`.
+
+
+# 45. BUILD 704.14.26 — VARIANTES POKÉMON REALES + FIRST PARTNER
+
+## Regla maestra de variantes del Base Set
+StickerBase NO debe volver a mostrar de forma genérica `Básica / Holo / Inverse Holo` para todas las cartas Pokémon. La UI depende de la rareza real:
+- Common / Uncommon: `Normal` + `Reverse Holo`.
+- Rare (single star / holo rare): `Holo` + `Reverse Holo`.
+- Pokémon ex / Double Rare y superiores: una única versión del checklist base.
+- Rarezas posteriores al número oficial (IR, UR, SIR, Hyper/Mega Hyper, etc.): una única versión.
+
+Ascended Heroes es una excepción: cada Pokémon no-ex del main set tiene, además de Normal/Holo según rareza, `Energy Reverse` y una segunda reverse de patrón de Ball; los Pokémon de Team Rocket usan `R Reverse` en lugar del patrón Ball. Trainers y Energy usan solo la reverse estándar. Las estadísticas deben calcular elegibilidad por variante; no usar como denominador todas las cartas base.
+
+## Ascended Heroes — checklist corregido
+El main set oficial es 217 y el total 295. Rangos: BASE 001–217; IR 218–250; UR 251–264; Mega Attack Rare 265–270; SIR 271–293; Mega Hyper Rare 294–295. La migración mueve de forma conservadora cualquier cantidad ya registrada en 217, 250, 264 y 293 al apartado correcto.
+
+## First Partner Illustration Collection
+Nueva colección Pokémon soportada: 27 promos MEP 037–063, una sola versión por carta, repartidas en tres acordeones:
+- Series 1 (037–045): Kanto, Sinnoh, Alola.
+- Series 2 (046–054): Johto, Unova, Galar.
+- Series 3 (055–063): Hoenn, Kalos, Paldea.
+Cada carta se trata como Promo · Illustration Rare fija, sin Normal/Holo/Reverse adicionales. Está disponible en Crear nuevo álbum y se añade a instalaciones existentes mediante la migración Pokémon v3 sin duplicar colecciones ya presentes.

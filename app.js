@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.21";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.26";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -16,7 +16,8 @@ const COLLECTION_DEFINITIONS={
   "pokemon-surging-sparks":{label:"POKÉMON · SURGING SPARKS",subtitle:"Scarlet & Violet · SV08",icon:"SS",theme:"pokemon"},
   "pokemon-151":{label:"POKÉMON · 151",subtitle:"Scarlet & Violet · 151",icon:"151",theme:"pokemon"},
   "pokemon-phantasmal-flames":{label:"POKÉMON · PHANTASMAL FLAMES",subtitle:"Mega Evolution · ME02",icon:"PF",theme:"pokemon"},
-  "pokemon-ascended-heroes":{label:"POKÉMON · ASCENDED HEROES",subtitle:"Mega Evolution · ME2.5",icon:"AH",theme:"pokemon"}
+  "pokemon-ascended-heroes":{label:"POKÉMON · ASCENDED HEROES",subtitle:"Mega Evolution · ME2.5",icon:"AH",theme:"pokemon"},
+  "pokemon-first-partner":{label:"POKÉMON · FIRST PARTNER",subtitle:"MEP Black Star Promos · 30th Anniversary",icon:"FP",theme:"pokemon"}
 };
 
 const POKEMON_SET_DEFS={
@@ -26,7 +27,12 @@ const POKEMON_SET_DEFS={
  "pokemon-surging-sparks":{name:"Surging Sparks",seedType:"pokemon-surging-sparks",setId:"sv8",official:191,total:252,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/sv8.json",ranges:[["BASE",1,191],["ILLUSTRATION RARE",192,214],["ULTRA RARE",215,235],["SPECIAL ILLUSTRATION RARE",236,246],["HYPER RARE",247,252]]},
  "pokemon-151":{name:"151",seedType:"pokemon-151",setId:"sv3pt5",official:165,total:207,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/sv3pt5.json",ranges:[["BASE",1,165],["ILLUSTRATION RARE",166,181],["ULTRA RARE",182,197],["SPECIAL ILLUSTRATION RARE",198,204],["HYPER RARE",205,207]]},
  "pokemon-phantasmal-flames":{name:"Phantasmal Flames",seedType:"pokemon-phantasmal-flames",setId:"me2",official:94,total:130,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me2.json",ranges:[["BASE",1,94],["ILLUSTRATION RARE",95,107],["ULTRA RARE",108,124],["SPECIAL ILLUSTRATION RARE",125,129],["MEGA HYPER RARE",130,130]]},
- "pokemon-ascended-heroes":{name:"Ascended Heroes",seedType:"pokemon-ascended-heroes",setId:"me2pt5",official:216,total:295,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me2pt5.json",ranges:[["BASE",1,216],["ILLUSTRATION RARE",217,249],["ULTRA RARE",250,263],["MEGA ATTACK RARE",264,270],["SPECIAL ILLUSTRATION RARE",271,292],["MEGA HYPER RARE",293,295]]}
+ "pokemon-ascended-heroes":{name:"Ascended Heroes",seedType:"pokemon-ascended-heroes",setId:"me2pt5",official:217,total:295,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me2pt5.json",ranges:[["BASE",1,217],["ILLUSTRATION RARE",218,250],["ULTRA RARE",251,264],["MEGA ATTACK RARE",265,270],["SPECIAL ILLUSTRATION RARE",271,293],["MEGA HYPER RARE",294,295]]},
+ "pokemon-first-partner":{name:"First Partner",seedType:"pokemon-first-partner",setId:"mep",imageProvider:"tcgdex-mep",official:27,total:27,ranges:[["SERIES 1",37,45],["SERIES 2",46,54],["SERIES 3",55,63]],staticCards:{
+  "037":"Bulbasaur","038":"Charmander","039":"Squirtle","040":"Turtwig","041":"Chimchar","042":"Piplup","043":"Rowlet","044":"Litten","045":"Popplio",
+  "046":"Chikorita","047":"Cyndaquil","048":"Totodile","049":"Snivy","050":"Tepig","051":"Oshawott","052":"Grookey","053":"Scorbunny","054":"Sobble",
+  "055":"Treecko","056":"Torchic","057":"Mudkip","058":"Chespin","059":"Fennekin","060":"Froakie","061":"Sprigatito","062":"Fuecoco","063":"Quaxly"
+ }}
 };
 function isPokemonCollectionType(type){return Boolean(POKEMON_SET_DEFS[type])}
 function pokemonCode(n){return String(n).padStart(3,"0")}
@@ -34,9 +40,9 @@ function pokemonInventoryTemplate(type){const def=POKEMON_SET_DEFS[type];if(!def
 function pokemonProjectMeta(project=projects?.[activeProjectId]){return project?.pokemonMeta||{}}
 function pokemonCardMeta(code,project=projects?.[activeProjectId]){return pokemonProjectMeta(project)?.[String(code)]||null}
 function pokemonRarityLabel(rarity=""){return String(rarity||"").replace(/^Rare Holo$/i,"Rare · Holo").replace(/^Rare$/i,"Rare · Holo")}
-function pokemonDirectImageUrl(type,code,size="small"){const def=POKEMON_SET_DEFS[type];if(!def?.setId)return "";return `https://images.scrydex.com/pokemon/${def.setId}-${Number(code)}/${size}`;}
+function pokemonDirectImageUrl(type,code,size="small"){const def=POKEMON_SET_DEFS[type];if(!def?.setId)return "";if(def.imageProvider==="tcgdex-mep"){const quality=size==="large"?"high":"low";return `https://assets.tcgdex.net/en/me/mep/${pokemonCode(Number(code))}/${quality}.webp`;}return `https://images.scrydex.com/pokemon/${def.setId}-${Number(code)}/${size}`;}
 function pokemonSectionLabel(section){return section==="BASE"?"BASE SET":section;}
-function pokemonSectionSubtitle(section){const labels={"BASE":"Cartas principales de la colección","ILLUSTRATION RARE":"Cartas Illustration Rare","ULTRA RARE":"Cartas Ultra Rare","MEGA ATTACK RARE":"Cartas Mega Attack Rare","SPECIAL ILLUSTRATION RARE":"Cartas Special Illustration Rare","MEGA HYPER RARE":"Cartas Mega Hyper Rare","HYPER RARE":"Cartas Hyper Rare"};return labels[section]||`Cartas ${section}`;}
+function pokemonSectionSubtitle(section){const labels={"BASE":"Cartas principales de la colección","ILLUSTRATION RARE":"Cartas Illustration Rare","ULTRA RARE":"Cartas Ultra Rare","MEGA ATTACK RARE":"Cartas Mega Attack Rare","SPECIAL ILLUSTRATION RARE":"Cartas Special Illustration Rare","MEGA HYPER RARE":"Cartas Mega Hyper Rare","HYPER RARE":"Cartas Hyper Rare","SERIES 1":"9 promos · Kanto, Sinnoh y Alola","SERIES 2":"9 promos · Johto, Unova y Galar","SERIES 3":"9 promos · Hoenn, Kalos y Paldea"};return labels[section]||`Cartas ${section}`;}
 function pokemonSectionTone(section){if(section==="BASE")return "base";if(section.includes("SPECIAL"))return "gold";if(section.includes("HYPER"))return "orange";if(section.includes("ULTRA"))return "violet";return "purple";}
 
 
@@ -462,7 +468,7 @@ function bootstrapProjectsFromSeed(seedData){
  localStorage.setItem(MASTER_SEED_KEY,seedData.revision||DATA_REVISION);
 }
 
-const POKEMON_SEED_MIGRATION_KEY="stickerbase.pokemon.collections.v2";
+const POKEMON_SEED_MIGRATION_KEY="stickerbase.pokemon.collections.v3";
 function ensurePokemonProjects(){
  if(localStorage.getItem(POKEMON_SEED_MIGRATION_KEY))return false;
  let changed=false;
@@ -476,18 +482,44 @@ function ensurePokemonProjects(){
  if(changed)persistProjects();
  return changed;
 }
+function migrateAscendedHeroesInventory(project){
+ if(inferCollectionType(project)!=="pokemon-ascended-heroes")return false;
+ project.inventory=project.inventory||{};let changed=false;
+ const moves=[["ILLUSTRATION RARE","BASE","217"],["ULTRA RARE","ILLUSTRATION RARE","250"],["MEGA ATTACK RARE","ULTRA RARE","264"],["MEGA HYPER RARE","SPECIAL ILLUSTRATION RARE","293"]];
+ for(const [from,to,code] of moves){const source=project.inventory[from]||{},qty=Number(source[code])||0;if(Object.prototype.hasOwnProperty.call(source,code)){project.inventory[to]=project.inventory[to]||{};project.inventory[to][code]=(Number(project.inventory[to][code])||0)+qty;delete source[code];changed=true;}}
+ const def=POKEMON_SET_DEFS["pokemon-ascended-heroes"];
+ for(const [section,a,b] of def.ranges){project.inventory[section]=project.inventory[section]||{};for(let n=a;n<=b;n++){const code=pokemonCode(n);if(!Object.prototype.hasOwnProperty.call(project.inventory[section],code)){project.inventory[section][code]=0;changed=true;}}}
+ project.teamOrder=def.ranges.map(r=>r[0]);return changed;
+}
+function pokemonStaticMeta(def){if(!def?.staticCards)return null;return Object.fromEntries(Object.entries(def.staticCards).map(([code,name])=>[pokemonCode(Number(code)),{id:`mep-${pokemonCode(Number(code))}`,name,rarity:"Promo · Illustration Rare",supertype:"Pokémon",types:[],subtypes:["Promo"],images:{small:pokemonDirectImageUrl("pokemon-first-partner",code,"small"),large:pokemonDirectImageUrl("pokemon-first-partner",code,"large")}}]));}
+function migratePokemonVariantState(project){
+ const type=inferCollectionType(project);if(!isPokemonCollectionType(type))return false;let changed=false;
+ project.pokemonVariants=project.pokemonVariants||{};
+ for(const [code,state] of Object.entries(project.pokemonVariants)){
+  if(!state||typeof state!=="object")continue;if(!Object.prototype.hasOwnProperty.call(state,"pattern")){state.pattern=0;changed=true;}
+  const meta=pokemonCardMeta(code,project);if(!meta||pokemonIsEx(meta))continue;const opts=pokemonBaseVariantOptions(project,code,meta),keys=new Set(opts.map(x=>x[0]));
+  if(keys.has("basic")&&!keys.has("holo")&&(Number(state.holo)||0)>0){state.basic=(Number(state.basic)||0)+(Number(state.holo)||0);state.holo=0;changed=true;}
+  if(keys.has("holo")&&!keys.has("basic")&&(Number(state.basic)||0)>0){state.holo=(Number(state.holo)||0)+(Number(state.basic)||0);state.basic=0;changed=true;}
+ }
+ return changed;
+}
 async function hydratePokemonProjects(){
  let changed=false;
  for(const [type,def] of Object.entries(POKEMON_SET_DEFS)){
    const related=Object.values(projects||{}).filter(p=>inferCollectionType(p)===type);if(!related.length)continue;
-   let cards=null;try{const response=await fetch(def.source,{cache:"force-cache"});if(response.ok)cards=await response.json();}catch{}
-   if(!Array.isArray(cards))continue;
-   const meta=Object.fromEntries(cards.map(card=>[pokemonCode(Number(card.number)),{id:card.id,name:card.name,rarity:pokemonRarityLabel(card.rarity),supertype:card.supertype,types:card.types||[],subtypes:card.subtypes||[],images:card.images||{}}]));
+   if(type==="pokemon-ascended-heroes")related.forEach(p=>{if(migrateAscendedHeroesInventory(p))changed=true;});
+   let cards=null,meta=pokemonStaticMeta(def);
+   if(!meta&&def.source){try{const response=await fetch(def.source,{cache:"force-cache"});if(response.ok)cards=await response.json();}catch{}}
+   if(!meta&&Array.isArray(cards))meta=Object.fromEntries(cards.map(card=>[pokemonCode(Number(card.number)),{id:card.id,name:card.name,rarity:pokemonRarityLabel(card.rarity),supertype:card.supertype,types:card.types||[],subtypes:card.subtypes||[],images:card.images||{}}]));
+   if(!meta)continue;
    for(const p of related){
-     p.pokemonMeta=meta;p.pokemonDataSource=def.source;p.pokemonVariants=p.pokemonVariants||{};
-     const reverseCards=cards.filter(card=>Number(card.number)<=def.official&&["Common","Uncommon","Rare","Rare Holo"].includes(String(card.rarity)));
-     const reverse=p.inventory["REVERSE HOLO"]||(p.inventory["REVERSE HOLO"]={});
-     reverseCards.forEach(card=>{const code=pokemonCode(Number(card.number));if(!Object.prototype.hasOwnProperty.call(reverse,code))reverse[code]=0;const v=p.pokemonVariants[code]||(p.pokemonVariants[code]={basic:0,holo:0,reverse:0});if(Number(reverse[code])>0&&Number(v.reverse)===0)v.reverse=Number(reverse[code]);});
+     p.pokemonMeta=meta;p.pokemonDataSource=def.source||"static:first-partner";p.pokemonVariants=p.pokemonVariants||{};
+     if(Array.isArray(cards)){
+       const reverseCards=cards.filter(card=>Number(card.number)<=def.official&&["Common","Uncommon","Rare","Rare Holo"].includes(String(card.rarity)));
+       const reverse=p.inventory["REVERSE HOLO"]||(p.inventory["REVERSE HOLO"]={});
+       reverseCards.forEach(card=>{const code=pokemonCode(Number(card.number));if(!Object.prototype.hasOwnProperty.call(reverse,code))reverse[code]=0;const v=p.pokemonVariants[code]||(p.pokemonVariants[code]={basic:0,holo:0,reverse:0,pattern:0});if(!Object.prototype.hasOwnProperty.call(v,"pattern"))v.pattern=0;if(Number(reverse[code])>0&&Number(v.reverse)===0)v.reverse=Number(reverse[code]);});
+     }
+     if(migratePokemonVariantState(p))changed=true;
      p.teamOrder=def.ranges.map(r=>r[0]).filter(x=>p.inventory[x]);changed=true;
    }
  }
@@ -2242,21 +2274,33 @@ function renderMegacracksCollection(){
  if(!list.children.length)list.innerHTML='<div class="collection-empty">No hay cards para este filtro.</div>';
 }
 
+function pokemonBaseVariantOptions(project,code,meta=pokemonCardMeta(code,project)||{}){
+ const type=inferCollectionType(project);if(type==="pokemon-first-partner"||pokemonIsEx(meta))return [];
+ const rarity=String(meta?.rarity||"").toLowerCase(),isRare=/^rare(?:\s*·\s*holo)?$/i.test(String(meta?.rarity||""))||rarity==="rare holo";
+ const first=isRare?["holo","Holo"]:["basic","Normal"];
+ if(type==="pokemon-ascended-heroes"&&String(meta?.supertype||"").toLowerCase().includes("pok")){
+   const rocket=/team rocket/i.test(String(meta?.name||""));return [first,["reverse","Energy Reverse"],["pattern",rocket?"R Reverse":"Ball Reverse"]];
+ }
+ return [first,["reverse","Reverse Holo"]];
+}
+function pokemonVariantState(project,code){project.pokemonVariants=project.pokemonVariants||{};const v=project.pokemonVariants[code]||(project.pokemonVariants[code]={basic:0,holo:0,reverse:0,pattern:0});if(!Object.prototype.hasOwnProperty.call(v,"pattern"))v.pattern=0;return v}
+function pokemonSelectedVariant(project,code){project.ui=project.ui||{};project.ui.pokemonVariantChoice=project.ui.pokemonVariantChoice||{};const options=pokemonBaseVariantOptions(project,code),allowed=options.map(x=>x[0]),saved=project.ui.pokemonVariantChoice[code];return allowed.includes(saved)?saved:(allowed[0]||"basic")}
+function pokemonSetSelectedVariant(project,code,variant){const allowed=pokemonBaseVariantOptions(project,code).map(x=>x[0]);if(!allowed.includes(variant))return;project.ui=project.ui||{};project.ui.pokemonVariantChoice=project.ui.pokemonVariantChoice||{};project.ui.pokemonVariantChoice[code]=variant;persistProjects();renderGlobalCollection()}
+function pokemonVariantQty(project,code,variant){return Number(pokemonVariantState(project,code)[variant])||0}
+function pokemonVariantTotal(project,code,meta=pokemonCardMeta(code,project)||{}){const v=pokemonVariantState(project,code);return pokemonBaseVariantOptions(project,code,meta).reduce((sum,[k])=>sum+(Number(v[k])||0),0)}
+function pokemonVariantLabel(project,code,variant){return pokemonBaseVariantOptions(project,code).find(([k])=>k===variant)?.[1]||variant}
+function changePokemonVariant(code,variant,delta){const p=projects?.[activeProjectId];if(!p)return;const allowed=pokemonBaseVariantOptions(p,code).map(x=>x[0]);if(!allowed.includes(variant))return;const state=pokemonVariantState(p,code),previous=Number(state[variant])||0,next=Math.max(0,previous+delta);if(next===previous)return;state[variant]=next;history.push({id:crypto.randomUUID?.()||String(Date.now()+Math.random()),team:"BASE",code:`${code}:${variant}`,previous,next,delta,at:new Date().toISOString(),source:"pokemon-variant"});delta>0?sessionStats.plus++:sessionStats.minus++;saveAll("✓ Guardado ahora");vibrate();renderAll();showToast(`✓ ${pokemonCardMeta(code,p)?.name||code} · ${pokemonVariantLabel(p,code,variant)} x${next}`)}
+function pokemonPrimaryChecklistEntries(project,def){const base=project?.inventory?.BASE;if(base)return Object.entries(base).map(([code,qty])=>["BASE",code,qty]);return def.ranges.flatMap(([section])=>Object.entries(project?.inventory?.[section]||{}).map(([code,qty])=>[section,code,qty]));}
 function renderPokemonDashboard(){
  const wrap=$("#pokemonDashboard");if(!wrap)return;const p=projects?.[activeProjectId],type=inferCollectionType(p),def=POKEMON_SET_DEFS[type];
  const active=Boolean(def);wrap.hidden=!active;document.body.classList.toggle("pokemon-ui-active",active);if(!active)return;
- const base=inventory?.BASE||{};let completed=0;
- Object.entries(base).forEach(([code,qty])=>{const meta=pokemonCardMeta(code,p);if(pokemonIsEx(meta)){if(Number(qty)>0)completed++;}else{const v=pokemonVariantState(p,code);if((Number(v.basic)||0)+(Number(v.holo)||0)+(Number(v.reverse)||0)>0)completed++;}});
+ let completed=0;pokemonPrimaryChecklistEntries(p,def).forEach(([section,code,qty])=>{const meta=pokemonCardMeta(code,p);if(section==="BASE"&&!pokemonIsEx(meta)&&pokemonBaseVariantOptions(p,code,meta).length){if(pokemonVariantTotal(p,code,meta)>0)completed++;}else if(Number(qty)>0)completed++;});
  const total=def.official,pending=Math.max(0,total-completed),progress=total?Math.round(completed/total*100):0;
  $("#pokemonDashTotal").textContent=String(total);$("#pokemonDashComplete").textContent=String(completed);$("#pokemonDashPending").textContent=String(pending);$("#pokemonDashProgress").textContent=`${progress}%`;
  $("#pokemonDashBar").style.width=`${Math.max(0,Math.min(100,progress))}%`;
 }
 function pokemonIsEx(meta){return (meta?.subtypes||[]).some(x=>/\bex\b/i.test(String(x)))||/\bex\b/i.test(meta?.name||"")}
-function pokemonVariantState(project,code){project.pokemonVariants=project.pokemonVariants||{};return project.pokemonVariants[code]||(project.pokemonVariants[code]={basic:0,holo:0,reverse:0})}
-function pokemonSelectedVariant(project,code){project.ui=project.ui||{};project.ui.pokemonVariantChoice=project.ui.pokemonVariantChoice||{};return project.ui.pokemonVariantChoice[code]||"basic"}
-function pokemonSetSelectedVariant(project,code,variant){project.ui=project.ui||{};project.ui.pokemonVariantChoice=project.ui.pokemonVariantChoice||{};project.ui.pokemonVariantChoice[code]=variant;persistProjects();renderGlobalCollection()}
-function pokemonVariantQty(project,code,variant){return Number(pokemonVariantState(project,code)[variant])||0}
-function changePokemonVariant(code,variant,delta){const p=projects?.[activeProjectId];if(!p)return;const state=pokemonVariantState(p,code),previous=Number(state[variant])||0,next=Math.max(0,previous+delta);if(next===previous)return;state[variant]=next;history.push({id:crypto.randomUUID?.()||String(Date.now()+Math.random()),team:"BASE",code:`${code}:${variant}`,previous,next,delta,at:new Date().toISOString(),source:"pokemon-variant"});delta>0?sessionStats.plus++:sessionStats.minus++;saveAll("✓ Guardado ahora");vibrate();renderAll();showToast(`✓ ${pokemonCardMeta(code,p)?.name||code} · ${variant==="reverse"?"Inverse Holo":variant==="holo"?"Holo":"Básica"} x${next}`)}
+
 function pokemonIsOpen(section){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.pokemonOpenSections=p.ui.pokemonOpenSections||{};return p.ui.pokemonOpenSections[section]??(section==="BASE")}
 function togglePokemonSection(section){const p=projects?.[activeProjectId];p.ui=p.ui||{};p.ui.pokemonOpenSections=p.ui.pokemonOpenSections||{};p.ui.pokemonOpenSections[section]=!pokemonIsOpen(section);persistProjects();renderGlobalCollection()}
 
@@ -2280,9 +2324,9 @@ function pokemonCardRow(section,code,qty){
  row.className=`pokemon-card-row ${ex?"is-ex":""}`;
  const img=meta.images?.small||pokemonDirectImageUrl(type,code,"small")||meta.images?.large||"";
  const fallback=pokemonDirectImageUrl(type,code,"small");let controls="";
- if(section==="BASE"&&!ex){
-  const choice=pokemonSelectedVariant(p,code),v=pokemonVariantState(p,code);
-  controls=`<div class="pokemon-variant-chips">${[["basic","Básica"],["holo","Holo"],["reverse","Inverse Holo"]].map(([k,l])=>`<button type="button" data-variant="${k}" class="pokemon-variant-chip ${choice===k?"active":""}"><span>${l}</span><small>x${Number(v[k])||0}</small></button>`).join("")}</div><div class="pokemon-stock"><strong>x${pokemonVariantQty(p,code,choice)}</strong><button class="pokemon-step minus" aria-label="Restar">−</button><button class="pokemon-step plus" aria-label="Sumar">+</button></div>`;
+ if(section==="BASE"&&!ex&&pokemonBaseVariantOptions(p,code,meta).length){
+  const choice=pokemonSelectedVariant(p,code),v=pokemonVariantState(p,code),options=pokemonBaseVariantOptions(p,code,meta);
+  controls=`<div class="pokemon-variant-chips">${options.map(([k,l])=>`<button type="button" data-variant="${k}" class="pokemon-variant-chip ${choice===k?"active":""}"><span>${l}</span><small>x${Number(v[k])||0}</small></button>`).join("")}</div><div class="pokemon-stock"><strong>x${pokemonVariantQty(p,code,choice)}</strong><button class="pokemon-step minus" aria-label="Restar">−</button><button class="pokemon-step plus" aria-label="Sumar">+</button></div>`;
  } else {
   controls=`<div class="pokemon-fixed-badge ${ex?"ex":""}">${ex?"EX":collectionSafeText(meta.rarity||section)}</div><div class="pokemon-stock"><strong>x${qty}</strong><button class="pokemon-step minus" aria-label="Restar">−</button><button class="pokemon-step plus" aria-label="Sumar">+</button></div>`;
  }
@@ -2290,7 +2334,7 @@ function pokemonCardRow(section,code,qty){
  const image=row.querySelector(".pokemon-thumb img");if(image){image.onerror=()=>{const f=image.dataset.fallback;if(f&&image.src!==f){image.src=f;delete image.dataset.fallback;}else{image.closest(".pokemon-thumb").innerHTML="<span>PK</span>";}};image.closest(".pokemon-thumb").classList.add("is-clickable");image.closest(".pokemon-thumb").setAttribute("role","button");image.closest(".pokemon-thumb").setAttribute("tabindex","0");image.closest(".pokemon-thumb").setAttribute("aria-label",`Ver ${meta.name||`carta ${code}`} en grande`);const open=()=>openPokemonCardViewer(type,code,meta);image.closest(".pokemon-thumb").onclick=open;image.closest(".pokemon-thumb").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};}
  row.querySelectorAll("[data-variant]").forEach(b=>b.onclick=()=>pokemonSetSelectedVariant(p,code,b.dataset.variant));
  const minus=row.querySelector(".minus"),plus=row.querySelector(".plus");
- if(section==="BASE"&&!ex){minus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),-1);plus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),1)}
+ if(section==="BASE"&&!ex&&pokemonBaseVariantOptions(p,code,meta).length){minus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),-1);plus.onclick=()=>changePokemonVariant(code,pokemonSelectedVariant(p,code),1)}
  else{minus.onclick=e=>changeQuantity(section,code,-1,e.currentTarget);plus.onclick=e=>changeQuantity(section,code,1,e.currentTarget)}
  return row;
 }
@@ -2300,10 +2344,10 @@ function renderPokemonCollection(){
   if(collectionTeamFilter!=="all"&&section!==collectionTeamFilter)return;
   const cards=inventory[section]||{},searching=Boolean(normalizeTradeName(teamSearch?.value||"")),entries=Object.entries(cards).filter(([code,qty])=>collectionStickerMatches(section,code,Number(qty)||0)&&pokemonCardMatchesSearch(section,code,p));if(!entries.length)return;
   const open=searching?true:pokemonIsOpen(section);let copies=0,unique=0;
-  entries.forEach(([code,q])=>{if(section==="BASE"&&!pokemonIsEx(pokemonCardMeta(code,p))){const v=pokemonVariantState(p,code),sum=Object.values(v).reduce((a,b)=>a+Number(b||0),0);copies+=sum;if(sum>0)unique++;}else{const n=Number(q)||0;copies+=n;if(n>0)unique++;}});
+  entries.forEach(([code,q])=>{const meta=pokemonCardMeta(code,p);if(section==="BASE"&&!pokemonIsEx(meta)&&pokemonBaseVariantOptions(p,code,meta).length){const sum=pokemonVariantTotal(p,code,meta);copies+=sum;if(sum>0)unique++;}else{const n=Number(q)||0;copies+=n;if(n>0)unique++;}});
   const pct=entries.length?Math.round(unique/entries.length*100):0;
   const sec=document.createElement("section");sec.className=`pokemon-accordion tone-${pokemonSectionTone(section)} ${open?"open":""}`;
-  sec.innerHTML=`<button type="button" class="pokemon-section-toggle" aria-expanded="${open}"><span class="pokemon-section-orb" aria-hidden="true"></span><div class="pokemon-section-copy"><strong>${collectionSafeText(pokemonSectionLabel(section))}</strong><span>${collectionSafeText(pokemonSectionSubtitle(section))}</span></div><b>${entries.length}</b><span class="pokemon-chevron">⌄</span></button>${section==="BASE"?`<div class="pokemon-section-progress"><span>${unique} / ${entries.length}</span><div><i style="width:${pct}%"></i></div><strong>${pct}%</strong></div>`:""}<div class="pokemon-section-body" ${open?"":"hidden"}></div>`;
+  sec.innerHTML=`<button type="button" class="pokemon-section-toggle" aria-expanded="${open}"><span class="pokemon-section-orb" aria-hidden="true"></span><div class="pokemon-section-copy"><strong>${collectionSafeText(pokemonSectionLabel(section))}</strong><span>${collectionSafeText(pokemonSectionSubtitle(section))}</span></div><b>${entries.length}</b><span class="pokemon-chevron">⌄</span></button>${(section==="BASE"||def.ranges.length<=3)?`<div class="pokemon-section-progress"><span>${unique} / ${entries.length}</span><div><i style="width:${pct}%"></i></div><strong>${pct}%</strong></div>`:""}<div class="pokemon-section-body" ${open?"":"hidden"}></div>`;
   sec.querySelector(".pokemon-section-toggle").onclick=()=>togglePokemonSection(section);
   const body=sec.querySelector(".pokemon-section-body");entries.sort(([a],[b])=>Number(a)-Number(b)).forEach(([code,q])=>body.appendChild(pokemonCardRow(section,code,Number(q)||0)));list.appendChild(sec);
  });
@@ -2435,27 +2479,26 @@ function albumLayerProgress(project=projects?.[activeProjectId]){
 }
 function calculatePokemonStatistics(project=projects?.[activeProjectId]){
  const type=inferCollectionType(project),def=POKEMON_SET_DEFS[type];if(!def)return null;
- const sections={};let unique=0,copies=0,repeats=0;
- let baseBasic=0,baseHolo=0,baseReverse=0,baseVariantEligible=0,baseUnique=0;
+ const sections={};let unique=0,copies=0,repeats=0,baseUnique=0;
+ const variantOwned={basic:0,holo:0,reverse:0,pattern:0},variantEligible={basic:0,holo:0,reverse:0,pattern:0};
  def.ranges.forEach(([section])=>{
    const cards=project?.inventory?.[section]||{};let sectionOwned=0,sectionCopies=0;
    Object.entries(cards).forEach(([code,raw])=>{
-     const meta=pokemonCardMeta(code,project)||{};
-     if(section==="BASE"&&!pokemonIsEx(meta)){
-       const v=pokemonVariantState(project,code),b=Number(v.basic)||0,h=Number(v.holo)||0,r=Number(v.reverse)||0,sum=b+h+r;
-       baseVariantEligible++;if(b>0)baseBasic++;if(h>0)baseHolo++;if(r>0)baseReverse++;
-       if(sum>0){sectionOwned++;baseUnique++;unique++;}
-       copies+=sum;sectionCopies+=sum;repeats+=Math.max(0,b-1)+Math.max(0,h-1)+Math.max(0,r-1);
+     const meta=pokemonCardMeta(code,project)||{},options=section==="BASE"&&!pokemonIsEx(meta)?pokemonBaseVariantOptions(project,code,meta):[];
+     if(options.length){
+       const v=pokemonVariantState(project,code);let sum=0;for(const [key] of options){variantEligible[key]++;const n=Number(v[key])||0;if(n>0)variantOwned[key]++;sum+=n;repeats+=Math.max(0,n-1);}
+       if(sum>0){sectionOwned++;baseUnique++;unique++;}copies+=sum;sectionCopies+=sum;
      }else{
        const qty=Number(raw)||0;if(qty>0){sectionOwned++;unique++;if(section==="BASE")baseUnique++;}
        copies+=qty;sectionCopies+=qty;repeats+=Math.max(0,qty-1);
      }
    });
-   const total=Object.keys(cards).length;
-   sections[section]={owned:sectionOwned,total,copies:sectionCopies,progress:total?Math.round(sectionOwned/total*100):0};
+   const total=Object.keys(cards).length;sections[section]={owned:sectionOwned,total,copies:sectionCopies,progress:total?Math.round(sectionOwned/total*100):0};
  });
- return {type,def,unique,copies,repeats,missing:Math.max(0,def.total-unique),progress:def.total?Math.round(unique/def.total*100):0,baseUnique,baseTotal:def.official,baseBasic,baseHolo,baseReverse,baseVariantEligible,sections};
+ const primaryTotal=project?.inventory?.BASE?def.official:def.total,primaryUnique=project?.inventory?.BASE?baseUnique:unique;
+ return {type,def,unique,copies,repeats,missing:Math.max(0,def.total-unique),progress:def.total?Math.round(unique/def.total*100):0,baseUnique:primaryUnique,baseTotal:primaryTotal,variantOwned,variantEligible,sections};
 }
+
 function renderPokemonStatistics(){
  const ps=calculatePokemonStatistics();if(!ps)return;
  const genericGrid=document.querySelector(".visual-stats-grid"),shinyBreakdown=document.querySelector(".shiny-breakdown"),custom=$("#collectionSpecificStats"),albumProgressRoot=$("#albumProgressStats");
@@ -2473,12 +2516,12 @@ function renderPokemonStatistics(){
      <article><span>＋</span><div><small>Copias totales</small><strong>${ps.copies}</strong><em>incluye variantes</em></div></article>
      <article><span>↺</span><div><small>Repetidas</small><strong>${ps.repeats}</strong><em>copias extra</em></div></article>
    </div>
-   <section class="pokemon-variant-stats">
-     <div class="pokemon-stats-title"><strong>Variantes del Base Set</strong><small>Progreso independiente</small></div>
-     ${[["Básica",ps.baseBasic],["Holo",ps.baseHolo],["Inverse Holo",ps.baseReverse]].map(([label,owned])=>{const pct=ps.baseVariantEligible?Math.round(owned/ps.baseVariantEligible*100):0;return `<article><div><strong>${label}</strong><span>${owned}/${ps.baseVariantEligible}</span></div><div class="pokemon-stat-track"><i style="width:${pct}%"></i></div><b>${pct}%</b></article>`}).join("")}
-   </section>
+   ${Object.values(ps.variantEligible||{}).some(Boolean)?`<section class="pokemon-variant-stats">
+     <div class="pokemon-stats-title"><strong>Variantes del Base Set</strong><small>Solo versiones que existen físicamente</small></div>
+     ${[["basic","Normal"],["holo","Holo"],["reverse",ps.type==="pokemon-ascended-heroes"?"Energy Reverse":"Reverse Holo"],["pattern","Ball / R Reverse"]].filter(([key])=>(ps.variantEligible?.[key]||0)>0).map(([key,label])=>{const eligible=ps.variantEligible[key]||0,owned=ps.variantOwned[key]||0,pct=eligible?Math.round(owned/eligible*100):0;return `<article><div><strong>${label}</strong><span>${owned}/${eligible}</span></div><div class="pokemon-stat-track"><i style="width:${pct}%"></i></div><b>${pct}%</b></article>`}).join("")}
+   </section>`:""}
    <section class="pokemon-rarity-stats">
-     <div class="pokemon-stats-title"><strong>Rarezas ocultas</strong><small>Progreso por apartado</small></div>
+     <div class="pokemon-stats-title"><strong>${ps.type==="pokemon-first-partner"?"Series":"Rarezas ocultas"}</strong><small>Progreso por apartado</small></div>
      ${specialSections.map(section=>{const s=ps.sections[section]||{owned:0,total:0,progress:0};return `<article class="tone-${pokemonSectionTone(section)}"><span class="pokemon-section-orb"></span><div><strong>${collectionSafeText(pokemonSectionLabel(section))}</strong><small>${s.owned}/${s.total} cartas</small><div class="pokemon-stat-track"><i style="width:${s.progress}%"></i></div></div><b>${s.progress}%</b></article>`}).join("")}
    </section>`;
  }
@@ -3261,7 +3304,7 @@ function renderCollections(){
  const items=orderedProjects();
  const football=items.filter(p=>!isPokemonCollectionType(inferCollectionType(p)));
  const pokemon=items.filter(p=>isPokemonCollectionType(inferCollectionType(p)));
- const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271};
+ const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271,"pokemon-first-partner":37};
  const footballCover={"world-cup-2026":"assets/collection-covers/world-cup-2026-library.webp","liga-este-2026-27":"assets/collection-covers/liga-este-2026-27-library.webp","megacracks-2026-27":"assets/collection-covers/megacracks-2026-27-library.webp"};
  const renderCard=(p)=>{
    const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
