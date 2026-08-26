@@ -1526,3 +1526,10 @@ En la cuadrícula visual de la pestaña `Colecciones`, las familias de fútbol u
 - Megacracks 2026/27: portada oficial 25 aniversario (`megacracks-2026-27-library.webp`).
 
 Estas imágenes son exclusivas de la vista de Colecciones. No sustituir con ellas las imágenes de cabecera internas salvo petición expresa. Mantenerlas locales para funcionamiento PWA/offline y evitar dependencias de URLs externas.
+
+
+# 44. BUILD 704.14.25 — HEADERS OFICIALES + ESTADO DE ESPECIALES MEGACRACKS
+
+Las portadas locales oficiales usadas en la biblioteca de Colecciones para Mundial 2026, Liga Este 2026/27 y Megacracks 2026/27 se reutilizan también en el header de sus respectivos proyectos. Mundial conserva su composición clara/compacta; Liga Este y Megacracks conservan su header premium con estadísticas.
+
+En Megacracks, todos los acordeones especiales (ENJOY, ENJOY POWER y demás apartados definidos como especiales) deben mostrar en su subtítulo el total de cards y el estado `X pendientes` o `Completo`, usando el mismo criterio de objetivo/inventario que los clubes y excluyendo cualquier referencia marcada como `Pendiente`. No volver a dejar los especiales con solo `X cards`.

@@ -1,3 +1,10 @@
+# Build 704.14.25
+
+- Headers: Mundial 2026, Liga Este 2026/27 y Megacracks 2026/27 reutilizan las mismas portadas oficiales locales aprobadas para Colecciones.
+- Mundial conserva su layout claro existente; solo incorpora la portada oficial en el header.
+- Megacracks: los apartados especiales muestran ahora `X pendientes` o `Completo`, igual que los clubes, calculado sobre el inventario real y excluyendo referencias marcadas como Pendiente.
+- Sin cambios en inventarios, checklists, sincronización ni datos de colecciones.
+
 # Build 704.14.24
 
 - Colecciones: sustituidas las portadas de biblioteca de Mundial 2026, Liga Este 2026/27 y Megacracks 2026/27 por las imágenes oficiales aprobadas por el usuario.

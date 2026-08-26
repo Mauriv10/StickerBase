@@ -198,9 +198,14 @@ function syncCollectionChrome(collectionType){
  }
 }
 function syncPaniniPremiumHeader(project=projects?.[activeProjectId]){
- const type=inferCollectionType(project),isLiga=type==="liga-este-2026-27",isMega=type==="megacracks-2026-27",isPanini=isLiga||isMega;
+ const type=inferCollectionType(project),isWorld=type==="world-cup-2026",isLiga=type==="liga-este-2026-27",isMega=type==="megacracks-2026-27",isPanini=isLiga||isMega,isFootball=isWorld||isPanini;
  const cover=$("#paniniHeaderCover"),stats=$("#paniniHeaderStats"),legacy=$("#ligaEsteHeaderLogo");
- if(cover){cover.hidden=!isPanini;cover.style.backgroundImage=isLiga?'url("./assets/collection-covers/liga-este-2026-27.jpg")':isMega?'url("./assets/collection-covers/megacracks-2026-27.webp")':"";}
+ const headerCover={
+  "world-cup-2026":"./assets/collection-covers/world-cup-2026-library.webp",
+  "liga-este-2026-27":"./assets/collection-covers/liga-este-2026-27-library.webp",
+  "megacracks-2026-27":"./assets/collection-covers/megacracks-2026-27-library.webp"
+ }[type]||"";
+ if(cover){cover.hidden=!isFootball;cover.style.backgroundImage=headerCover?`url("${headerCover}")`:"";}
  if(stats)stats.hidden=!isPanini;
  if(legacy&&isPanini)legacy.hidden=true;
  if(!isPanini||!project)return;
@@ -2225,9 +2230,9 @@ function renderMegacracksCollection(){
   specialTeams.forEach(team=>{
    const stickers=inventory[team]||{},entries=Object.entries(stickers).filter(([code,qty])=>collectionStickerMatches(team,code,Number(qty)||0));
    if(!entries.length)return;
-   const total=entries.reduce((a,[,b])=>a+Number(b||0),0),open=megacracksIsOpen(team);
+   const target=getTarget(),total=Object.values(stickers).reduce((a,b)=>a+Number(b||0),0),missing=Object.entries(stickers).reduce((a,[code,b])=>a+(isPendingCollectionItem(team,code)?0:Math.max(0,target-Number(b||0))),0),open=megacracksIsOpen(team);
    const section=document.createElement("section");section.className=`ligaeste-team-accordion megacracks-team-accordion megacracks-special-accordion${open?" open":""}`;
-   section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
+   section.innerHTML=`<button type="button" class="ligaeste-team-toggle" aria-expanded="${open}"><div class="ligaeste-team-heading">${flagHTML(team)}<div><strong>${collectionSafeText(team)}</strong><span>${total} cards · ${missing?`${missing} pendientes`:"Completo"}</span></div></div><span class="ligaeste-team-chevron">⌄</span></button><div class="ligaeste-team-body" ${open?"":"hidden"}><div class="ligaeste-list-head"><span>Nº</span><span>Jugador / card</span><span>Stock</span></div><div class="ligaeste-player-list"></div></div>`;
    section.querySelector(".ligaeste-team-toggle").onclick=()=>toggleMegacracksTeam(team);
    const rows=section.querySelector(".ligaeste-player-list");
    entries.sort(([a],[b])=>String(a).localeCompare(String(b),"es",{numeric:true})).forEach(([code,qty])=>rows.appendChild(ligaEsteRow(team,code,Number(qty)||0)));

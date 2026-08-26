@@ -8481,3 +8481,18 @@ body.main-tab-collection.collection-theme-pokemon.pokemon-theme-151 .search-wrap
   border:1px solid rgba(10,167,162,.42)!important;
   box-shadow:0 6px 18px rgba(34,121,119,.065)!important;
 }
+
+
+/* 704.14.25 · portadas oficiales también en headers */
+body.collection-theme-worldcup .panini-header-cover{
+  display:block!important;
+  width:72px!important;height:94px!important;flex:0 0 72px!important;
+  border-radius:13px!important;background-size:cover!important;background-position:center!important;
+  box-shadow:0 8px 20px rgba(15,23,42,.16)!important;border:1px solid rgba(20,115,230,.16)!important;
+}
+body.collection-theme-worldcup .compact-home-titlebar{align-items:center!important}
+body.collection-theme-worldcup .compact-home-copy{flex:1 1 auto!important;min-width:0!important}
+@media(max-width:390px){
+ body.collection-theme-worldcup .panini-header-cover{width:62px!important;height:82px!important;flex-basis:62px!important}
+ body.collection-theme-worldcup .compact-home-titlebar{gap:10px!important}
+}
