@@ -1555,3 +1555,8 @@ Nueva colección Pokémon soportada: 27 promos MEP 037–063, una sola versión 
 - Series 2 (046–054): Johto, Unova, Galar.
 - Series 3 (055–063): Hoenn, Kalos, Paldea.
 Cada carta se trata como Promo · Illustration Rare fija, sin Normal/Holo/Reverse adicionales. Está disponible en Crear nuevo álbum y se añade a instalaciones existentes mediante la migración Pokémon v3 sin duplicar colecciones ya presentes.
+
+
+# 46. BUILD 704.14.27 — FIRST PARTNER SERIES 2/3 IMÁGENES
+
+Corregida la carga visual de las miniaturas MEP 046–063 de First Partner. Series 2 y 3 son más recientes y el endpoint TCGdex usado inicialmente no dispone/entrega todavía todas esas imágenes, aunque Series 1 sí cargaba. Para MEP 046–063 se usan fallbacks directos verificados de UnownArchives CDN. No modificar inventarios ni numeración; First Partner continúa siendo MEP 037–063 dividido en tres series de 9.

@@ -1,3 +1,9 @@
+# Build 704.14.27
+
+- First Partner: corregida la carga de miniaturas de Series 2 (MEP 046–054) y Series 3 (MEP 055–063).
+- La causa era que el proveedor de imágenes usado por Series 1 todavía no servía correctamente las cartas más recientes de Series 2/3.
+- Se añaden URLs de respaldo verificadas únicamente para MEP 046–063, manteniendo intacta Series 1 y toda la lógica/inventario Pokémon.
+
 # Build 704.14.26
 
 - Pokémon: las variantes del Base Set dejan de ser genéricas. Common/Uncommon muestran Normal + Reverse Holo; Rare muestran Holo + Reverse Holo; Pokémon ex y rarezas ocultas siguen como una única versión.
