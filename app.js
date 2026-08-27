@@ -2329,6 +2329,11 @@ function pokemonCardRow(section,code,qty){
  const requiredVariants=(section==="BASE"&&!ex)?pokemonBaseVariantOptions(p,code,meta):[];
  const incomplete=requiredVariants.length?requiredVariants.some(([k])=>pokemonVariantQty(p,code,k)<1):Number(qty)<1;
  row.className=`pokemon-card-row ${ex?"is-ex":""} ${incomplete?"is-incomplete":"is-complete"}`;
+ if(incomplete){
+   const light151=type==="pokemon-151";
+   row.style.setProperty("background",light151?"linear-gradient(90deg,rgba(255,226,228,.96),rgba(255,242,243,.92))":"linear-gradient(90deg,rgba(118,31,38,.30),rgba(78,24,30,.20))","important");
+   row.style.setProperty("box-shadow",light151?"inset 4px 0 0 rgba(210,82,94,.55)":"inset 4px 0 0 rgba(235,92,104,.62)","important");
+ }
  const img=meta.images?.small||pokemonDirectImageUrl(type,code,"small")||meta.images?.large||"";
  const fallback=pokemonDirectImageUrl(type,code,"small");let controls="";
  if(section==="BASE"&&!ex&&pokemonBaseVariantOptions(p,code,meta).length){

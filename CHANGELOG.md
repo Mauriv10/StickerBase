@@ -1,3 +1,10 @@
+# Build 704.14.30
+
+- Pokémon: reforzado el indicador visual de carta incompleta.
+- El fondo rojizo se aplica directamente a la fila con prioridad CSS, evitando que los fondos `!important` de cada tema lo oculten.
+- 151 mantiene una variante rojiza clara adaptada a su tema perla/turquesa.
+- Sin cambios en inventarios, checklists, variantes ni sincronización.
+
 # Build 704.14.29
 
 - Chispas Fulgurantes / Surging Sparks: revisada la lógica de variantes del set base.

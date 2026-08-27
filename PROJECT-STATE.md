@@ -1570,3 +1570,8 @@ En todas las colecciones Pokémon, la fila de una carta muestra un fondo rojizo 
 # 48. BUILD 704.14.29 — CHISPAS FULGURANTES / SURGING SPARKS: VARIANTES REALES
 
 Se revisó la checklist de Surging Sparks (SV08) para que la Master Base refleje las variantes físicas reales. En BASE 001–191: Common/Uncommon usan Normal + Reverse Holo; Rare usan Holo + Reverse Holo; Pokémon ex son una única carta; y las ocho ACE SPEC — 162 Amulet of Hope, 164 Brilliant Blender, 176 Energy Search Pro, 182 Megaton Blower, 183 Miracle Headset, 185 Precious Trolley, 186 Scramble Switch y 191 Enriching Energy — son una única variante ACE SPEC, sin Normal/Holo/Reverse adicional. Las rarezas 192–252 continúan como cartas individuales. La implementación conserva la clave de inventario `basic` para ACE SPEC con la etiqueta visual `ACE SPEC`, evitando migraciones destructivas y preservando cantidades ya registradas en esa variante. El indicador rojizo de incompleto de 704.14.28 debe considerar únicamente estas variantes reales, por lo que una ACE SPEC a x1 queda completa.
+
+
+# 49. BUILD 704.14.30 — ESTADO ROJIZO POKÉMON ROBUSTO
+
+El indicador visual de carta incompleta se aplica directamente sobre cada `pokemon-card-row` con prioridad `important`, porque algunos temas Pokémon definen fondos base también con `!important`. Una carta queda rojiza mientras falte al menos una variante real requerida; al completarse todas, recupera el fondo normal. 151 usa una versión clara del aviso. Esta capa es puramente visual.
