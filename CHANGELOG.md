@@ -1,3 +1,19 @@
+# Build 704.14.29
+
+- Chispas Fulgurantes / Surging Sparks: revisada la lógica de variantes del set base.
+- Common y Uncommon mantienen Normal + Reverse Holo.
+- Rare mantienen Holo + Reverse Holo.
+- Pokémon ex mantienen una única versión.
+- Las 8 ACE SPEC (162, 164, 176, 182, 183, 185, 186 y 191) pasan a una única variante ACE SPEC; ya no se les exige una variante Normal/Reverse inexistente.
+- Rarezas 192–252 siguen siendo cartas individuales.
+- Sin cambios en cantidades almacenadas, sincronización ni otras colecciones.
+
+# Build 704.14.28
+
+- Pokémon: fondo rojizo suave cuando falta alguna variante requerida.
+- Vuelve al aspecto normal al tener al menos x1 de todas sus variantes.
+- Sin cambios de inventario, checklist ni sincronización.
+
 # Build 704.14.27
 
 - First Partner: corregida la carga de miniaturas de Series 2 (MEP 046–054) y Series 3 (MEP 055–063).

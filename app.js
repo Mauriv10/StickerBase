@@ -2277,7 +2277,11 @@ function renderMegacracksCollection(){
 
 function pokemonBaseVariantOptions(project,code,meta=pokemonCardMeta(code,project)||{}){
  const type=inferCollectionType(project);if(type==="pokemon-first-partner"||pokemonIsEx(meta))return [];
- const rarity=String(meta?.rarity||"").toLowerCase(),isRare=/^rare(?:\s*·\s*holo)?$/i.test(String(meta?.rarity||""))||rarity==="rare holo";
+ const rarity=String(meta?.rarity||"").toLowerCase();
+ // Surging Sparks ACE SPEC (162, 164, 176, 182, 183, 185, 186, 191)
+ // exist only in their native ACE SPEC foil treatment: no Normal/Holo/Reverse variant.
+ if(type==="pokemon-surging-sparks"&&rarity.includes("ace spec"))return [["basic","ACE SPEC"]];
+ const isRare=/^rare(?:\s*·\s*holo)?$/i.test(String(meta?.rarity||""))||rarity==="rare holo";
  const first=isRare?["holo","Holo"]:["basic","Normal"];
  if(type==="pokemon-ascended-heroes"&&String(meta?.supertype||"").toLowerCase().includes("pok")){
    const rocket=/team rocket/i.test(String(meta?.name||""));return [first,["reverse","Energy Reverse"],["pattern",rocket?"R Reverse":"Ball Reverse"]];
@@ -2322,7 +2326,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelec
 
 function pokemonCardRow(section,code,qty){
  const p=projects?.[activeProjectId],type=inferCollectionType(p),meta=pokemonCardMeta(code,p)||{},ex=section==="BASE"&&pokemonIsEx(meta),row=document.createElement("div");
- row.className=`pokemon-card-row ${ex?"is-ex":""}`;
+ const requiredVariants=(section==="BASE"&&!ex)?pokemonBaseVariantOptions(p,code,meta):[];
+ const incomplete=requiredVariants.length?requiredVariants.some(([k])=>pokemonVariantQty(p,code,k)<1):Number(qty)<1;
+ row.className=`pokemon-card-row ${ex?"is-ex":""} ${incomplete?"is-incomplete":"is-complete"}`;
  const img=meta.images?.small||pokemonDirectImageUrl(type,code,"small")||meta.images?.large||"";
  const fallback=pokemonDirectImageUrl(type,code,"small");let controls="";
  if(section==="BASE"&&!ex&&pokemonBaseVariantOptions(p,code,meta).length){

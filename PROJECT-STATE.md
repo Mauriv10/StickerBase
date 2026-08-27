@@ -1560,3 +1560,13 @@ Cada carta se trata como Promo · Illustration Rare fija, sin Normal/Holo/Revers
 # 46. BUILD 704.14.27 — FIRST PARTNER SERIES 2/3 IMÁGENES
 
 Corregida la carga visual de las miniaturas MEP 046–063 de First Partner. Series 2 y 3 son más recientes y el endpoint TCGdex usado inicialmente no dispone/entrega todavía todas esas imágenes, aunque Series 1 sí cargaba. Para MEP 046–063 se usan fallbacks directos verificados de UnownArchives CDN. No modificar inventarios ni numeración; First Partner continúa siendo MEP 037–063 dividido en tres series de 9.
+
+
+# 47. BUILD 704.14.28 — INDICADOR VISUAL DE POKÉMON INCOMPLETO
+
+En todas las colecciones Pokémon, la fila de una carta muestra un fondo rojizo suave mientras falte al menos una de sus variantes requeridas. Cuando todas las variantes reales tienen al menos x1, recupera el fondo normal. Las cartas de una sola versión se consideran completas desde x1. Es exclusivamente visual y no altera inventario, checklists ni sincronización.
+
+
+# 48. BUILD 704.14.29 — CHISPAS FULGURANTES / SURGING SPARKS: VARIANTES REALES
+
+Se revisó la checklist de Surging Sparks (SV08) para que la Master Base refleje las variantes físicas reales. En BASE 001–191: Common/Uncommon usan Normal + Reverse Holo; Rare usan Holo + Reverse Holo; Pokémon ex son una única carta; y las ocho ACE SPEC — 162 Amulet of Hope, 164 Brilliant Blender, 176 Energy Search Pro, 182 Megaton Blower, 183 Miracle Headset, 185 Precious Trolley, 186 Scramble Switch y 191 Enriching Energy — son una única variante ACE SPEC, sin Normal/Holo/Reverse adicional. Las rarezas 192–252 continúan como cartas individuales. La implementación conserva la clave de inventario `basic` para ACE SPEC con la etiqueta visual `ACE SPEC`, evitando migraciones destructivas y preservando cantidades ya registradas en esa variante. El indicador rojizo de incompleto de 704.14.28 debe considerar únicamente estas variantes reales, por lo que una ACE SPEC a x1 queda completa.
