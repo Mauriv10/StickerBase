@@ -8541,3 +8541,30 @@ body.pokemon-theme-first-partner .pokemon-header-face{width:65%!important;right:
  body.pokemon-theme-pitch-black .pokemon-header-face,body.pokemon-theme-destined-rivals .pokemon-header-face,body.pokemon-theme-first-partner .pokemon-header-face{right:14px!important;width:68%!important}
  body.pokemon-theme-151 .pokemon-header-face{opacity:.56!important}
 }
+
+/* 704.14.35 · header Pokémon edge-to-edge como referencia aprobada */
+body.collection-theme-pokemon .compact-home-titlebar{
+ grid-template-columns:minmax(0,1fr) 54px!important;
+ column-gap:14px!important;
+ padding-left:38px!important;
+ padding-right:18px!important;
+}
+body.collection-theme-pokemon .ligaeste-header-logo{display:none!important}
+body.collection-theme-pokemon .pokemon-header-face{
+ inset:0!important;width:100%!important;height:100%!important;right:0!important;top:0!important;bottom:0!important;
+ opacity:.96!important;overflow:hidden!important;
+ -webkit-mask-image:none!important;mask-image:none!important;
+}
+body.collection-theme-pokemon .pokemon-header-face:before{
+ background:linear-gradient(90deg,rgba(3,7,11,.74) 0%,rgba(3,7,11,.48) 28%,rgba(3,7,11,.12) 54%,transparent 72%)!important;
+}
+body.collection-theme-pokemon .pokemon-header-face img{
+ inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;
+}
+body.pokemon-theme-151 .pokemon-header-face{opacity:.92!important}
+body.pokemon-theme-151 .pokemon-header-face:before{background:linear-gradient(90deg,rgba(245,255,255,.80) 0%,rgba(245,255,255,.48) 30%,rgba(245,255,255,.10) 58%,transparent 74%)!important}
+@media(max-width:430px){
+ body.collection-theme-pokemon .compact-home-titlebar{grid-template-columns:minmax(0,1fr) 46px!important;padding-left:38px!important;padding-right:13px!important}
+ body.collection-theme-pokemon .pokemon-header-face,body.pokemon-theme-pitch-black .pokemon-header-face,body.pokemon-theme-destined-rivals .pokemon-header-face,body.pokemon-theme-first-partner .pokemon-header-face{inset:0!important;width:100%!important;right:0!important;opacity:.96!important}
+ body.pokemon-theme-151 .pokemon-header-face{opacity:.92!important}
+}

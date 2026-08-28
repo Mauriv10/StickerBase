@@ -511,3 +511,10 @@
 - El campo de búsqueda interior permanece blanco, con borde turquesa y contraste limpio.
 - Colecciones permanece exactamente como en 704.14.21; no se modifica su jerarquía ni galería.
 - Sin cambios en checklists, inventarios, estadísticas, navegación, proyectos ni sincronización.
+
+## 704.14.35 — Header Pokémon edge-to-edge
+- Elimina la viñeta lateral `POKÉ-MON` de todos los headers Pokémon.
+- El artwork decorativo ocupa ahora el header completo hasta el borde derecho, sin margen lateral.
+- Los assets de header se recomponen a formato panorámico para conservar el Pokémon/personaje completo y evitar el recorte excesivo observado en iPhone.
+- El contenido textual permanece por encima con degradado de legibilidad; no cambia la altura del header.
+- Sin cambios en inventario, checklists, estadísticas, portadas de Colecciones ni sincronización.

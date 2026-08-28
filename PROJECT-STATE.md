@@ -1607,3 +1607,11 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - En móvil el artwork debe comenzar aproximadamente desde el 32–38% derecho del header, entrando visualmente hacia la izquierda y fundiéndose mediante máscara; nunca debe aparecer texto/marco de una carta.
 - Mantener el botón volver y la información del header por encima del artwork.
 - Mega Evolution conserva exclusivamente en la biblioteca de Colecciones la portada #179.
+
+## 704.14.35 — contrato final de composición de headers Pokémon
+- Eliminar la viñeta `POKÉ-MON` del lado izquierdo en todos los headers Pokémon; no debe volver a introducirse.
+- El artwork debe llegar físicamente hasta el borde derecho del header (`inset:0`, sin margen derecho) y extenderse por todo el ancho visual del banner.
+- Los assets locales de `assets/pokemon-header-art/` están preparados en formato panorámico 1200×340: fondo extendido + protagonista conservado completo/anclado a la derecha + zona izquierda oscurecida para texto.
+- Mantener el título/kicker/subtítulo a la izquierda y el botón volver a la derecha, ambos sobre el artwork.
+- En iPhone no usar un contenedor parcial con `right:14px/18px` ni un `object-fit:cover` sobre una fuente vertical que vuelva a cortar al protagonista.
+- No modificar por este sistema inventarios, checklists, estadísticas, fingerprint, Supabase ni portadas de la biblioteca; Mega Evolution mantiene #179 como portada de Colecciones.
