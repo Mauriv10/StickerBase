@@ -1575,3 +1575,10 @@ Se revisó la checklist de Surging Sparks (SV08) para que la Master Base refleje
 # 49. BUILD 704.14.30 — ESTADO ROJIZO POKÉMON ROBUSTO
 
 El indicador visual de carta incompleta se aplica directamente sobre cada `pokemon-card-row` con prioridad `important`, porque algunos temas Pokémon definen fondos base también con `!important`. Una carta queda rojiza mientras falte al menos una variante real requerida; al completarse todas, recupera el fondo normal. 151 usa una versión clara del aviso. Esta capa es puramente visual.
+
+
+# 50. BUILD 704.14.31 — MEGA EVOLUTION + RIVALES PREDESTINADOS
+
+Se incorporan dos colecciones Pokémon completas al mismo motor usado por el resto de expansiones. Mega Evolution (ME01/me1): main set 001–132, 188 cartas totales, IR 133–154, UR 155–176, SIR 177–186 y Mega Hyper Rare 187–188. Rivales Predestinados / Destined Rivals (DRI/sv10): main set 001–182, 244 cartas totales, IR 183–205, UR 206–227, SIR 228–238 y Hyper Rare 239–244. Ambas están disponibles en Crear nuevo álbum y se muestran dentro del acordeón Pokémon TCG. Las instalaciones existentes reciben los nuevos proyectos mediante migración Pokémon v4, sin duplicar tipos ya existentes.
+
+Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa eléctrico y matiz púrpura; Rivales Predestinados usa base negra con naranja/rojo inspirada en Team Rocket. Conservan el mismo comportamiento Pokémon: carga de metadatos e imágenes, variantes por rareza, estadísticas, buscador, visor de carta, cantidades y resaltado rojizo de carta incompleta. No modificar inventarios de colecciones anteriores ni sincronización para incorporar estas expansiones.

@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.26";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.31";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -17,7 +17,9 @@ const COLLECTION_DEFINITIONS={
   "pokemon-151":{label:"POKÉMON · 151",subtitle:"Scarlet & Violet · 151",icon:"151",theme:"pokemon"},
   "pokemon-phantasmal-flames":{label:"POKÉMON · PHANTASMAL FLAMES",subtitle:"Mega Evolution · ME02",icon:"PF",theme:"pokemon"},
   "pokemon-ascended-heroes":{label:"POKÉMON · ASCENDED HEROES",subtitle:"Mega Evolution · ME2.5",icon:"AH",theme:"pokemon"},
-  "pokemon-first-partner":{label:"POKÉMON · FIRST PARTNER",subtitle:"MEP Black Star Promos · 30th Anniversary",icon:"FP",theme:"pokemon"}
+  "pokemon-first-partner":{label:"POKÉMON · FIRST PARTNER",subtitle:"MEP Black Star Promos · 30th Anniversary",icon:"FP",theme:"pokemon"},
+  "pokemon-mega-evolution":{label:"POKÉMON · MEGA EVOLUTION",subtitle:"Mega Evolution · ME01",icon:"ME",theme:"pokemon"},
+  "pokemon-destined-rivals":{label:"POKÉMON · RIVALES PREDESTINADOS",subtitle:"Scarlet & Violet · DRI",icon:"DR",theme:"pokemon"}
 };
 
 const POKEMON_SET_DEFS={
@@ -32,7 +34,9 @@ const POKEMON_SET_DEFS={
   "037":"Bulbasaur","038":"Charmander","039":"Squirtle","040":"Turtwig","041":"Chimchar","042":"Piplup","043":"Rowlet","044":"Litten","045":"Popplio",
   "046":"Chikorita","047":"Cyndaquil","048":"Totodile","049":"Snivy","050":"Tepig","051":"Oshawott","052":"Grookey","053":"Scorbunny","054":"Sobble",
   "055":"Treecko","056":"Torchic","057":"Mudkip","058":"Chespin","059":"Fennekin","060":"Froakie","061":"Sprigatito","062":"Fuecoco","063":"Quaxly"
- }}
+ }},
+ "pokemon-mega-evolution":{name:"Mega Evolution",seedType:"pokemon-mega-evolution",setId:"me1",official:132,total:188,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/me1.json",ranges:[["BASE",1,132],["ILLUSTRATION RARE",133,154],["ULTRA RARE",155,176],["SPECIAL ILLUSTRATION RARE",177,186],["MEGA HYPER RARE",187,188]]},
+ "pokemon-destined-rivals":{name:"Rivales Predestinados",seedType:"pokemon-destined-rivals",setId:"sv10",official:182,total:244,source:"https://raw.githubusercontent.com/PokemonTCG/pokemon-tcg-data/refs/heads/master/cards/en/sv10.json",ranges:[["BASE",1,182],["ILLUSTRATION RARE",183,205],["ULTRA RARE",206,227],["SPECIAL ILLUSTRATION RARE",228,238],["HYPER RARE",239,244]]}
 };
 function isPokemonCollectionType(type){return Boolean(POKEMON_SET_DEFS[type])}
 function pokemonCode(n){return String(n).padStart(3,"0")}
@@ -233,7 +237,7 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  syncCollectionChrome(project.collectionType);
  const def=collectionDefinition(project);
  document.body.dataset.collectionType=project.collectionType;
- document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks","collection-theme-pokemon","pokemon-theme-pitch-black","pokemon-theme-chaos-rising","pokemon-theme-perfect-order","pokemon-theme-surging-sparks","pokemon-theme-151","pokemon-theme-phantasmal-flames","pokemon-theme-ascended-heroes");
+ document.body.classList.remove("collection-theme-worldcup","collection-theme-ligaeste","collection-theme-megacracks","collection-theme-pokemon","pokemon-theme-pitch-black","pokemon-theme-chaos-rising","pokemon-theme-perfect-order","pokemon-theme-surging-sparks","pokemon-theme-151","pokemon-theme-phantasmal-flames","pokemon-theme-ascended-heroes","pokemon-theme-mega-evolution","pokemon-theme-destined-rivals");
  document.body.classList.add(`collection-theme-${def.theme}`);
  if(isPokemonCollectionType(project.collectionType)) document.body.classList.add(`pokemon-theme-${project.collectionType.replace(/^pokemon-/,"")}`);
  const kicker=document.querySelector(".collection-header-kicker");if(kicker)kicker.textContent=def.label;
@@ -469,7 +473,7 @@ function bootstrapProjectsFromSeed(seedData){
  localStorage.setItem(MASTER_SEED_KEY,seedData.revision||DATA_REVISION);
 }
 
-const POKEMON_SEED_MIGRATION_KEY="stickerbase.pokemon.collections.v3";
+const POKEMON_SEED_MIGRATION_KEY="stickerbase.pokemon.collections.v4";
 function ensurePokemonProjects(){
  if(localStorage.getItem(POKEMON_SEED_MIGRATION_KEY))return false;
  let changed=false;
@@ -3316,7 +3320,7 @@ function renderCollections(){
  const items=orderedProjects();
  const football=items.filter(p=>!isPokemonCollectionType(inferCollectionType(p)));
  const pokemon=items.filter(p=>isPokemonCollectionType(inferCollectionType(p)));
- const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271,"pokemon-first-partner":37};
+ const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271,"pokemon-first-partner":37,"pokemon-mega-evolution":188,"pokemon-destined-rivals":231};
  const footballCover={"world-cup-2026":"assets/collection-covers/world-cup-2026-library.webp","liga-este-2026-27":"assets/collection-covers/liga-este-2026-27-library.webp","megacracks-2026-27":"assets/collection-covers/megacracks-2026-27-library.webp"};
  const renderCard=(p)=>{
    const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);

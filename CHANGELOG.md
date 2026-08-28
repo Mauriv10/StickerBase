@@ -1,3 +1,13 @@
+# Build 704.14.31
+
+- Pokémon: añadidas Mega Evolution (ME01) y Rivales Predestinados / Destined Rivals (DRI).
+- Mega Evolution: 132 cartas base, 188 totales; IR 133–154, UR 155–176, SIR 177–186 y MHR 187–188.
+- Rivales Predestinados: 182 cartas base, 244 totales; IR 183–205, UR 206–227, SIR 228–238 y Hyper Rare 239–244.
+- Ambas aparecen en Crear nuevo álbum y dentro del acordeón Pokémon TCG.
+- Identidades visuales: Mega Evolution cian eléctrico; Rivales Predestinados naranja/rojo oscuro.
+- Se mantiene el sistema de variantes reales, imágenes, estadísticas y aviso rojizo de incompletas.
+- Sin cambios en inventarios existentes, Supabase ni sincronización.
+
 # Build 704.14.30
 
 - Pokémon: reforzado el indicador visual de carta incompleta.

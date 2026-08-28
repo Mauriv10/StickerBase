@@ -8496,3 +8496,18 @@ body.collection-theme-worldcup .compact-home-copy{flex:1 1 auto!important;min-wi
  body.collection-theme-worldcup .panini-header-cover{width:62px!important;height:82px!important;flex-basis:62px!important}
  body.collection-theme-worldcup .compact-home-titlebar{gap:10px!important}
 }
+
+/* Build 704.14.28 · Pokémon incompleto */
+body.collection-theme-pokemon .pokemon-card-row.is-incomplete{background:linear-gradient(90deg,rgba(118,31,38,.22),rgba(78,24,30,.13))!important;box-shadow:inset 3px 0 0 rgba(225,91,101,.48)!important}
+body.collection-theme-pokemon .pokemon-card-row.is-complete{box-shadow:none}
+body.collection-theme-pokemon.pokemon-theme-151 .pokemon-card-row.is-incomplete{background:linear-gradient(90deg,rgba(255,226,228,.94),rgba(255,242,243,.90))!important;box-shadow:inset 3px 0 0 rgba(210,82,94,.42)!important}
+
+/* 704.14.31 · Mega Evolution + Rivales Predestinados */
+body.pokemon-theme-mega-evolution{--pk-accent:#2ed6df;--pk-accent2:#1595b8;--pk-rgb:46,214,223;--pk-glow:rgba(46,214,223,.17)}
+body.pokemon-theme-mega-evolution .compact-home-titlebar{background:radial-gradient(circle at 86% 15%,rgba(30,196,210,.22),transparent 30%),radial-gradient(circle at 70% 52%,rgba(117,44,189,.15),transparent 34%),linear-gradient(125deg,#04080c,#07141b 58%,#0b1018)!important}
+body.pokemon-theme-mega-evolution .search-wrap{border-color:rgba(46,214,223,.44)!important;box-shadow:0 0 24px rgba(46,214,223,.06),inset -50px 0 75px rgba(106,49,181,.05)!important}
+body.pokemon-theme-destined-rivals{--pk-accent:#ff922f;--pk-accent2:#d85a1d;--pk-rgb:255,146,47;--pk-glow:rgba(255,91,43,.18)}
+body.pokemon-theme-destined-rivals .compact-home-titlebar{background:radial-gradient(circle at 88% 15%,rgba(206,42,34,.25),transparent 31%),radial-gradient(circle at 72% 50%,rgba(255,125,37,.13),transparent 34%),linear-gradient(125deg,#080708,#180b0b 60%,#230c0b)!important}
+body.pokemon-theme-destined-rivals .search-wrap{border-color:rgba(255,146,47,.46)!important;box-shadow:0 0 24px rgba(255,95,35,.06),inset -50px 0 75px rgba(154,31,24,.06)!important}
+.collection-folder-pokemon .pokemon-library-mega-evolution{--pokemon-card-accent:#2ed6df;--pokemon-card-accent2:#1595b8}
+.collection-folder-pokemon .pokemon-library-destined-rivals{--pokemon-card-accent:#ff922f;--pokemon-card-accent2:#d85a1d}
