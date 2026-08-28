@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.32";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.33";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -233,16 +233,16 @@ function syncPaniniPremiumHeader(project=projects?.[activeProjectId]){
 
 
 const POKEMON_HEADER_FACE_CARDS={
- "pokemon-pitch-black":116,       // Mega Darkrai ex
- "pokemon-chaos-rising":116,      // Mega Greninja ex
- "pokemon-perfect-order":120,     // Mega Zygarde ex
- "pokemon-surging-sparks":238,    // Pikachu ex
- "pokemon-151":205,               // Mew ex
- "pokemon-phantasmal-flames":125, // protagonista del set
- "pokemon-ascended-heroes":271,   // Mega Dragonite ex
- "pokemon-first-partner":37,      // Bulbasaur / First Partner
- "pokemon-mega-evolution":179,    // Mega Lucario ex
- "pokemon-destined-rivals":231    // Team Rocket / carta protagonista
+ "pokemon-pitch-black":48,        // Mega Darkrai ex · regular: artwork limpio para header
+ "pokemon-chaos-rising":22,       // Mega Greninja ex · regular
+ "pokemon-perfect-order":47,      // Mega Zygarde ex · regular
+ "pokemon-surging-sparks":57,     // Pikachu ex · regular
+ "pokemon-151":151,               // Mew ex · regular
+ "pokemon-phantasmal-flames":13,  // Mega Charizard X ex · regular
+ "pokemon-ascended-heroes":152,   // Mega Dragonite ex · regular
+ "pokemon-first-partner":37,      // Bulbasaur · First Partner
+ "pokemon-mega-evolution":77,     // Mega Lucario ex · regular; la portada de Colecciones sigue en #179
+ "pokemon-destined-rivals":81     // Team Rocket's Mewtwo ex · regular
 };
 function syncPokemonHeaderFace(project=projects?.[activeProjectId]){
  const titlebar=document.querySelector(".compact-home-titlebar");

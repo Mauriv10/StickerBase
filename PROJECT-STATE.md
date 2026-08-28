@@ -1591,3 +1591,11 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Mega Evolution: Mega Lucario ex #179.
 - En la galería `Colecciones`, SOLO Mega Evolution cambia su portada a #179; el resto conserva la portada anterior.
 - Contrato: estos elementos son decorativos y nunca forman parte del inventario/fingerprint/Supabase.
+
+
+## 704.14.33 — contrato visual de headers Pokémon en iPhone
+- No usar secret/SIR/full-art completas como fondo directo del header: en formato iPhone el recorte puede revelar nombres de ataques, habilidades o texto de carta.
+- Los headers usan una impresión regular del protagonista y un recorte/zoom centrado en el artwork superior, conservando exactamente la altura y estructura del header existente.
+- Protagonistas: Pitch Black Mega Darkrai #048; Chaos Rising Mega Greninja #022; Perfect Order Mega Zygarde #047; Surging Sparks Pikachu #057; 151 Mew #151; Phantasmal Flames Mega Charizard X #013; Ascended Heroes Mega Dragonite #152; First Partner Bulbasaur MEP037; Mega Evolution Mega Lucario #077; Destined Rivals Team Rocket's Mewtwo #081.
+- La portada de biblioteca de Mega Evolution continúa siendo Mega Lucario ex #179. No cambiar las demás portadas de Colecciones por este trabajo.
+- Los elementos del header son decorativos y quedan fuera de inventario, fingerprint y sincronización.

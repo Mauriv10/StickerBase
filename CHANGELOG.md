@@ -1,3 +1,10 @@
+## Build 704.14.33 — headers Pokémon optimizados para iPhone
+- Se corrige el problema visual de 704.14.32: los headers ya no usan secret/SIR ampliadas que podían mostrar texto de ataques o habilidades.
+- Cada header usa una impresión regular del Pokémon/personaje protagonista y recorta exclusivamente la zona superior de ilustración mediante un encuadre específico para móvil.
+- Pitch Black usa Mega Darkrai ex #048/084; Chaos Rising Mega Greninja ex #022/086; Perfect Order Mega Zygarde ex #047/088; Surging Sparks Pikachu ex #057/191; 151 Mew ex #151/165; Phantasmal Flames Mega Charizard X ex #013/094; Ascended Heroes Mega Dragonite ex #152/217; First Partner Bulbasaur MEP #037; Mega Evolution Mega Lucario ex #077/132; Rivales Predestinados Team Rocket's Mewtwo ex #081/182.
+- Mega Evolution conserva Mega Lucario ex #179 como portada de la galería `Colecciones`, tal como pidió el usuario. El resto de portadas de `Colecciones` no cambia.
+- No hay cambios en inventario, checklists, estadísticas, variantes ni Supabase.
+
 
 ## Build 704.14.32 — identidad visual Pokémon en headers
 - Añadida imagen temática en el header de todas las colecciones Pokémon usando una carta protagonista de cada expansión como fuente visual, recortada para integrarse como artwork y sin alterar el layout funcional.

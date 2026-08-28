@@ -8512,33 +8512,41 @@ body.pokemon-theme-destined-rivals .search-wrap{border-color:rgba(255,146,47,.46
 .collection-folder-pokemon .pokemon-library-mega-evolution{--pokemon-card-accent:#2ed6df;--pokemon-card-accent2:#1595b8}
 .collection-folder-pokemon .pokemon-library-destined-rivals{--pokemon-card-accent:#ff922f;--pokemon-card-accent2:#d85a1d}
 
-
-/* 704.14.32 · identidad visual Pokémon en headers */
+/* 704.14.33 · headers Pokémon: recorte limpio de la ilustración */
 body.collection-theme-pokemon .compact-home-titlebar{isolation:isolate!important}
 body.collection-theme-pokemon .compact-home-titlebar>*:not(.pokemon-header-face){position:relative!important;z-index:3!important}
 body.collection-theme-pokemon .pokemon-header-face{
  position:absolute!important;z-index:1!important;pointer-events:none!important;
- right:58px!important;top:0!important;bottom:0!important;width:42%!important;
- overflow:hidden!important;opacity:.62!important;
- -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.58) 22%,#000 48%,#000 100%);
- mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.58) 22%,#000 48%,#000 100%);
+ right:58px!important;top:0!important;bottom:0!important;width:44%!important;
+ overflow:hidden!important;opacity:.72!important;
+ -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.5) 16%,#000 42%,#000 100%);
+ mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.5) 16%,#000 42%,#000 100%);
 }
-body.collection-theme-pokemon .pokemon-header-face:after{
- content:"";position:absolute;inset:0;
- background:linear-gradient(90deg,rgba(5,8,12,.16),transparent 30%,rgba(5,8,12,.04));
+body.collection-theme-pokemon .pokemon-header-face:before{
+ content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+ background:linear-gradient(90deg,rgba(5,8,12,.30) 0%,rgba(5,8,12,.08) 32%,transparent 66%);
 }
 body.collection-theme-pokemon .pokemon-header-face img{
- position:absolute!important;width:190%!important;height:190%!important;
- max-width:none!important;right:-43%!important;top:-43%!important;
- object-fit:cover!important;object-position:50% 42%!important;
- filter:saturate(1.12) contrast(1.04)!important;
+ position:absolute!important;z-index:1!important;
+ width:100%!important;height:100%!important;max-width:none!important;
+ right:0!important;top:0!important;object-fit:cover!important;object-position:50% 31%!important;
+ transform:scale(2.12)!important;transform-origin:50% 31%!important;
+ filter:saturate(1.18) contrast(1.06) brightness(.94)!important;
 }
-body.pokemon-theme-pitch-black .pokemon-header-face{opacity:.72!important}
-body.pokemon-theme-pitch-black .pokemon-header-face img{object-position:50% 38%!important}
-body.pokemon-theme-destined-rivals .pokemon-header-face{opacity:.68!important}
-body.pokemon-theme-mega-evolution .pokemon-header-face{opacity:.72!important}
-body.pokemon-theme-151 .pokemon-header-face{opacity:.48!important}
+/* Ajustes finos por protagonista: mantienen el foco dentro del artwork y lejos del texto impreso */
+body.pokemon-theme-pitch-black .pokemon-header-face img{object-position:50% 30%!important;transform-origin:50% 30%!important}
+body.pokemon-theme-chaos-rising .pokemon-header-face img{object-position:54% 30%!important;transform-origin:54% 30%!important}
+body.pokemon-theme-perfect-order .pokemon-header-face img{object-position:50% 31%!important;transform-origin:50% 31%!important}
+body.pokemon-theme-surging-sparks .pokemon-header-face img{object-position:50% 30%!important;transform-origin:50% 30%!important}
+body.pokemon-theme-151 .pokemon-header-face{opacity:.42!important}
+body.pokemon-theme-151 .pokemon-header-face img{object-position:50% 30%!important;transform-origin:50% 30%!important;filter:saturate(1.05) contrast(1.02) brightness(1.08)!important}
+body.pokemon-theme-phantasmal-flames .pokemon-header-face img{object-position:52% 30%!important;transform-origin:52% 30%!important}
+body.pokemon-theme-ascended-heroes .pokemon-header-face img{object-position:50% 30%!important;transform-origin:50% 30%!important}
+body.pokemon-theme-first-partner .pokemon-header-face img{object-position:50% 31%!important;transform-origin:50% 31%!important}
+body.pokemon-theme-mega-evolution .pokemon-header-face img{object-position:50% 30%!important;transform-origin:50% 30%!important}
+body.pokemon-theme-destined-rivals .pokemon-header-face img{object-position:50% 30%!important;transform-origin:50% 30%!important}
 @media(max-width:430px){
- body.collection-theme-pokemon .pokemon-header-face{right:46px!important;width:45%!important;opacity:.58!important}
- body.collection-theme-pokemon .pokemon-header-face img{width:205%!important;height:205%!important;right:-50%!important;top:-50%!important}
+ body.collection-theme-pokemon .pokemon-header-face{right:48px!important;width:47%!important;opacity:.68!important}
+ body.collection-theme-pokemon .pokemon-header-face img{transform:scale(2.28)!important}
+ body.pokemon-theme-151 .pokemon-header-face{opacity:.38!important}
 }
