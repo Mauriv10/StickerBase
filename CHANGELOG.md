@@ -1,3 +1,10 @@
+
+## Build 704.14.32 — identidad visual Pokémon en headers
+- Añadida imagen temática en el header de todas las colecciones Pokémon usando una carta protagonista de cada expansión como fuente visual, recortada para integrarse como artwork y sin alterar el layout funcional.
+- Pitch Black usa Mega Darkrai ex como protagonista del header.
+- Mega Evolution usa Mega Lucario ex #179 como protagonista y, además, su portada en `Colecciones` cambia específicamente a la carta #179 solicitada.
+- Se conservan sin cambios las portadas actuales de todas las demás colecciones.
+- Cambio exclusivamente visual: no modifica inventarios, checklists, estadísticas ni sincronización Supabase.
 # Build 704.14.31
 
 - Pokémon: añadidas Mega Evolution (ME01) y Rivales Predestinados / Destined Rivals (DRI).

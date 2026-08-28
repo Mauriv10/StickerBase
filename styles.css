@@ -8502,7 +8502,7 @@ body.collection-theme-pokemon .pokemon-card-row.is-incomplete{background:linear-
 body.collection-theme-pokemon .pokemon-card-row.is-complete{box-shadow:none}
 body.collection-theme-pokemon.pokemon-theme-151 .pokemon-card-row.is-incomplete{background:linear-gradient(90deg,rgba(255,226,228,.94),rgba(255,242,243,.90))!important;box-shadow:inset 3px 0 0 rgba(210,82,94,.42)!important}
 
-/* 704.14.31 · Mega Evolution + Rivales Predestinados */
+/* 704.14.32 · Mega Evolution + Rivales Predestinados */
 body.pokemon-theme-mega-evolution{--pk-accent:#2ed6df;--pk-accent2:#1595b8;--pk-rgb:46,214,223;--pk-glow:rgba(46,214,223,.17)}
 body.pokemon-theme-mega-evolution .compact-home-titlebar{background:radial-gradient(circle at 86% 15%,rgba(30,196,210,.22),transparent 30%),radial-gradient(circle at 70% 52%,rgba(117,44,189,.15),transparent 34%),linear-gradient(125deg,#04080c,#07141b 58%,#0b1018)!important}
 body.pokemon-theme-mega-evolution .search-wrap{border-color:rgba(46,214,223,.44)!important;box-shadow:0 0 24px rgba(46,214,223,.06),inset -50px 0 75px rgba(106,49,181,.05)!important}
@@ -8511,3 +8511,34 @@ body.pokemon-theme-destined-rivals .compact-home-titlebar{background:radial-grad
 body.pokemon-theme-destined-rivals .search-wrap{border-color:rgba(255,146,47,.46)!important;box-shadow:0 0 24px rgba(255,95,35,.06),inset -50px 0 75px rgba(154,31,24,.06)!important}
 .collection-folder-pokemon .pokemon-library-mega-evolution{--pokemon-card-accent:#2ed6df;--pokemon-card-accent2:#1595b8}
 .collection-folder-pokemon .pokemon-library-destined-rivals{--pokemon-card-accent:#ff922f;--pokemon-card-accent2:#d85a1d}
+
+
+/* 704.14.32 · identidad visual Pokémon en headers */
+body.collection-theme-pokemon .compact-home-titlebar{isolation:isolate!important}
+body.collection-theme-pokemon .compact-home-titlebar>*:not(.pokemon-header-face){position:relative!important;z-index:3!important}
+body.collection-theme-pokemon .pokemon-header-face{
+ position:absolute!important;z-index:1!important;pointer-events:none!important;
+ right:58px!important;top:0!important;bottom:0!important;width:42%!important;
+ overflow:hidden!important;opacity:.62!important;
+ -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.58) 22%,#000 48%,#000 100%);
+ mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.58) 22%,#000 48%,#000 100%);
+}
+body.collection-theme-pokemon .pokemon-header-face:after{
+ content:"";position:absolute;inset:0;
+ background:linear-gradient(90deg,rgba(5,8,12,.16),transparent 30%,rgba(5,8,12,.04));
+}
+body.collection-theme-pokemon .pokemon-header-face img{
+ position:absolute!important;width:190%!important;height:190%!important;
+ max-width:none!important;right:-43%!important;top:-43%!important;
+ object-fit:cover!important;object-position:50% 42%!important;
+ filter:saturate(1.12) contrast(1.04)!important;
+}
+body.pokemon-theme-pitch-black .pokemon-header-face{opacity:.72!important}
+body.pokemon-theme-pitch-black .pokemon-header-face img{object-position:50% 38%!important}
+body.pokemon-theme-destined-rivals .pokemon-header-face{opacity:.68!important}
+body.pokemon-theme-mega-evolution .pokemon-header-face{opacity:.72!important}
+body.pokemon-theme-151 .pokemon-header-face{opacity:.48!important}
+@media(max-width:430px){
+ body.collection-theme-pokemon .pokemon-header-face{right:46px!important;width:45%!important;opacity:.58!important}
+ body.collection-theme-pokemon .pokemon-header-face img{width:205%!important;height:205%!important;right:-50%!important;top:-50%!important}
+}

@@ -1582,3 +1582,12 @@ El indicador visual de carta incompleta se aplica directamente sobre cada `pokem
 Se incorporan dos colecciones Pokémon completas al mismo motor usado por el resto de expansiones. Mega Evolution (ME01/me1): main set 001–132, 188 cartas totales, IR 133–154, UR 155–176, SIR 177–186 y Mega Hyper Rare 187–188. Rivales Predestinados / Destined Rivals (DRI/sv10): main set 001–182, 244 cartas totales, IR 183–205, UR 206–227, SIR 228–238 y Hyper Rare 239–244. Ambas están disponibles en Crear nuevo álbum y se muestran dentro del acordeón Pokémon TCG. Las instalaciones existentes reciben los nuevos proyectos mediante migración Pokémon v4, sin duplicar tipos ya existentes.
 
 Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa eléctrico y matiz púrpura; Rivales Predestinados usa base negra con naranja/rojo inspirada en Team Rocket. Conservan el mismo comportamiento Pokémon: carga de metadatos e imágenes, variantes por rareza, estadísticas, buscador, visor de carta, cantidades y resaltado rojizo de carta incompleta. No modificar inventarios de colecciones anteriores ni sincronización para incorporar estas expansiones.
+
+
+## 704.14.32 — Headers Pokémon con identidad propia
+- Todas las colecciones Pokémon muestran artwork temático en el lado derecho del header, manteniendo la estructura premium existente.
+- La referencia visual se basa en el Pokémon/personaje protagonista de cada expansión (ETB/booster/chase), usando imágenes de cartas ya soportadas por el proveedor de imágenes de StickerBase.
+- Pitch Black: Mega Darkrai ex.
+- Mega Evolution: Mega Lucario ex #179.
+- En la galería `Colecciones`, SOLO Mega Evolution cambia su portada a #179; el resto conserva la portada anterior.
+- Contrato: estos elementos son decorativos y nunca forman parte del inventario/fingerprint/Supabase.

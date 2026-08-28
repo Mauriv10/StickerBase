@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.31";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.32";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -231,6 +231,43 @@ function syncPaniniPremiumHeader(project=projects?.[activeProjectId]){
  }catch(_e){}
 }
 
+
+const POKEMON_HEADER_FACE_CARDS={
+ "pokemon-pitch-black":116,       // Mega Darkrai ex
+ "pokemon-chaos-rising":116,      // Mega Greninja ex
+ "pokemon-perfect-order":120,     // Mega Zygarde ex
+ "pokemon-surging-sparks":238,    // Pikachu ex
+ "pokemon-151":205,               // Mew ex
+ "pokemon-phantasmal-flames":125, // protagonista del set
+ "pokemon-ascended-heroes":271,   // Mega Dragonite ex
+ "pokemon-first-partner":37,      // Bulbasaur / First Partner
+ "pokemon-mega-evolution":179,    // Mega Lucario ex
+ "pokemon-destined-rivals":231    // Team Rocket / carta protagonista
+};
+function syncPokemonHeaderFace(project=projects?.[activeProjectId]){
+ const titlebar=document.querySelector(".compact-home-titlebar");
+ if(!titlebar)return;
+ let face=titlebar.querySelector(".pokemon-header-face");
+ const type=inferCollectionType(project);
+ if(!isPokemonCollectionType(type)){
+   if(face)face.remove();
+   return;
+ }
+ if(!face){
+   face=document.createElement("div");
+   face.className="pokemon-header-face";
+   face.setAttribute("aria-hidden","true");
+   face.innerHTML='<img alt="" decoding="async">';
+   titlebar.appendChild(face);
+ }
+ const card=POKEMON_HEADER_FACE_CARDS[type]||1;
+ const img=face.querySelector("img");
+ if(img){
+   img.src=pokemonDirectImageUrl(type,card,"large")||pokemonDirectImageUrl(type,card,"small");
+   img.dataset.headerType=type;
+ }
+}
+
 function applyCollectionIdentity(project=projects?.[activeProjectId]){
  if(!project)return;
  project.collectionType=inferCollectionType(project);
@@ -249,6 +286,7 @@ function applyCollectionIdentity(project=projects?.[activeProjectId]){
  const infoSub=$("#appInfoSubtitle");if(infoSub)infoSub.textContent=`Build ${APP_VERSION}`;
  const logo=document.querySelector("#ligaEsteHeaderLogo");if(logo){logo.hidden=project.collectionType==="world-cup-2026";logo.textContent=isPokemonCollectionType(project.collectionType)?"POKÉ\nMON":project.collectionType==="megacracks-2026-27"?"Mega\nCracks":"LIGA\nESTE";}
  syncPaniniPremiumHeader(project);
+ syncPokemonHeaderFace(project);
 }
 
 const EXTRA_PLAYERS=[
@@ -3320,7 +3358,7 @@ function renderCollections(){
  const items=orderedProjects();
  const football=items.filter(p=>!isPokemonCollectionType(inferCollectionType(p)));
  const pokemon=items.filter(p=>isPokemonCollectionType(inferCollectionType(p)));
- const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271,"pokemon-first-partner":37,"pokemon-mega-evolution":188,"pokemon-destined-rivals":231};
+ const chase={"pokemon-pitch-black":116,"pokemon-chaos-rising":116,"pokemon-perfect-order":121,"pokemon-surging-sparks":219,"pokemon-151":205,"pokemon-phantasmal-flames":125,"pokemon-ascended-heroes":271,"pokemon-first-partner":37,"pokemon-mega-evolution":179,"pokemon-destined-rivals":231};
  const footballCover={"world-cup-2026":"assets/collection-covers/world-cup-2026-library.webp","liga-este-2026-27":"assets/collection-covers/liga-este-2026-27-library.webp","megacracks-2026-27":"assets/collection-covers/megacracks-2026-27-library.webp"};
  const renderCard=(p)=>{
    const s=collectionProgress(p),active=p.id===activeProjectId,def=collectionDefinition(p),ptype=inferCollectionType(p),isPokemon=isPokemonCollectionType(ptype);
