@@ -1599,3 +1599,11 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Protagonistas: Pitch Black Mega Darkrai #048; Chaos Rising Mega Greninja #022; Perfect Order Mega Zygarde #047; Surging Sparks Pikachu #057; 151 Mew #151; Phantasmal Flames Mega Charizard X #013; Ascended Heroes Mega Dragonite #152; First Partner Bulbasaur MEP037; Mega Evolution Mega Lucario #077; Destined Rivals Team Rocket's Mewtwo #081.
 - La portada de biblioteca de Mega Evolution continúa siendo Mega Lucario ex #179. No cambiar las demás portadas de Colecciones por este trabajo.
 - Los elementos del header son decorativos y quedan fuera de inventario, fingerprint y sincronización.
+
+
+## 704.14.34 — contrato de artwork de headers Pokémon
+- Los headers Pokémon ya no deben obtener su imagen decorativa desde `pokemonDirectImageUrl()` ni desde una carta del checklist.
+- Usan assets locales bajo `assets/pokemon-header-art/`, separados del inventario y del fingerprint.
+- En móvil el artwork debe comenzar aproximadamente desde el 32–38% derecho del header, entrando visualmente hacia la izquierda y fundiéndose mediante máscara; nunca debe aparecer texto/marco de una carta.
+- Mantener el botón volver y la información del header por encima del artwork.
+- Mega Evolution conserva exclusivamente en la biblioteca de Colecciones la portada #179.

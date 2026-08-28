@@ -1,3 +1,11 @@
+
+## Build 704.14.34 — artwork independiente en headers Pokémon
+- Sustituido el sistema de recorte de cartas por assets visuales locales dedicados al header.
+- El artwork entra más hacia el centro/izquierda, como en las referencias aprobadas, con máscara progresiva para conservar la legibilidad del título.
+- Ajustes específicos de ancho/opacidad para Pitch Black, Rivales Predestinados, First Partner y 151.
+- Los nuevos assets se precachean en el service worker para funcionamiento PWA/iPhone.
+- La portada de Mega Evolution en Colecciones continúa siendo Mega Lucario ex #179; las demás portadas no cambian.
+- Sin cambios en inventario, checklists, estadísticas, variantes ni Supabase.
 ## Build 704.14.33 — headers Pokémon optimizados para iPhone
 - Se corrige el problema visual de 704.14.32: los headers ya no usan secret/SIR ampliadas que podían mostrar texto de ataques o habilidades.
 - Cada header usa una impresión regular del Pokémon/personaje protagonista y recorta exclusivamente la zona superior de ilustración mediante un encuadre específico para móvil.
