@@ -347,10 +347,14 @@
     <section class="pokemon-scan-card">
       <div class="pokemon-scan-camera">
         <div id="pokemonScanPreview" class="pokemon-scan-preview">
-          <div class="pokemon-scan-placeholder"><b>⌁</b><span>Apunta a cualquier carta Pokémon</span><small>La cámara detectará automáticamente su número</small></div>
+          <div class="pokemon-scan-placeholder"><b>⌁</b><span>Apunta a cualquier carta Pokémon</span><small>Detectará nombre + número de la carta</small></div>
           <video id="pokemonScanVideo" playsinline muted hidden></video>
           <img id="pokemonScanImage" alt="Carta escaneada" hidden>
           <div id="pokemonScanGuide" class="pokemon-scan-guide" hidden></div>
+          <div id="pokemonScanFullscreenHud" class="pokemon-scan-fullscreen-hud" hidden>
+            <div class="pokemon-scan-fullscreen-top"><strong>ESCANEAR CARTA</strong><button id="pokemonScanFullscreenClose" type="button" aria-label="Cerrar scanner">✕</button></div>
+            <div class="pokemon-scan-fullscreen-copy"><b id="pokemonScanFullscreenStatus">Coloca toda la carta dentro del marco</b><span>Nombre + número · captura automática al quedar estable</span></div>
+          </div>
         </div>
         <input id="pokemonScanImageInput" type="file" accept="image/*" capture="environment" hidden>
         <button id="pokemonScanCameraButton" class="pokemon-scan-main-button" type="button"><span>📷</span> Escanear carta</button>

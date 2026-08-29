@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.41";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.42";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2655,7 +2655,7 @@ function renderStatistics(){
 }
 
 const POKEMON_TCGDEX_API="https://api.tcgdex.net/v2";
-let pokemonScanObjectUrl="",pokemonScanBusy=false,pokemonScanStream=null,pokemonScanLoopTimer=null,pokemonScanLoopBusy=false,pokemonScanStableText="",pokemonScanStableCount=0,pokemonScanWorkerPromise=null,pokemonScanWorkerLang="",pokemonScanNumberVotes=new Map(),pokemonScanNameHistory=[];
+let pokemonScanObjectUrl="",pokemonScanBusy=false,pokemonScanStream=null,pokemonScanLoopTimer=null,pokemonScanLoopBusy=false,pokemonScanStableText="",pokemonScanStableCount=0,pokemonScanWorkerPromise=null,pokemonScanWorkerLang="",pokemonScanNumberVotes=new Map(),pokemonScanNameHistory=[],pokemonScanMotionPrev=null,pokemonScanStableSince=0,pokemonScanLastOCRAt=0;
 function pokemonScannerIsActive(){return isPokemonCollectionType(inferCollectionType(projects?.[activeProjectId]))}
 function renderPokemonPriceScanner(){
  const isPokemon=pokemonScannerIsActive(),pokeView=$("#pokemonPriceScannerView"),panini=$("#paniniTradeView");
@@ -2674,7 +2674,10 @@ function pokemonScanParseNumber(raw){
  if(fraction)return {localId:String(Number(fraction[1])),denominator:Number(fraction[2]),display:`${String(Number(fraction[1])).padStart(3,"0")}/${String(Number(fraction[2])).padStart(3,"0")}`};
  const single=text.match(/^0*(\d{1,3})$/);return single?{localId:String(Number(single[1])),denominator:null,display:String(Number(single[1])).padStart(3,"0")}:{localId:"",denominator:null,display:""};
 }
-function pokemonScanSetStatus(text,kind=""){const el=$("#pokemonScanStatus");if(el){el.textContent=text;el.className=`pokemon-scan-status ${kind}`.trim()}}
+function pokemonScanSetStatus(text,kind=""){
+ const el=$("#pokemonScanStatus");if(el){el.textContent=text;el.className=`pokemon-scan-status ${kind}`.trim()}
+ const hud=$("#pokemonScanFullscreenStatus");if(hud)hud.textContent=text;
+}
 function pokemonScanLanguages(lang){
  const map={"zh-cn":["zh-cn","zh-tw","en"],"zh-tw":["zh-tw","en"],ja:["ja","en"],es:["es","en"],en:["en"]};
  return [...new Set(map[lang]||[lang,"en"].filter(Boolean))];
@@ -2815,63 +2818,88 @@ function pokemonScanExtractNumber(text){
  if(fractions.length)return fractions[0];
  return clean.match(/\b\d{1,3}\b/)?.[0]||"";
 }
-function pokemonScanFrameCanvas(){
+function pokemonScanCardGeometry(){
  const video=$("#pokemonScanVideo");if(!video||video.readyState<2||!video.videoWidth)return null;
  const sourceW=video.videoWidth,sourceH=video.videoHeight;
- // Recortamos la carta completa centrada, no solo el número. El OCR lee nombre + numeración.
- const cropW=Math.floor(sourceW*.56),cropH=Math.floor(sourceH*.92),cropX=Math.floor((sourceW-cropW)/2),cropY=Math.floor(sourceH*.04);
- const maxW=1200,scale=Math.min(1.35,maxW/cropW);
- const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d",{willReadFrequently:true});canvas.width=Math.max(1,Math.floor(cropW*scale));canvas.height=Math.max(1,Math.floor(cropH*scale));
- ctx.filter="grayscale(1) contrast(1.42) brightness(1.04)";ctx.drawImage(video,cropX,cropY,cropW,cropH,0,0,canvas.width,canvas.height);return canvas;
+ // Marco vertical grande: captura la carta completa con margen suficiente para OCR.
+ const targetRatio=63/88;let cropH=Math.floor(sourceH*.88),cropW=Math.floor(cropH*targetRatio);
+ if(cropW>sourceW*.86){cropW=Math.floor(sourceW*.86);cropH=Math.floor(cropW/targetRatio)}
+ return {sourceW,sourceH,cropW,cropH,cropX:Math.floor((sourceW-cropW)/2),cropY:Math.floor((sourceH-cropH)/2)};
+}
+function pokemonScanFrameCanvas(){
+ const video=$("#pokemonScanVideo"),g=pokemonScanCardGeometry();if(!video||!g)return null;
+ const maxW=1500,scale=Math.min(1.55,maxW/g.cropW);
+ const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d",{willReadFrequently:true});
+ canvas.width=Math.max(1,Math.floor(g.cropW*scale));canvas.height=Math.max(1,Math.floor(g.cropH*scale));
+ ctx.filter="grayscale(1) contrast(1.5) brightness(1.06)";ctx.drawImage(video,g.cropX,g.cropY,g.cropW,g.cropH,0,0,canvas.width,canvas.height);return canvas;
+}
+function pokemonScanMotionLevel(){
+ const video=$("#pokemonScanVideo"),g=pokemonScanCardGeometry();if(!video||!g)return 1;
+ const c=document.createElement("canvas"),w=48,h=68;c.width=w;c.height=h;const x=c.getContext("2d",{willReadFrequently:true});
+ x.drawImage(video,g.cropX,g.cropY,g.cropW,g.cropH,0,0,w,h);const data=x.getImageData(0,0,w,h).data,now=new Uint8Array(w*h);
+ for(let i=0,j=0;i<data.length;i+=4,j++)now[j]=(data[i]*3+data[i+1]*6+data[i+2])/10;
+ if(!pokemonScanMotionPrev){pokemonScanMotionPrev=now;return 1}
+ let diff=0;for(let i=0;i<now.length;i++)diff+=Math.abs(now[i]-pokemonScanMotionPrev[i]);pokemonScanMotionPrev=now;return diff/(now.length*255);
 }
 async function pokemonScanAnalyzeLiveFrame(){
  if(!pokemonScanStream||pokemonScanLoopBusy||pokemonScanBusy)return;
  pokemonScanLoopBusy=true;
  try{
+   const motion=pokemonScanMotionLevel(),now=Date.now();
+   // Mientras la carta/móvil se mueve, no hacemos OCR: esperamos estabilidad real.
+   if(motion>.018){pokemonScanStableSince=0;pokemonScanSetStatus("Mantén la carta quieta dentro del marco…","loading");return}
+   if(!pokemonScanStableSince)pokemonScanStableSince=now;
+   const stableMs=now-pokemonScanStableSince;
+   if(stableMs<650){pokemonScanSetStatus("Bien encuadrada · mantén quieto un instante…","loading");return}
+   if(now-pokemonScanLastOCRAt<1800)return;
+   pokemonScanLastOCRAt=now;
    const canvas=pokemonScanFrameCanvas();if(!canvas)return;
    const worker=await pokemonScanWorker();if(!pokemonScanStream)return;
-   pokemonScanSetStatus("Reconociendo carta completa · nombre + número…","loading");
+   pokemonScanSetStatus("Leyendo nombre + número…","loading");
    const result=await worker.recognize(canvas),ocrText=result?.data?.text||"",detected=pokemonScanExtractNumber(ocrText);
-   if(!detected){pokemonScanSetStatus("Cámara activa · mantén la carta completa dentro del marco.","loading");return}
-   const parsed=pokemonScanParseNumber(detected);if(!parsed.localId)return;
+   if(!detected){pokemonScanStableSince=0;pokemonScanSetStatus("No leo todavía nombre y número · ajusta distancia o reflejos.","warning");return}
+   const parsed=pokemonScanParseNumber(detected);if(!parsed.localId){pokemonScanStableSince=0;return}
    const nameHint=pokemonScanExtractNameHint(ocrText,detected);
-   pokemonScanNameHistory.push(nameHint);if(pokemonScanNameHistory.length>4)pokemonScanNameHistory.shift();
+   pokemonScanNameHistory.push(nameHint);if(pokemonScanNameHistory.length>3)pokemonScanNameHistory.shift();
    const combinedName=pokemonScanNameHistory.filter(Boolean).join(" ");
    const key=parsed.display,seen=(pokemonScanNumberVotes.get(key)||0)+1;pokemonScanNumberVotes.set(key,seen);
    if($("#pokemonScanNumber"))$("#pokemonScanNumber").value=parsed.display;
-   if(!parsed.denominator){pokemonScanSetStatus(`Veo ${parsed.display}; sigo leyendo nombre y /XXX…`,"warning");return}
-   pokemonScanSetStatus(nameHint?`Veo ${parsed.display} y texto de nombre · confirmando carta…`:`Número ${parsed.display} confirmado · leyendo nombre…`,"success");
-   // No exigimos frames consecutivos: pequeños movimientos ya no reinician el progreso.
-   if(seen>=2&&(combinedName||seen>=3)){
+   if(!parsed.denominator){pokemonScanStableSince=0;pokemonScanSetStatus(`Veo ${parsed.display}; necesito también /XXX y el nombre.`,"warning");return}
+   // Si tenemos número completo + un nombre razonable, paramos YA. Si el nombre no sale,
+   // permitimos una segunda lectura estable del mismo número y luego resolvemos candidatos.
+   if(nameHint||seen>=2){
+     pokemonScanSetStatus(`✓ Carta capturada · ${parsed.display}${nameHint?" + nombre":""}`,"success");
      pokemonScanStopCamera(false);
-     pokemonScanSetStatus(`Carta capturada: ${parsed.display} · identificando nombre…`,"success");
      await pokemonScanLookup(parsed.display,combinedName);
+     return;
    }
- }catch(e){console.warn("Pokemon live OCR",e);pokemonScanSetStatus("Cámara activa · ajusta encuadre o reflejos; sigo intentando.","warning")}
+   pokemonScanStableSince=0;
+   pokemonScanSetStatus(`Número ${parsed.display} detectado · confirmando nombre…`,"success");
+ }catch(e){console.warn("Pokemon live OCR",e);pokemonScanStableSince=0;pokemonScanSetStatus("No pude leerla con claridad · mantén la carta completa y evita reflejos.","warning")}
  finally{pokemonScanLoopBusy=false}
 }
 function pokemonScanScheduleLoop(){
  clearTimeout(pokemonScanLoopTimer);if(!pokemonScanStream)return;
- pokemonScanLoopTimer=setTimeout(async()=>{await pokemonScanAnalyzeLiveFrame();pokemonScanScheduleLoop()},1200);
+ pokemonScanLoopTimer=setTimeout(async()=>{await pokemonScanAnalyzeLiveFrame();pokemonScanScheduleLoop()},220);
 }
 async function pokemonScanStartCamera(){
  if(pokemonScanStream){pokemonScanStopCamera();return}
  if(!navigator.mediaDevices?.getUserMedia){$("#pokemonScanImageInput")?.click();return}
  pokemonScanHideCandidates();const result=$("#pokemonScanResult");if(result)result.hidden=true;
- pokemonScanStableText="";pokemonScanStableCount=0;pokemonScanNumberVotes=new Map();pokemonScanNameHistory=[];pokemonScanSetStatus("Abriendo cámara…","loading");
+ pokemonScanStableText="";pokemonScanStableCount=0;pokemonScanNumberVotes=new Map();pokemonScanNameHistory=[];pokemonScanMotionPrev=null;pokemonScanStableSince=0;pokemonScanLastOCRAt=0;pokemonScanSetStatus("Abriendo cámara a pantalla completa…","loading");
  try{
-   pokemonScanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}},audio:false});
+   pokemonScanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:2560},height:{ideal:1440}},audio:false});
    const video=$("#pokemonScanVideo");if(!video)throw new Error("video-missing");video.srcObject=pokemonScanStream;video.hidden=false;await video.play();
-   $("#pokemonScanImage")?.setAttribute("hidden","");$("#pokemonScanPreview")?.classList.add("has-video");$("#pokemonScanGuide")?.removeAttribute("hidden");
+   $("#pokemonScanImage")?.setAttribute("hidden","");$("#pokemonScanPreview")?.classList.add("has-video");$("#pokemonScanGuide")?.removeAttribute("hidden");$("#pokemonScanFullscreenHud")?.removeAttribute("hidden");document.body.classList.add("pokemon-scanner-fullscreen");
    const btn=$("#pokemonScanCameraButton");if(btn)btn.innerHTML="<span>⏹</span> Detener cámara";
-   pokemonScanSetStatus("Cámara activa · encuadra la carta completa. Leeré nombre + número y pararé al identificarla.","loading");pokemonScanScheduleLoop();
+   pokemonScanSetStatus("Coloca toda la carta dentro del marco","loading");pokemonScanScheduleLoop();
  }catch(e){console.warn("Pokemon camera",e);pokemonScanStopCamera(false);pokemonScanSetStatus("No pude abrir la cámara en directo. Puedes elegir una foto como alternativa.","warning");$("#pokemonScanImageInput")?.click()}
 }
 function pokemonScanStopCamera(resetStatus=true){
  clearTimeout(pokemonScanLoopTimer);pokemonScanLoopTimer=null;
  if(pokemonScanStream){pokemonScanStream.getTracks().forEach(t=>t.stop());pokemonScanStream=null}
  const video=$("#pokemonScanVideo");if(video){try{video.pause()}catch{}video.srcObject=null;video.hidden=true}
- $("#pokemonScanPreview")?.classList.remove("has-video");
+ $("#pokemonScanPreview")?.classList.remove("has-video");$("#pokemonScanFullscreenHud")?.setAttribute("hidden","");document.body.classList.remove("pokemon-scanner-fullscreen");pokemonScanMotionPrev=null;pokemonScanStableSince=0;
  const btn=$("#pokemonScanCameraButton");if(btn)btn.innerHTML="<span>📷</span> Escanear carta";
  if(resetStatus&&pokemonScannerIsActive())pokemonScanSetStatus("Cámara detenida. Pulsa Escanear carta para continuar.");
 }
@@ -2887,6 +2915,7 @@ async function pokemonScanOCR(file){
 }
 function wirePokemonPriceScanner(){
  $("#pokemonScanCameraButton")?.addEventListener("click",pokemonScanStartCamera);
+ $("#pokemonScanFullscreenClose")?.addEventListener("click",()=>pokemonScanStopCamera());
  $("#pokemonScanImageInput")?.addEventListener("change",e=>{const file=e.currentTarget.files?.[0];if(file)pokemonScanOCR(file);e.currentTarget.value=""});
  $("#pokemonScanLookupButton")?.addEventListener("click",()=>pokemonScanLookup());
  $("#pokemonScanNumber")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();pokemonScanLookup()}});

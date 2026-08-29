@@ -574,3 +574,13 @@
 - OCR adaptado al idioma elegido: spa, eng, jpn, chi_sim o chi_tra.
 - El fallback por foto también analiza la carta completa y cruza nombre + número.
 - Sin cambios en inventario, checklists, estadísticas, fingerprint o Supabase.
+
+
+## 704.14.42 — Scanner Pokémon fullscreen y captura estable
+- Al pulsar Escanear carta, la cámara trasera ocupa toda la pantalla del dispositivo.
+- Marco vertical grande 63:88 para colocar la carta completa, con referencias NOMBRE/NÚMERO y botón cerrar.
+- El scanner deja de lanzar OCR mientras detecta movimiento. Solo captura un frame de alta resolución cuando la carta permanece estable ~650 ms.
+- El OCR trabaja sobre la carta completa y cruza nombre + numeración.
+- En cuanto obtiene número completo y nombre, o confirma el mismo número en dos lecturas estables, detiene físicamente la cámara antes de buscar la ficha/precios.
+- Intervalo de control de movimiento rápido (~220 ms) separado del OCR pesado; evita el bucle de búsquedas provocado por pequeños movimientos.
+- Mantiene foto y entrada manual como fallback. Sin cambios en inventario, checklists, estadísticas, fingerprint ni Supabase.

@@ -1674,3 +1674,14 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - OCR según idioma elegido: castellano=spa, inglés=eng, japonés=jpn, chino simplificado=chi_sim, chino tradicional=chi_tra.
 - Mantener entrada manual como fallback y los únicos precios visibles: Trend, AVG1, AVG7, AVG30 y Low.
 - No modificar inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.
+
+
+## 704.14.42 — contrato scanner Pokémon fullscreen
+- `Escanear carta` debe abrir la cámara a pantalla completa (`body.pokemon-scanner-fullscreen`), no dentro de la tarjeta pequeña de Intercambio.
+- El marco debe representar una carta completa 63:88 y ocupar aproximadamente 75–80% del ancho útil / hasta 72–78% de la altura.
+- Mientras haya movimiento apreciable dentro del marco, NO ejecutar Tesseract. Esperar estabilidad ~650 ms y entonces procesar una captura de alta resolución.
+- OCR obligatorio sobre carta completa: usar nombre + número para resolver la carta; el número no debe ser la única señal cuando el nombre es legible.
+- Tras una identificación suficiente, detener tracks de cámara ANTES de iniciar la búsqueda global/precios. No debe continuar escaneando ni reiniciar por pequeños movimientos.
+- Si el nombre no sale, se admite resolver tras dos lecturas estables coincidentes del número completo y mostrar candidatos si hay ambigüedad.
+- Mantener botón cerrar, fallback de foto y entrada manual.
+- No tocar inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.

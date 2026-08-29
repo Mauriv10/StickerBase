@@ -8743,3 +8743,35 @@ body.pokemon-theme-151 .pokemon-scan-candidate-title{color:#17313a}body.pokemon-
 }
 .pokemon-scan-guide:after{content:"NÚMERO"!important;right:8px!important;bottom:7px!important}
 @media(max-width:430px){.pokemon-scan-guide{left:22%!important;right:22%!important;top:4%!important;bottom:4%!important}}
+
+/* 704.14.42 · scanner Pokémon realmente fullscreen + captura por estabilidad */
+.pokemon-scan-fullscreen-hud{display:none}
+body.pokemon-scanner-fullscreen{overflow:hidden!important;touch-action:none}
+body.pokemon-scanner-fullscreen .pokemon-scan-camera{
+ position:fixed!important;z-index:10050!important;inset:0!important;padding:0!important;margin:0!important;
+ background:#020609!important;display:block!important
+}
+body.pokemon-scanner-fullscreen .pokemon-scan-preview{
+ position:absolute!important;inset:0!important;width:100vw!important;height:100dvh!important;aspect-ratio:auto!important;
+ border:0!important;border-radius:0!important;background:#000!important
+}
+body.pokemon-scanner-fullscreen .pokemon-scan-preview video{width:100%!important;height:100%!important;object-fit:cover!important}
+body.pokemon-scanner-fullscreen .pokemon-scan-guide{
+ display:block!important;left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;
+ width:min(78vw,390px)!important;height:min(78dvh,545px)!important;aspect-ratio:63/88!important;
+ transform:translate(-50%,-50%)!important;border:3px solid rgba(var(--pk-rgb,62,194,255),.92)!important;
+ border-radius:19px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.42),0 0 32px rgba(var(--pk-rgb,62,194,255),.35)!important
+}
+body.pokemon-scanner-fullscreen .pokemon-scan-guide:before{content:"NOMBRE"!important;top:10px!important;left:10px!important;font-size:10px!important}
+body.pokemon-scanner-fullscreen .pokemon-scan-guide:after{content:"NÚMERO"!important;bottom:10px!important;right:10px!important;font-size:10px!important}
+body.pokemon-scanner-fullscreen .pokemon-scan-fullscreen-hud{display:block!important;position:absolute;z-index:4;inset:0;pointer-events:none;color:#fff}
+body.pokemon-scanner-fullscreen .pokemon-scan-fullscreen-top{position:absolute;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;gap:12px;text-shadow:0 2px 10px #000}
+body.pokemon-scanner-fullscreen .pokemon-scan-fullscreen-top strong{font-size:13px;letter-spacing:.14em}
+body.pokemon-scanner-fullscreen .pokemon-scan-fullscreen-top button{pointer-events:auto;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.32);background:rgba(4,10,16,.72);backdrop-filter:blur(10px);color:#fff;font-size:19px;font-weight:900}
+body.pokemon-scanner-fullscreen .pokemon-scan-fullscreen-copy{position:absolute;left:20px;right:20px;bottom:max(34px,calc(env(safe-area-inset-bottom) + 20px));display:grid;gap:6px;text-align:center;text-shadow:0 2px 14px #000}
+body.pokemon-scanner-fullscreen .pokemon-scan-fullscreen-copy b{font-size:17px;line-height:1.25}
+body.pokemon-scanner-fullscreen .pokemon-scan-fullscreen-copy span{font-size:12px;color:rgba(255,255,255,.78)}
+body.pokemon-scanner-fullscreen #pokemonScanCameraButton{display:none!important}
+@media(max-width:430px){
+ body.pokemon-scanner-fullscreen .pokemon-scan-guide{width:min(80vw,355px)!important;height:auto!important;max-height:72dvh!important}
+}
