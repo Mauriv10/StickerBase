@@ -1685,3 +1685,14 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Si el nombre no sale, se admite resolver tras dos lecturas estables coincidentes del número completo y mostrar candidatos si hay ambigüedad.
 - Mantener botón cerrar, fallback de foto y entrada manual.
 - No tocar inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.
+
+
+## 704.14.43 — contrato de scanner Pokémon fullscreen
+- `Escanear carta` debe abrir un overlay real a pantalla completa. Para evitar clipping causado por transforms/overflow del shell PWA, `.pokemon-scan-camera` se mueve temporalmente a `body` mediante placeholder y se restaura al cerrar.
+- El rectángulo visible es la única región principal de análisis. `pokemonScanCardGeometry()` debe mapear el `getBoundingClientRect()` del marco a coordenadas reales del sensor teniendo en cuenta `object-fit: cover`. No volver a asumir un crop central fijo del sensor.
+- Movimiento se calcula solo dentro de la carta, con margen interior, y no puede reiniciarse por cambios en teclado/fondo/manos fuera del marco.
+- OCR principal: carta completa capturada a alta resolución + recorte superior para nombre + recorte inferior para número; la carta completa queda como fallback para numeraciones desplazadas.
+- Precargar el worker OCR al abrir cámara. El estado del HUD debe cambiar para que el usuario sepa si está encuadrando, estabilizando, leyendo o si falta nitidez.
+- Mantener botón `Leer ahora` como fallback, pero el flujo normal debe ser automático tras ~480 ms de estabilidad.
+- Al conseguir una identificación suficiente, detener tracks/cámara antes de buscar y mostrar resultado/candidatos. Nunca continuar escaneando tras haber aceptado una carta.
+- Este módulo no modifica inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni funciones de intercambio de fútbol.

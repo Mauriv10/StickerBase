@@ -584,3 +584,14 @@
 - En cuanto obtiene número completo y nombre, o confirma el mismo número en dos lecturas estables, detiene físicamente la cámara antes de buscar la ficha/precios.
 - Intervalo de control de movimiento rápido (~220 ms) separado del OCR pesado; evita el bucle de búsquedas provocado por pequeños movimientos.
 - Mantiene foto y entrada manual como fallback. Sin cambios en inventario, checklists, estadísticas, fingerprint ni Supabase.
+
+
+## 704.14.43 — Scanner Pokémon fullscreen funcional / OCR corregido
+- Corrige el fallo de 704.14.42 en iPhone donde el scanner quedaba recortado dentro del shell y seguían visibles header y navegación inferior. La cámara se mueve temporalmente como hijo directo de `body`, por encima de todo el PWA, y vuelve a su lugar al cerrar.
+- El área que analiza OCR coincide ahora matemáticamente con el marco visible pese a `object-fit: cover`; ya no analiza teclado, manos o fondo fuera de la carta.
+- El detector de movimiento utiliza solo el interior de la carta y tolera el pulso normal de mano.
+- El OCR deja de intentar leer toda la carta en una sola pasada: captura el marco completo en alta resolución y hace lecturas ampliadas separadas de la zona superior (nombre) y la inferior (número), con fallback de carta completa.
+- Precarga Tesseract al abrir la cámara para eliminar la sensación de que no ocurre nada.
+- Se añade `Leer ahora` como fallback manual dentro del fullscreen, sin eliminar la captura automática por estabilidad.
+- En cuanto obtiene número completo + nombre (o confirma dos veces el mismo número si hay reflejos), detiene físicamente la cámara antes de resolver la carta/precios.
+- Sin cambios en inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.
