@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.38";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.39";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2653,6 +2653,95 @@ function renderStatistics(){
    if(custom){custom.hidden=true;custom.innerHTML="";}
  }
 }
+
+const POKEMON_TCGDEX_API="https://api.tcgdex.net/v2";
+let pokemonScanObjectUrl="",pokemonScanBusy=false;
+function pokemonScannerIsActive(){return isPokemonCollectionType(inferCollectionType(projects?.[activeProjectId]))}
+function renderPokemonPriceScanner(){
+ const isPokemon=pokemonScannerIsActive(),pokeView=$("#pokemonPriceScannerView"),panini=$("#paniniTradeView");
+ if(pokeView)pokeView.hidden=!isPokemon;if(panini)panini.hidden=isPokemon;
+ const tradeNav=document.querySelector('.bottom-nav-button[data-main-view="trade"] span:last-child');if(tradeNav)tradeNav.textContent=isPokemon?"Intercambio":"Cambiar";
+ if(!isPokemon)return;
+ const project=projects?.[activeProjectId],type=inferCollectionType(project),def=POKEMON_SET_DEFS[type];
+ const setLabel=$("#pokemonScanSetLabel");if(setLabel)setLabel.textContent=def?.name||project?.name||"Pokémon";
+ const status=$("#pokemonScanStatus");if(status&&!$("#pokemonScanResult")?.hidden)return;
+ if(status)status.textContent=`${def?.name||"Colección actual"} · escanea una carta o introduce su número.`;
+}
+function pokemonScanCurrency(value){const n=Number(value);return Number.isFinite(n)?new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(n):"—"}
+function pokemonScanLocalNumber(raw){
+ const text=String(raw||"").trim().toUpperCase().replace(/\s+/g,"");
+ const match=text.match(/(?:^|\D)(\d{1,3})\s*\/\s*\d{1,3}/)||text.match(/^(\d{1,3})$/);
+ return match?String(Number(match[1])):"";
+}
+function pokemonScanSetStatus(text,kind=""){const el=$("#pokemonScanStatus");if(el){el.textContent=text;el.className=`pokemon-scan-status ${kind}`.trim()}}
+async function pokemonScanFetchCard(localId,lang){
+ const project=projects?.[activeProjectId],type=inferCollectionType(project),def=POKEMON_SET_DEFS[type];if(!def?.setId)throw new Error("Esta colección no tiene identificador de set.");
+ const ids=[`${def.setId}-${Number(localId)}`];
+ const langs=[lang,"en"].filter((v,i,a)=>v&&a.indexOf(v)===i);
+ let last=null;
+ for(const language of langs){for(const id of ids){try{const r=await fetch(`${POKEMON_TCGDEX_API}/${encodeURIComponent(language)}/cards/${encodeURIComponent(id)}`,{cache:"no-store"});if(r.ok)return await r.json();last=new Error(`TCGdex ${r.status}`)}catch(e){last=e}}}
+ throw last||new Error("No se encontró la carta.");
+}
+function pokemonScanCardmarketPrices(card){
+ const cm=card?.pricing?.cardmarket||{};
+ return {trend:cm.trend??cm.trendPrice,avg1:cm.avg1,avg7:cm.avg7,avg30:cm.avg30,low:cm.low??cm.lowPrice,updated:cm.updated};
+}
+function pokemonScanRenderCard(card,localId,lang){
+ const project=projects?.[activeProjectId],type=inferCollectionType(project),def=POKEMON_SET_DEFS[type],prices=pokemonScanCardmarketPrices(card);
+ const local=pokemonCode(Number(localId)),fallback=pokemonCardMeta(local,project),name=card?.name||fallback?.name||`Carta ${local}`;
+ const image=card?.image?`${String(card.image).replace(/\/$/,"")}/high.webp`:pokemonDirectImageUrl(type,localId,"large");
+ const result=$("#pokemonScanResult");if(result)result.hidden=false;
+ const img=$("#pokemonScanResultImage");if(img){img.src=image;img.alt=name;img.onerror=()=>{img.onerror=null;img.src=pokemonDirectImageUrl(type,localId,"large")}}
+ $("#pokemonScanSetLabel").textContent=def?.name||project?.name||"Pokémon";
+ $("#pokemonScanCardName").textContent=name;
+ $("#pokemonScanCardMeta").textContent=`${local}/${String(def?.official||def?.total||"").padStart(3,"0")} · ${String(lang||"en").toUpperCase()}${card?.rarity?` · ${card.rarity}`:""}`;
+ $("#pokemonPriceTrend").textContent=pokemonScanCurrency(prices.trend);
+ $("#pokemonPriceAvg1").textContent=pokemonScanCurrency(prices.avg1);
+ $("#pokemonPriceAvg7").textContent=pokemonScanCurrency(prices.avg7);
+ $("#pokemonPriceAvg30").textContent=pokemonScanCurrency(prices.avg30);
+ $("#pokemonPriceLow").textContent=pokemonScanCurrency(prices.low);
+ const hasPrice=[prices.trend,prices.avg1,prices.avg7,prices.avg30,prices.low].some(v=>Number.isFinite(Number(v)));
+ const updated=$("#pokemonPriceUpdated");if(updated){const stamp=Number(prices.updated),stampMs=stamp>1e12?stamp:stamp*1000;updated.textContent=hasPrice?`Cardmarket${stamp?` · actualizado ${new Date(stampMs).toLocaleDateString("es-ES")}`:" · datos de mercado"}`:"Cardmarket · sin datos para esta carta"}
+ const link=$("#pokemonCardmarketLink");if(link)link.href=`https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=${encodeURIComponent(`${name} ${local}`)}`;
+ pokemonScanSetStatus(hasPrice?"Carta identificada · precios Cardmarket cargados.":"Carta identificada, pero Cardmarket no tiene precios disponibles.",hasPrice?"success":"warning");
+ result?.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+async function pokemonScanLookup(){
+ if(pokemonScanBusy)return;const raw=$("#pokemonScanNumber")?.value||"",localId=pokemonScanLocalNumber(raw),lang=$("#pokemonScanLanguage")?.value||"es";
+ if(!localId){pokemonScanSetStatus("No encuentro un número válido. Usa formato 238/191 o 238.","error");return}
+ const def=POKEMON_SET_DEFS[inferCollectionType(projects?.[activeProjectId])];
+ const num=Number(localId);if(def&&def.ranges&&!def.ranges.some(([,a,b])=>num>=a&&num<=b)){pokemonScanSetStatus(`La carta ${localId} no pertenece a ${def.name}.`,"error");return}
+ pokemonScanBusy=true;pokemonScanSetStatus("Buscando carta y precios Cardmarket…","loading");$("#pokemonScanLookupButton")?.setAttribute("disabled","");
+ try{const card=await pokemonScanFetchCard(localId,lang);pokemonScanRenderCard(card,localId,lang)}catch(e){console.warn("Pokemon price scan lookup",e);pokemonScanSetStatus("No he podido localizar esa carta. Revisa el número o prueba otro idioma.","error")}
+ finally{pokemonScanBusy=false;$("#pokemonScanLookupButton")?.removeAttribute("disabled")}
+}
+function loadPokemonScannerOCR(){
+ if(globalThis.Tesseract)return Promise.resolve(globalThis.Tesseract);
+ if(globalThis.__pokemonTesseractPromise)return globalThis.__pokemonTesseractPromise;
+ globalThis.__pokemonTesseractPromise=new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";script.async=true;script.onload=()=>resolve(globalThis.Tesseract);script.onerror=()=>reject(new Error("No se pudo cargar OCR"));document.head.appendChild(script)});return globalThis.__pokemonTesseractPromise;
+}
+async function pokemonScanOCR(file){
+ const img=$("#pokemonScanImage");if(!img)return;
+ if(pokemonScanObjectUrl)URL.revokeObjectURL(pokemonScanObjectUrl);pokemonScanObjectUrl=URL.createObjectURL(file);img.src=pokemonScanObjectUrl;img.hidden=false;$("#pokemonScanPreview")?.classList.add("has-image");$("#pokemonScanGuide")?.removeAttribute("hidden");
+ await new Promise((res,rej)=>{img.onload=res;img.onerror=rej});
+ pokemonScanSetStatus("Leyendo el número de la carta…","loading");
+ try{
+   const Tesseract=await loadPokemonScannerOCR(),canvas=document.createElement("canvas"),ctx=canvas.getContext("2d"),w=img.naturalWidth,h=img.naturalHeight;
+   const cropY=Math.floor(h*.64),cropH=Math.floor(h*.36);canvas.width=w;canvas.height=cropH;ctx.drawImage(img,0,cropY,w,cropH,0,0,w,cropH);
+   const result=await Tesseract.recognize(canvas,"eng",{logger:m=>{if(m.status==="recognizing text")pokemonScanSetStatus(`Leyendo carta… ${Math.round((m.progress||0)*100)}%`,"loading")}});
+   const text=String(result?.data?.text||"").replace(/[|I]/g,"1").replace(/[Oo]/g,"0");
+   const fraction=[...text.matchAll(/(\d{1,3})\s*[\/\\]\s*(\d{1,3})/g)].map(m=>m[0])[0];
+   const any=fraction||text.match(/\b\d{1,3}\b/)?.[0]||"";
+   if(!any)throw new Error("number-not-found");$("#pokemonScanNumber").value=any.replace("\\","/");pokemonScanSetStatus(`Número detectado: ${any.replace("\\","/")} · comprobando…`,"success");await pokemonScanLookup();
+ }catch(e){console.warn("Pokemon OCR",e);pokemonScanSetStatus("No pude leer el número automáticamente. Puedes escribirlo debajo y pulsar Buscar.","warning")}
+}
+function wirePokemonPriceScanner(){
+ $("#pokemonScanCameraButton")?.addEventListener("click",()=>$("#pokemonScanImageInput")?.click());
+ $("#pokemonScanImageInput")?.addEventListener("change",e=>{const file=e.currentTarget.files?.[0];if(file)pokemonScanOCR(file);e.currentTarget.value=""});
+ $("#pokemonScanLookupButton")?.addEventListener("click",pokemonScanLookup);
+ $("#pokemonScanNumber")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();pokemonScanLookup()}});
+}
+
 function setMainTab(tab){
  if(tab==="settings"){
    const dialog=$("#settingsDialog");
@@ -2684,6 +2773,7 @@ function setMainTab(tab){
 
  if(tab==="collection")renderGlobalCollection();
  if(tab==="statistics")renderStatistics();
+ if(tab==="trade")renderPokemonPriceScanner();
  if(tab==="collections")renderCollections();
 
  window.scrollTo({top:0,behavior:"auto"});
@@ -2699,7 +2789,6 @@ function setMainTab(tab){
 
 function renderAll(){
  applyCollectionIdentity();
- if(isPokemonCollectionType(inferCollectionType(projects?.[activeProjectId]))&&mainTab==="trade")mainTab="collection";
  updateOptionalCollectionVisibility();
  const homeName=$("#homeCollectionName");if(homeName&&projects[activeProjectId])homeName.textContent=projects[activeProjectId].name;
  if(currentView!=="missing")renderCards();
@@ -4766,3 +4855,5 @@ document.addEventListener("toggle",event=>{
 },true);
 
 $("#closeAlbumComplete")?.addEventListener("click",()=>{const overlay=$("#albumCompleteOverlay");if(overlay){overlay.classList.remove("show");overlay.hidden=true;}});
+
+wirePokemonPriceScanner();

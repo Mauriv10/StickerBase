@@ -543,3 +543,13 @@
 - Fallback local si falla la imagen remota.
 - Rivales reduce el título solo lo necesario para evitar truncado.
 - Sin cambios en inventario, checklists, estadísticas, sincronización o portadas.
+
+## 704.14.39 — Scanner Pokémon con precios Cardmarket
+- La pestaña `Intercambio` vuelve a estar visible en todas las colecciones Pokémon.
+- Dentro de Pokémon, esa pestaña contiene exclusivamente el nuevo scanner de precios; las herramientas de intercambio Panini no aparecen.
+- El scanner abre la cámara/galería, intenta leer por OCR el número de colección y permite corrección manual inmediata.
+- Selector especializado para castellano, inglés, japonés y chino (simplificado/tradicional).
+- La búsqueda se resuelve contra la expansión Pokémon activa mediante TCGdex y muestra exclusivamente Cardmarket: Trend, AVG1, AVG7, AVG30 y Low.
+- Incluye imagen/nombre de confirmación, fecha de actualización cuando está disponible y enlace de búsqueda directo a Cardmarket.
+- El OCR se carga solo al usar la cámara; si falla, el número puede escribirse manualmente sin bloquear la consulta.
+- Sin cambios en inventario, checklists, estadísticas, fingerprint, Supabase ni herramientas de intercambio de las colecciones de fútbol.

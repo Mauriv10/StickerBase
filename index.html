@@ -337,6 +337,58 @@
 
 
 <section id="tradeView" class="main-tab-view" hidden>
+  <section id="pokemonPriceScannerView" class="pokemon-price-scanner-view" hidden>
+    <div class="tab-page-heading pokemon-scan-heading">
+      <span>POKÉMON · CARDMARKET</span>
+      <h2>Escanear precio</h2>
+      <p>Escanea una carta de esta colección para ver Trend, AVG1, AVG7, AVG30 y Low.</p>
+    </div>
+
+    <section class="pokemon-scan-card">
+      <div class="pokemon-scan-camera">
+        <div id="pokemonScanPreview" class="pokemon-scan-preview">
+          <div class="pokemon-scan-placeholder"><b>⌁</b><span>Apunta a la carta completa</span><small>El número de colección debe verse con nitidez</small></div>
+          <img id="pokemonScanImage" alt="Carta escaneada" hidden>
+          <div id="pokemonScanGuide" class="pokemon-scan-guide" hidden></div>
+        </div>
+        <input id="pokemonScanImageInput" type="file" accept="image/*" capture="environment" hidden>
+        <button id="pokemonScanCameraButton" class="pokemon-scan-main-button" type="button"><span>📷</span> Escanear carta</button>
+      </div>
+
+      <div class="pokemon-scan-controls">
+        <label><span>Idioma de la carta</span>
+          <select id="pokemonScanLanguage">
+            <option value="es">Castellano</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="zh-cn">中文（简体）</option>
+            <option value="zh-tw">中文（繁體）</option>
+          </select>
+        </label>
+        <label><span>Número detectado</span>
+          <div class="pokemon-scan-number-row"><input id="pokemonScanNumber" inputmode="numeric" autocomplete="off" placeholder="Ej. 238/191"><button id="pokemonScanLookupButton" type="button">Buscar</button></div>
+        </label>
+        <div id="pokemonScanStatus" class="pokemon-scan-status" aria-live="polite">Escanea una carta o escribe su número.</div>
+      </div>
+    </section>
+
+    <section id="pokemonScanResult" class="pokemon-scan-result" hidden>
+      <div class="pokemon-scan-result-head">
+        <img id="pokemonScanResultImage" alt="">
+        <div><span id="pokemonScanSetLabel">—</span><h3 id="pokemonScanCardName">—</h3><p id="pokemonScanCardMeta">—</p></div>
+      </div>
+      <div class="pokemon-market-grid">
+        <article><span>Trend</span><strong id="pokemonPriceTrend">—</strong></article>
+        <article><span>AVG1</span><strong id="pokemonPriceAvg1">—</strong></article>
+        <article><span>AVG7</span><strong id="pokemonPriceAvg7">—</strong></article>
+        <article><span>AVG30</span><strong id="pokemonPriceAvg30">—</strong></article>
+        <article class="pokemon-market-low"><span>Low</span><strong id="pokemonPriceLow">—</strong></article>
+      </div>
+      <div class="pokemon-scan-result-foot"><small id="pokemonPriceUpdated">Datos Cardmarket</small><a id="pokemonCardmarketLink" href="https://www.cardmarket.com/en/Pokemon/Products/Singles" target="_blank" rel="noopener">Ver en Cardmarket ↗</a></div>
+    </section>
+  </section>
+
+  <section id="paniniTradeView">
   <div class="tab-page-heading">
     <span>INTERCAMBIOS</span>
     <h2>Cambiar cromos</h2>
@@ -380,6 +432,7 @@
       <p>Muestra tu QR o escanea el de otra persona para detectar qué podéis intercambiar.</p>
     </div>
     <button id="openQrCompareButton" type="button">Comparar</button>
+  </section>
   </section>
 </section>
 

@@ -1643,3 +1643,13 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Mantener fallback local si la fuente remota falla.
 - Rivales Predestinados debe mostrar el título completo mediante reducción tipográfica localizada.
 - No modificar inventario, fingerprint, Supabase, checklists, estadísticas ni portadas.
+
+## 704.14.39 — Scanner de precios Pokémon / contrato
+- La navegación Pokémon vuelve a tener cinco pestañas. La tercera se muestra como `Intercambio`.
+- Para cualquier `pokemon-*`, la pestaña Intercambio NO debe mostrar intercambio manual, Analizar lista, protegidos ni QR de Panini: únicamente `pokemonPriceScannerView`.
+- El scanner está contextualizado a la expansión Pokémon activa para minimizar falsos positivos: OCR del número de colección → `setId + localId` → TCGdex.
+- Idiomas expuestos: castellano (`es`), inglés (`en`), japonés (`ja`) y chino simplificado (`zh-cn`) y chino tradicional (`zh-tw`), con fallback de lookup a inglés cuando la ficha localizada no exista.
+- Los únicos datos de precio visibles son los cinco aprobados: `Trend`, `AVG1`, `AVG7`, `AVG30`, `Low`. La fuente mostrada es Cardmarket a través de `pricing.cardmarket` de TCGdex.
+- Principio de seguridad de matching: es mejor no mostrar precio que asignar el precio de otra carta. Si el número no está dentro de los rangos de la colección activa, la consulta se bloquea.
+- La cámara usa `capture=environment`; el OCR intenta leer la parte inferior de la carta mediante Tesseract.js cargado bajo demanda. Siempre debe existir entrada manual del número como fallback.
+- Este módulo no modifica inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni las funciones de intercambio de fútbol.
