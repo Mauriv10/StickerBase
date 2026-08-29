@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.37";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.38";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -244,6 +244,12 @@ const POKEMON_HEADER_ART={
  "pokemon-mega-evolution":"assets/pokemon-header-art/mega-evolution.webp",
  "pokemon-destined-rivals":"assets/pokemon-header-art/destined-rivals.webp"
 };
+const POKEMON_HEADER_CARD_ART={
+ "pokemon-first-partner":"https://assets.tcgdex.net/en/me/mep/037/high.webp",
+ "pokemon-ascended-heroes":"https://images.scrydex.com/pokemon/me2pt5-290/large",
+ "pokemon-mega-evolution":"https://images.scrydex.com/pokemon/me1-160/large",
+ "pokemon-destined-rivals":"https://images.scrydex.com/pokemon/sv10-231/large"
+};
 function syncPokemonHeaderFace(project=projects?.[activeProjectId]){
  const titlebar=document.querySelector(".compact-home-titlebar");
  if(!titlebar)return;
@@ -259,9 +265,18 @@ function syncPokemonHeaderFace(project=projects?.[activeProjectId]){
  }
  const img=face.querySelector("img");
  if(img){
-   const art=POKEMON_HEADER_ART[type]||"";
+   const cardArt=POKEMON_HEADER_CARD_ART[type]||"";
+   const art=cardArt||POKEMON_HEADER_ART[type]||"";
+   face.classList.toggle("is-card-art",Boolean(cardArt));
    img.src=art;
    img.dataset.headerType=type;
+   img.onerror=()=>{
+     if(cardArt){
+       face.classList.remove("is-card-art");
+       img.onerror=null;
+       img.src=POKEMON_HEADER_ART[type]||"";
+     }
+   };
    face.style.setProperty("--pokemon-header-art",art?`url("${art}")`:"none");
  }
 }

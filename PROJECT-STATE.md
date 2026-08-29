@@ -1632,3 +1632,14 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - La capa `<img>` no usa `clip-path`, zoom ni recortes destructivos. Debe conservar `transform:none`, `clip-path:none` y ocupar el lienzo completo; el recorte seguro ya está realizado dentro del propio asset.
 - Se mantiene sin viñeta POKÉ-MON en la izquierda y con el artwork llegando visualmente hasta el borde derecho.
 - No tocar inventario, checklists, estadísticas, portadas de Colecciones, fingerprint ni Supabase al ajustar estos headers.
+
+
+## 704.14.38 — contrato de las cuatro cabeceras rehechas
+- No tocar las cabeceras que el usuario consideró pasables.
+- Rehechas: First Partner, Ascended Heroes, Mega Evolution y Rivales Predestinados.
+- First Partner usa material real de la colección: Bulbasaur MEP 037.
+- Las cuatro usan `POKEMON_HEADER_CARD_ART` + `.is-card-art`; solo debe verse la zona de ilustración.
+- Nunca mostrar nombre de carta, ataques, habilidades ni texto de reglas en el header.
+- Mantener fallback local si la fuente remota falla.
+- Rivales Predestinados debe mostrar el título completo mediante reducción tipográfica localizada.
+- No modificar inventario, fingerprint, Supabase, checklists, estadísticas ni portadas.

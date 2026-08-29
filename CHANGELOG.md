@@ -533,3 +533,13 @@
 - Se elimina también la capa de fondo que reutilizaba el mockup completo, por lo que ya no existe ninguna ruta capaz de volver a mostrar texto/UI incrustada.
 - Mantiene el header sin viñeta POKÉ-MON, la altura actual, el título real de StickerBase y el botón de volver por encima del artwork.
 - Sin cambios en inventario, checklists, estadísticas, portadas de Colecciones, fingerprint ni Supabase.
+
+
+## 704.14.38 — Headers First Partner / Ascended Heroes / Mega Evolution / Rivales
+- Rehechas únicamente las cuatro cabeceras señaladas.
+- First Partner usa Bulbasaur MEP 037 de la propia colección.
+- Ascended Heroes usa Mega Dragonite ex; Mega Evolution, Mega Lucario ex; Rivales, Team Rocket's Mewtwo ex.
+- Solo se muestra la franja de ilustración de la carta; nombre, ataques y reglas quedan fuera del viewport.
+- Fallback local si falla la imagen remota.
+- Rivales reduce el título solo lo necesario para evitar truncado.
+- Sin cambios en inventario, checklists, estadísticas, sincronización o portadas.

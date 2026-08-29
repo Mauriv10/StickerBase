@@ -8682,3 +8682,21 @@ body.pokemon-theme-151 .pokemon-header-face::after{
     -webkit-clip-path:none!important;
   }
 }
+
+/* 704.14.38 · cuatro headers rehechos con ilustración real de carta */
+body.collection-theme-pokemon .pokemon-header-face.is-card-art{overflow:hidden!important}
+body.collection-theme-pokemon .pokemon-header-face.is-card-art img{inset:auto!important;left:auto!important;right:-1%!important;top:-54%!important;width:58%!important;height:auto!important;max-width:none!important;object-fit:contain!important;object-position:center!important;transform:none!important;filter:saturate(1.10) contrast(1.04)!important;opacity:.98!important}
+body.collection-theme-pokemon .pokemon-header-face.is-card-art::after{background:linear-gradient(90deg,rgba(2,7,11,.99) 0%,rgba(2,7,11,.94) 32%,rgba(2,7,11,.68) 47%,rgba(2,7,11,.18) 64%,rgba(2,7,11,0) 79%)!important}
+body.pokemon-theme-first-partner .pokemon-header-face.is-card-art img{top:-50%!important;width:60%!important;right:-2%!important}
+body.pokemon-theme-ascended-heroes .pokemon-header-face.is-card-art img{top:-50%!important;width:59%!important}
+body.pokemon-theme-mega-evolution .pokemon-header-face.is-card-art img{top:-51%!important;width:59%!important}
+body.pokemon-theme-destined-rivals .pokemon-header-face.is-card-art img{top:-48%!important;width:61%!important;right:-2%!important}
+body.pokemon-theme-destined-rivals #homeCollectionName{font-size:clamp(24px,5.2vw,38px)!important;letter-spacing:-.035em!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+@media(max-width:430px){
+ body.collection-theme-pokemon .pokemon-header-face.is-card-art img{top:-45%!important;width:61%!important;right:-2%!important}
+ body.pokemon-theme-first-partner .pokemon-header-face.is-card-art img{top:-41%!important;width:63%!important}
+ body.pokemon-theme-ascended-heroes .pokemon-header-face.is-card-art img{top:-42%!important;width:62%!important}
+ body.pokemon-theme-mega-evolution .pokemon-header-face.is-card-art img{top:-43%!important;width:62%!important}
+ body.pokemon-theme-destined-rivals .pokemon-header-face.is-card-art img{top:-40%!important;width:64%!important;right:-3%!important}
+ body.pokemon-theme-destined-rivals #homeCollectionName{font-size:clamp(21px,5.45vw,29px)!important}
+}
