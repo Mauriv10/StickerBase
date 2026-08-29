@@ -518,3 +518,11 @@
 - Los assets de header se recomponen a formato panorámico para conservar el Pokémon/personaje completo y evitar el recorte excesivo observado en iPhone.
 - El contenido textual permanece por encima con degradado de legibilidad; no cambia la altura del header.
 - Sin cambios en inventario, checklists, estadísticas, portadas de Colecciones ni sincronización.
+
+
+## 704.14.36 — Header Pokémon sin interfaz incrustada
+- Corrige el fallo visual observado en iPhone donde los assets panorámicos 704.14.35 mostraban fragmentos de títulos, subtítulos y buscador dentro del propio artwork.
+- La fuente visual se usa ahora en dos capas: fondo fuertemente desenfocado/oscurecido y una capa frontal recortada exclusivamente a la zona de ilustración.
+- La capa frontal elimina las franjas superior/inferior del mockup y la mitad izquierda que contenía UI, y reduce el protagonista para evitar el recorte excesivo.
+- Mantiene el artwork hasta el borde derecho, el header sin viñeta POKÉ-MON y el texto real de StickerBase por encima.
+- Sin cambios en inventario, checklists, estadísticas, portadas de Colecciones, fingerprint ni Supabase.

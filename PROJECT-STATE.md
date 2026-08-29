@@ -1615,3 +1615,12 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Mantener el título/kicker/subtítulo a la izquierda y el botón volver a la derecha, ambos sobre el artwork.
 - En iPhone no usar un contenedor parcial con `right:14px/18px` ni un `object-fit:cover` sobre una fuente vertical que vuelva a cortar al protagonista.
 - No modificar por este sistema inventarios, checklists, estadísticas, fingerprint, Supabase ni portadas de la biblioteca; Mega Evolution mantiene #179 como portada de Colecciones.
+
+
+## 704.14.36 — contrato de aislamiento visual del header Pokémon
+- Los archivos bajo `assets/pokemon-header-art/` pueden proceder de una composición visual, pero StickerBase nunca debe mostrar directamente su interfaz incrustada.
+- `syncPokemonHeaderFace()` define `--pokemon-header-art`; CSS usa esa fuente como fondo atmosférico desenfocado/oscurecido y como capa frontal recortada.
+- La capa frontal debe excluir la franja superior, la inferior y la zona izquierda donde puedan existir status bar, título, subtítulo o buscador de la fuente.
+- En iPhone el protagonista se escala aproximadamente al 76–80% según colección y queda anclado al borde derecho, evitando el primer plano/mutilación observado en 704.14.34–35.
+- El único texto visible del header debe ser el HTML real de StickerBase. La viñeta lateral POKÉ-MON permanece eliminada.
+- No tocar por esta capa visual inventario, checklists, estadísticas, fingerprint, Supabase ni portadas de Colecciones.
