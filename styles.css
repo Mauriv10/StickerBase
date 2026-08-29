@@ -8720,3 +8720,13 @@ body.pokemon-theme-151 .pokemon-scan-card,body.pokemon-theme-151 .pokemon-scan-r
 /* 704.14.39 · vuelve a mostrar la pestaña de intercambio en Pokémon; allí vive exclusivamente el scanner */
 body.collection-theme-pokemon .bottom-app-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 body.collection-theme-pokemon .bottom-nav-button[data-main-view="trade"]{display:flex!important}
+
+/* 704.14.40 · Scanner Pokémon global + cámara continua */
+.pokemon-scan-preview video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#070b0f}
+.pokemon-scan-preview.has-video .pokemon-scan-placeholder,.pokemon-scan-preview.has-video>img{display:none!important}
+.pokemon-scan-preview.has-video .pokemon-scan-guide{display:block}
+.pokemon-scan-candidates{margin-top:2px;display:grid;gap:10px}.pokemon-scan-candidates[hidden]{display:none!important}
+.pokemon-scan-candidate-title{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#eef4f7}.pokemon-scan-candidate-title strong{font-size:14px}.pokemon-scan-candidate-title span{font-size:11px;color:#8f9ca7}
+.pokemon-scan-candidate-grid{display:grid;gap:8px}.pokemon-scan-candidate-grid button{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;align-items:center;width:100%;padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.035);color:#fff;text-align:left}.pokemon-scan-candidate-grid img{width:48px;height:66px;object-fit:cover;border-radius:6px;background:#111820}.pokemon-scan-candidate-grid span{min-width:0;display:grid;gap:4px}.pokemon-scan-candidate-grid b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pokemon-scan-candidate-grid small{font-size:10px;color:#8f9ca7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pokemon-scan-again-button{width:100%;margin-top:12px;min-height:46px;border:1px solid rgba(var(--pk-rgb,62,194,255),.28);border-radius:13px;background:rgba(var(--pk-rgb,62,194,255),.10);color:var(--pk-accent,#67d9ef);font-weight:900;font-size:14px}
+body.pokemon-theme-151 .pokemon-scan-candidate-title{color:#17313a}body.pokemon-theme-151 .pokemon-scan-candidate-grid button{background:rgba(26,117,135,.05);border-color:rgba(26,117,135,.11);color:#17313a}

@@ -341,13 +341,14 @@
     <div class="tab-page-heading pokemon-scan-heading">
       <span>POKÉMON · CARDMARKET</span>
       <h2>Escanear precio</h2>
-      <p>Escanea una carta de esta colección para ver Trend, AVG1, AVG7, AVG30 y Low.</p>
+      <p>Apunta a cualquier carta Pokémon. StickerBase detecta la carta y muestra Trend, AVG1, AVG7, AVG30 y Low.</p>
     </div>
 
     <section class="pokemon-scan-card">
       <div class="pokemon-scan-camera">
         <div id="pokemonScanPreview" class="pokemon-scan-preview">
-          <div class="pokemon-scan-placeholder"><b>⌁</b><span>Apunta a la carta completa</span><small>El número de colección debe verse con nitidez</small></div>
+          <div class="pokemon-scan-placeholder"><b>⌁</b><span>Apunta a cualquier carta Pokémon</span><small>La cámara detectará automáticamente su número</small></div>
+          <video id="pokemonScanVideo" playsinline muted hidden></video>
           <img id="pokemonScanImage" alt="Carta escaneada" hidden>
           <div id="pokemonScanGuide" class="pokemon-scan-guide" hidden></div>
         </div>
@@ -368,7 +369,8 @@
         <label><span>Número detectado</span>
           <div class="pokemon-scan-number-row"><input id="pokemonScanNumber" inputmode="numeric" autocomplete="off" placeholder="Ej. 238/191"><button id="pokemonScanLookupButton" type="button">Buscar</button></div>
         </label>
-        <div id="pokemonScanStatus" class="pokemon-scan-status" aria-live="polite">Escanea una carta o escribe su número.</div>
+        <div id="pokemonScanStatus" class="pokemon-scan-status" aria-live="polite">Scanner global · escanea cualquier carta Pokémon o escribe su número.</div>
+        <div id="pokemonScanCandidates" class="pokemon-scan-candidates" hidden></div>
       </div>
     </section>
 
@@ -385,6 +387,7 @@
         <article class="pokemon-market-low"><span>Low</span><strong id="pokemonPriceLow">—</strong></article>
       </div>
       <div class="pokemon-scan-result-foot"><small id="pokemonPriceUpdated">Datos Cardmarket</small><a id="pokemonCardmarketLink" href="https://www.cardmarket.com/en/Pokemon/Products/Singles" target="_blank" rel="noopener">Ver en Cardmarket ↗</a></div>
+      <button id="pokemonScanAgainButton" class="pokemon-scan-again-button" type="button">📷 Escanear otra carta</button>
     </section>
   </section>
 

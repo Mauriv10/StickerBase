@@ -553,3 +553,13 @@
 - Incluye imagen/nombre de confirmación, fecha de actualización cuando está disponible y enlace de búsqueda directo a Cardmarket.
 - El OCR se carga solo al usar la cámara; si falla, el número puede escribirse manualmente sin bloquear la consulta.
 - Sin cambios en inventario, checklists, estadísticas, fingerprint, Supabase ni herramientas de intercambio de las colecciones de fútbol.
+
+## 704.14.40 — Scanner Pokémon global y cámara continua
+- El scanner deja de estar ligado a la expansión abierta: puede identificar cualquier carta Pokémon desde cualquier colección Pokémon.
+- La búsqueda global usa `localId` en TCGdex y, cuando se detecta `075/086`, cruza también el denominador con el tamaño oficial/total del set para reducir ambigüedad.
+- Si quedan varias coincidencias, nunca se elige una al azar: se muestran hasta 8 candidatas con imagen, nombre y expansión para confirmación.
+- `Escanear carta` abre `getUserMedia` con la cámara trasera y analiza frames de forma secuencial; no requiere pulsar el disparador. Dos lecturas estables del número completo disparan la búsqueda automática.
+- Se mantiene el selector ES/EN/JA/ZH y la entrada manual como fallback; si el navegador no permite cámara en directo, se conserva la captura de foto como alternativa.
+- Se añade `Escanear otra carta` para encadenar consultas.
+- Los únicos datos económicos siguen siendo Trend, AVG1, AVG7, AVG30 y Low de Cardmarket vía TCGdex.
+- Sin cambios en inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.

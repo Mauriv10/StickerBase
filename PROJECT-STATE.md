@@ -1653,3 +1653,14 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Principio de seguridad de matching: es mejor no mostrar precio que asignar el precio de otra carta. Si el número no está dentro de los rangos de la colección activa, la consulta se bloquea.
 - La cámara usa `capture=environment`; el OCR intenta leer la parte inferior de la carta mediante Tesseract.js cargado bajo demanda. Siempre debe existir entrada manual del número como fallback.
 - Este módulo no modifica inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni las funciones de intercambio de fútbol.
+
+## 704.14.40 — contrato Scanner Pokémon global
+- La colección Pokémon desde la que se abre Intercambio NO restringe el scanner. Puede buscar cualquier carta Pokémon.
+- Flujo principal: botón `Escanear carta` → cámara trasera en directo (`getUserMedia`) → OCR periódico de la zona inferior → estabilidad de lectura → búsqueda automática. No exigir disparador/foto manual.
+- El formato `número/denominador` es la clave principal de desambiguación global: filtrar candidatos por `localId` y comparar denominador con `set.cardCount.official` o `total`.
+- Si hay más de una candidata plausible, mostrar selección visual; está prohibido asignar silenciosamente un precio a una carta ambigua.
+- Mantener entrada manual y captura de foto solo como fallback.
+- Idiomas: ES, EN, JA, ZH simplificado/tradicional; para ZH simplificado se permite fallback ZH-TW/EN mientras TCGdex no tenga cobertura completa.
+- Tras resultado debe existir `Escanear otra carta` para reabrir inmediatamente la cámara.
+- Los únicos precios visibles continúan siendo Trend, AVG1, AVG7, AVG30 y Low.
+- No modificar inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.
