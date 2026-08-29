@@ -1624,3 +1624,11 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - En iPhone el protagonista se escala aproximadamente al 76–80% según colección y queda anclado al borde derecho, evitando el primer plano/mutilación observado en 704.14.34–35.
 - El único texto visible del header debe ser el HTML real de StickerBase. La viñeta lateral POKÉ-MON permanece eliminada.
 - No tocar por esta capa visual inventario, checklists, estadísticas, fingerprint, Supabase ni portadas de Colecciones.
+
+## 704.14.37 — contrato definitivo de artwork limpio en headers Pokémon
+- Los 10 archivos de `assets/pokemon-header-art/*.webp` son ahora lienzos RGBA 1200×340 con solo una zona de artwork válida anclada a la derecha y transparencia/fundido hacia el resto del header.
+- Está prohibido volver a usar como header un screenshot/mockup completo que contenga texto, buscador, barra de estado, botones o cualquier otra UI incrustada.
+- `pokemon-header-face::before` queda desactivado: no debe volver a mostrar el asset como fondo completo o desenfocado, porque esa ruta fue la responsable de reintroducir restos de UI en 704.14.36.
+- La capa `<img>` no usa `clip-path`, zoom ni recortes destructivos. Debe conservar `transform:none`, `clip-path:none` y ocupar el lienzo completo; el recorte seguro ya está realizado dentro del propio asset.
+- Se mantiene sin viñeta POKÉ-MON en la izquierda y con el artwork llegando visualmente hasta el borde derecho.
+- No tocar inventario, checklists, estadísticas, portadas de Colecciones, fingerprint ni Supabase al ajustar estos headers.

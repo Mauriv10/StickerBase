@@ -8617,3 +8617,68 @@ body.pokemon-theme-151 .pokemon-header-face img{opacity:.82!important;transform:
   body.pokemon-theme-perfect-order .pokemon-header-face img{transform:scale(.78)!important;clip-path:inset(10% 0 26% 59%)!important;-webkit-clip-path:inset(10% 0 26% 59%)!important}
   body.pokemon-theme-destined-rivals .pokemon-header-face img,body.pokemon-theme-phantasmal-flames .pokemon-header-face img{transform:scale(.78)!important;clip-path:inset(10% 0 26% 62%)!important;-webkit-clip-path:inset(10% 0 26% 62%)!important}
 }
+
+/* 704.14.37 · header Pokémon limpio: assets sin UI, sin recortes CSS */
+body.collection-theme-pokemon .pokemon-header-face{
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  right:0!important;
+  overflow:hidden!important;
+  opacity:1!important;
+  background:none!important;
+  pointer-events:none!important;
+}
+body.collection-theme-pokemon .pokemon-header-face::before{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+}
+body.collection-theme-pokemon .pokemon-header-face img{
+  display:block!important;
+  position:absolute!important;
+  z-index:1!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:fill!important;
+  object-position:center center!important;
+  transform:none!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+  filter:saturate(1.08) contrast(1.03)!important;
+  opacity:.98!important;
+}
+body.collection-theme-pokemon .pokemon-header-face::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  z-index:2!important;
+  inset:0!important;
+  pointer-events:none!important;
+  background:linear-gradient(90deg,rgba(2,7,11,.98) 0%,rgba(2,7,11,.92) 29%,rgba(2,7,11,.60) 43%,rgba(2,7,11,.20) 58%,rgba(2,7,11,0) 74%)!important;
+}
+body.pokemon-theme-151 .pokemon-header-face::after{
+  background:linear-gradient(90deg,rgba(244,252,253,.98) 0%,rgba(244,252,253,.92) 29%,rgba(244,252,253,.62) 44%,rgba(244,252,253,.20) 59%,rgba(244,252,253,0) 75%)!important;
+}
+@media(max-width:430px){
+  body.collection-theme-pokemon .pokemon-header-face,
+  body.pokemon-theme-pitch-black .pokemon-header-face,
+  body.pokemon-theme-destined-rivals .pokemon-header-face,
+  body.pokemon-theme-first-partner .pokemon-header-face{
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    right:0!important;
+    opacity:1!important;
+  }
+  body.collection-theme-pokemon .pokemon-header-face img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:fill!important;
+    transform:none!important;
+    clip-path:none!important;
+    -webkit-clip-path:none!important;
+  }
+}

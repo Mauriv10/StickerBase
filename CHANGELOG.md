@@ -526,3 +526,10 @@
 - La capa frontal elimina las franjas superior/inferior del mockup y la mitad izquierda que contenía UI, y reduce el protagonista para evitar el recorte excesivo.
 - Mantiene el artwork hasta el borde derecho, el header sin viñeta POKÉ-MON y el texto real de StickerBase por encima.
 - Sin cambios en inventario, checklists, estadísticas, portadas de Colecciones, fingerprint ni Supabase.
+
+## 704.14.37 — Header Pokémon limpio definitivo
+- Sustituye los 10 assets de header por composiciones locales que contienen únicamente la zona de artwork; se eliminan físicamente de los archivos los títulos, subtítulos, buscadores, barras de estado y controles que venían incrustados en los mockups anteriores.
+- El CSS deja de intentar ocultar UI mediante `clip-path`: el artwork se muestra completo dentro de un lienzo transparente 1200×340, anclado al borde derecho y con fundido real hacia la izquierda/inferior.
+- Se elimina también la capa de fondo que reutilizaba el mockup completo, por lo que ya no existe ninguna ruta capaz de volver a mostrar texto/UI incrustada.
+- Mantiene el header sin viñeta POKÉ-MON, la altura actual, el título real de StickerBase y el botón de volver por encima del artwork.
+- Sin cambios en inventario, checklists, estadísticas, portadas de Colecciones, fingerprint ni Supabase.
