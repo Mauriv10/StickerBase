@@ -1664,3 +1664,13 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Tras resultado debe existir `Escanear otra carta` para reabrir inmediatamente la cámara.
 - Los únicos precios visibles continúan siendo Trend, AVG1, AVG7, AVG30 y Low.
 - No modificar inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.
+
+## 704.14.41 — contrato scanner Pokémon nombre + número
+- El scanner Pokémon global NO debe basarse únicamente en el número de colección. Debe analizar la carta completa y cruzar como mínimo numeración + nombre OCR.
+- La guía de cámara debe encuadrar la carta completa en vertical; `pokemonScanFrameCanvas()` recorta ese marco completo.
+- Los pequeños movimientos no reinician el reconocimiento: las lecturas del mismo número acumulan votos aunque no sean frames consecutivos.
+- En cuanto hay confirmación suficiente, `pokemonScanStopCamera(false)` debe ejecutarse ANTES del lookup; una carta ya capturada nunca debe seguir escaneándose en segundo plano.
+- `pokemonScanGlobalCandidates()` ordena también por similitud entre el nombre OCR y el nombre TCGdex. Una coincidencia clara puede resolverse automáticamente; una ambigua debe mostrar candidatos con la cámara ya detenida.
+- OCR según idioma elegido: castellano=spa, inglés=eng, japonés=jpn, chino simplificado=chi_sim, chino tradicional=chi_tra.
+- Mantener entrada manual como fallback y los únicos precios visibles: Trend, AVG1, AVG7, AVG30 y Low.
+- No modificar inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.

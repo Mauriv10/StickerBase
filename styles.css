@@ -8730,3 +8730,16 @@ body.collection-theme-pokemon .bottom-nav-button[data-main-view="trade"]{display
 .pokemon-scan-candidate-grid{display:grid;gap:8px}.pokemon-scan-candidate-grid button{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;align-items:center;width:100%;padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.035);color:#fff;text-align:left}.pokemon-scan-candidate-grid img{width:48px;height:66px;object-fit:cover;border-radius:6px;background:#111820}.pokemon-scan-candidate-grid span{min-width:0;display:grid;gap:4px}.pokemon-scan-candidate-grid b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pokemon-scan-candidate-grid small{font-size:10px;color:#8f9ca7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pokemon-scan-again-button{width:100%;margin-top:12px;min-height:46px;border:1px solid rgba(var(--pk-rgb,62,194,255),.28);border-radius:13px;background:rgba(var(--pk-rgb,62,194,255),.10);color:var(--pk-accent,#67d9ef);font-weight:900;font-size:14px}
 body.pokemon-theme-151 .pokemon-scan-candidate-title{color:#17313a}body.pokemon-theme-151 .pokemon-scan-candidate-grid button{background:rgba(26,117,135,.05);border-color:rgba(26,117,135,.11);color:#17313a}
+
+/* 704.14.41 · scanner Pokémon: encuadre de carta completa (nombre + número) */
+.pokemon-scan-guide{
+ left:23%!important;right:23%!important;top:4%!important;bottom:4%!important;height:auto!important;
+ border:2px solid rgba(var(--pk-rgb,62,194,255),.78)!important;border-radius:14px!important;
+ box-shadow:0 0 0 999px rgba(0,0,0,.16),0 0 22px rgba(var(--pk-rgb,62,194,255),.24)!important
+}
+.pokemon-scan-guide:before{
+ content:"NOMBRE";position:absolute;left:8px;top:7px;font-size:9px;font-weight:900;letter-spacing:.13em;color:#fff;
+ background:rgba(0,0,0,.54);padding:3px 6px;border-radius:5px
+}
+.pokemon-scan-guide:after{content:"NÚMERO"!important;right:8px!important;bottom:7px!important}
+@media(max-width:430px){.pokemon-scan-guide{left:22%!important;right:22%!important;top:4%!important;bottom:4%!important}}

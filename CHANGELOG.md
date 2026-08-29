@@ -563,3 +563,14 @@
 - Se añade `Escanear otra carta` para encadenar consultas.
 - Los únicos datos económicos siguen siendo Trend, AVG1, AVG7, AVG30 y Low de Cardmarket vía TCGdex.
 - Sin cambios en inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.
+
+## 704.14.41 — Scanner Pokémon por carta completa
+- Corrige el scanner en vivo para reconocer la carta completa: usa conjuntamente nombre OCR + numeración, no solo el número.
+- El marco de cámara pasa a formato vertical de carta completa y marca las zonas NOMBRE / NÚMERO.
+- El progreso de detección ya no exige dos frames consecutivos idénticos: pequeños movimientos del móvil no reinician la confirmación.
+- Al obtener dos lecturas compatibles del mismo número y texto de nombre, se detiene físicamente la cámara antes de consultar TCGdex/Cardmarket.
+- Las coincidencias globales se ordenan también por similitud del nombre leído; si hay una coincidencia claramente superior se selecciona automáticamente.
+- Si sigue habiendo ambigüedad, se muestran candidatos y el scanner permanece detenido, evitando búsqueda infinita.
+- OCR adaptado al idioma elegido: spa, eng, jpn, chi_sim o chi_tra.
+- El fallback por foto también analiza la carta completa y cruza nombre + número.
+- Sin cambios en inventario, checklists, estadísticas, fingerprint o Supabase.
