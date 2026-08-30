@@ -1,3 +1,19 @@
+## Build 704.14.57 — 30/08/2026 — Mis Singles: Cardmarket oficial directo
+- Precios: fuente primaria = JSON público oficial de Cardmarket Pokémon (`products_singles_6.json` + `price_guide_6.json`), enlazados por `idProduct`.
+- Cardmarket actualiza la guía de precios diariamente; la app no debe presentar valores 0 como precios válidos.
+- TCGdex queda como catálogo/búsqueda visual y fallback de precio solo si la descarga directa de Cardmarket no está disponible.
+- Pokémon TCG API se usa como fallback de IMAGEN, no como fuente económica primaria.
+- Regla visual absoluta: nunca construir URLs ambiguas que puedan devolver un reverso; si no hay frontal fiable, placeholder PK.
+- No tocar Supabase, inventarios, checklists, routing ni En camino.
+
+## Build 704.14.56 — 30/08/2026 — Mis Singles: imágenes y Cardmarket robustos
+- En Mis Singles nunca debe mostrarse el reverso genérico de una carta como si fuese su imagen frontal.
+- Se elimina el fallback por URL construida de PokémonTCG.io, porque IDs de set incompatibles entre proveedores podían devolver un reverso genérico.
+- Orden de imagen: TCGdex exacto → TCGdex EN exacto → Pokémon TCG API consultada por carta → Limitless solo cuando el set está mapeado con seguridad → placeholder PK.
+- Un valor `0,00 €` de Cardmarket se considera dato ausente, no precio real.
+- Precio: TCGdex Cardmarket si hay dato positivo; si no, fallback Pokémon TCG API/Cardmarket.
+- No tocar Supabase ni inventario para estas correcciones.
+
 ## Build 704.14.55 — 30/08/2026 — Mis Singles: buscador único + Cardmarket
 - `Mis Singles` NO debe mostrar el buscador global `#teamSearch`; el único buscador visible es `#pokemonSingleQuery` dentro de Discover. La ocultación es específica de `body[data-collection-type="pokemon-singles"]` y no afecta al buscador de álbumes Pokémon normales ni a Panini.
 - Los detalles de carta de TCGdex ya incluyen `pricing.cardmarket`; aprovechar esa misma respuesta para mostrar Cardmarket sin API key adicional ni backend.

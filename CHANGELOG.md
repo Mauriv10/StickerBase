@@ -1,3 +1,19 @@
+## 704.14.57 — 30/08/2026
+- Mis Singles: integración directa con los datasets públicos oficiales de Cardmarket para Pokémon.
+- Cruce catálogo/precios mediante `idProduct`; Trend/AVG7/AVG30 ignoran ceros.
+- TCGdex deja de ser la fuente primaria de precio; permanece como búsqueda/metadata y fallback.
+- Pokémon TCG API queda como fallback visual exacto por nombre+número.
+- Se mantiene la regla de no mostrar reversos: si no existe frontal fiable, se muestra PK.
+
+## 704.14.56 — Mis Singles: imágenes frontales seguras + precios Cardmarket corregidos
+- Elimina el fallback construido a `images.pokemontcg.io` que podía devolver el reverso genérico cuando el ID de set no coincidía entre proveedores.
+- Mantiene TCGdex como imagen principal y usa Limitless solo en sets mapeados de forma segura.
+- Añade fallback consultado a Pokémon TCG API para recuperar imagen frontal exacta cuando TCGdex no dispone de imagen.
+- Cardmarket deja de considerar `0,00 €` como un precio válido.
+- Si TCGdex no trae un precio positivo, consulta Pokémon TCG API y usa su bloque Cardmarket como segunda fuente.
+- Para cartas no inglesas, resuelve primero el nombre inglés mediante TCGdex antes de consultar el fallback de precios/imágenes.
+- Si ninguna fuente devuelve una imagen frontal fiable, se muestra un placeholder `PK` en lugar de un reverso.
+
 ## 704.14.55 — Mis Singles: buscador único + Cardmarket
 - El buscador global superior se oculta únicamente dentro de `Mis Singles`; se conserva el buscador Discover predictivo como único campo de búsqueda en esa pantalla.
 - Los resultados de `Mis Singles` muestran precio Cardmarket cuando TCGdex lo proporciona, usando tendencia como referencia principal y medias de 7/30 días como contexto.
