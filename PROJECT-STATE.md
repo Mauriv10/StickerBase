@@ -1,3 +1,8 @@
+## Build 704.14.49 — 30/08/2026
+- Mis Singles: las imágenes de resultados y cartas registradas son pulsables y abren la misma vista ampliada usada por los álbumes Pokémon.
+- Mis Singles: fallback de imagen al catálogo inglés de TCGdex cuando la ficha localizada no aporta imagen, manteniendo nombre/idioma de la búsqueda.
+- No se modifica inventario, checklists ni sincronización.
+
 # StickerBase — PROJECT STATE MAESTRO
 
 Última actualización: 23/08/2026

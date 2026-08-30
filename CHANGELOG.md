@@ -1,3 +1,8 @@
+## Build 704.14.49 — 30/08/2026
+- Mis Singles: miniaturas pulsables con indicador de ampliación; las imágenes de resultados y cartas registradas son pulsables y abren la misma vista ampliada usada por los álbumes Pokémon.
+- Mis Singles: fallback de imagen al catálogo inglés de TCGdex cuando la ficha localizada no aporta imagen, manteniendo nombre/idioma de la búsqueda.
+- No se modifica inventario, checklists ni sincronización.
+
 # Build 704.14.48 — Mis Singles enruta al álbum correcto
 
 - Al añadir una carta desde **Mis Singles**, StickerBase detecta si su `setId` corresponde a una colección Pokémon ya creada y si el número existe realmente en el checklist de ese álbum.
