@@ -1844,3 +1844,11 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - No usar `autoValueScanAt` como bloqueo para enriquecer con precio una ficha recién creada. Ese timestamp solo limita la reevaluación global de cartas BASE para la regla > 2 €.
 - Los precios ya existentes conservan refresco máximo cada 24 h mediante `pokemonSinglesRefreshStoredPrices()`.
 - No alterar inventario, cantidades, checklists ni routing álbum + Mis Singles.
+
+
+## 704.14.62 — reparación definitiva de precios de mirrors
+- Causa confirmada en el flujo de mirrors: `pokemonSinglesAlbumCardStub()` generaba `tcgdexId` desde el `setId` compacto interno (`me5-115`, etc.), mientras TCGdex puede requerir el código oficial con cero/punto (`me05-115`, etc.). Esto impedía recuperar el nombre inglés fiable usado para emparejar Cardmarket.
+- Se añade resolución tolerante de IDs TCGdex: conserva compatibilidad con IDs existentes y prueba variantes oficiales para Mega Evolution y sets `.5`.
+- Al resolver una carta se persisten en memoria `tcgdexId` y `englishName`, por lo que los mirrors ya creados se autorreparan durante el refresco; no hace falta borrarlos/recrearlos.
+- Un fallo de Cardmarket ya NO actualiza `cardmarketFetchedAt`. Solo una obtención de precio válida marca el refresco de 24 h. Los fallos registran `cardmarketLastErrorAt` únicamente como diagnóstico y pueden reintentarse.
+- No alterar inventario, cantidades, checklists ni routing álbum + Mis Singles.

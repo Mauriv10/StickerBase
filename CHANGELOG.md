@@ -1,3 +1,10 @@
+## 704.14.62
+- Corrige la resolución de precios Cardmarket de cartas espejadas desde álbumes Pokémon.
+- Los IDs compactos internos (por ejemplo `me5`) prueban también el formato oficial/TCGdex (`me05`) para recuperar el nombre inglés correcto.
+- Repara automáticamente `tcgdexId`/`englishName` de mirrors existentes al refrescar precios.
+- Un intento de precio fallido ya no escribe `cardmarketFetchedAt`, evitando bloquear durante 24 h una carta que sigue sin precio.
+- No modifica inventarios, cantidades ni routing álbum + Mis Singles.
+
 ## 704.14.61
 - Corrige el refresco de precios Cardmarket de cartas incorporadas automáticamente desde álbumes a Mis Singles.
 - Los mirrors no-BASE sin precio se consultan inmediatamente aunque el escaneo global de valor de 24 h todavía no haya vencido.
