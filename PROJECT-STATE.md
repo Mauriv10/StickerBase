@@ -1,3 +1,10 @@
+## Build 704.14.50 — 30/08/2026
+- Fix confirmado tras prueba real en iPhone: un single antiguo podía conservar `image: ""`, por lo que seguía mostrando `PK` aunque 704.14.49 ya supiera guardar imágenes en nuevas búsquedas. Ahora Mis Singles rehidrata en segundo plano cualquier carta guardada sin imagen consultando TCGdex (idioma original -> EN fallback), persiste la URL y vuelve a renderizar.
+- El visor ampliado se mantiene para resultados y cartas registradas; además las miniaturas de `En camino` son pulsables y abren el mismo visor.
+- Fix de `En camino` vacío en iPhone/PWA: `renderPokemonIncomingView()` controla `hidden` Y `style.display` de `#pokemonIncomingView` / `#paniniTradeView`, evitando estados visuales heredados al cambiar de pestaña.
+- `En camino` sigue siendo agregado global de todas las colecciones Pokémon y Mis Singles; no modificar inventarios/checklists salvo al pulsar explícitamente `Recibida`.
+- Regresión: una carta de Mis Singles marcada En camino debe aparecer en esa pestaña incluso si la colección activa es `pokemon-singles`.
+
 ## Build 704.14.49 — 30/08/2026
 - Mis Singles: las imágenes de resultados y cartas registradas son pulsables y abren la misma vista ampliada usada por los álbumes Pokémon.
 - Mis Singles: fallback de imagen al catálogo inglés de TCGdex cuando la ficha localizada no aporta imagen, manteniendo nombre/idioma de la búsqueda.

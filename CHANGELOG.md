@@ -1,3 +1,9 @@
+## 704.14.50 — Mis Singles: imágenes reparadas + En camino visible
+- Repara automáticamente cartas de Mis Singles ya guardadas sin URL de imagen: vuelve a consultar TCGdex en el idioma de la carta y, si hace falta, en inglés; al encontrarla persiste la miniatura para no perderla de nuevo.
+- Las miniaturas de Mis Singles siguen abriendo el visor grande y la vista En camino también permite abrir la carta en grande cuando hay imagen.
+- Corrige la pestaña Pokémon `En camino` en iPhone/PWA forzando de forma explícita la visibilidad del panel Pokémon y ocultando el panel Panini, en vez de depender únicamente del atributo `hidden`.
+- La vista En camino rehidrata también imágenes de singles antiguos pendientes.
+
 ## Build 704.14.49 — 30/08/2026
 - Mis Singles: miniaturas pulsables con indicador de ampliación; las imágenes de resultados y cartas registradas son pulsables y abren la misma vista ampliada usada por los álbumes Pokémon.
 - Mis Singles: fallback de imagen al catálogo inglés de TCGdex cuando la ficha localizada no aporta imagen, manteniendo nombre/idioma de la búsqueda.
