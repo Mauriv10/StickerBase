@@ -1,3 +1,9 @@
+## 704.14.58 — 30/08/2026
+
+- First Partner: corregido el desplazamiento vertical de los controles de stock − / + en cartas de variante fija.
+- Se anula el `margin-top:-35px` heredado del layout Pokémon antiguo cuando `pokemon-fixed-badge` va seguido de `pokemon-stock`; los controles vuelven a quedar centrados dentro de su fila.
+- Cambio exclusivamente visual: no modifica cantidades, variantes, inventario, En camino, checklists ni sincronización Supabase.
+
 ## 704.14.57 — 30/08/2026
 - Mis Singles: integración directa con los datasets públicos oficiales de Cardmarket para Pokémon.
 - Cruce catálogo/precios mediante `idProduct`; Trend/AVG7/AVG30 ignoran ceros.

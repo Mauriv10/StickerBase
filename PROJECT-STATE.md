@@ -1,3 +1,11 @@
+# Update 704.14.58 — First Partner stock controls
+
+- Build source: 704.14.57 COMPLETE.
+- Fixed a legacy CSS collision in fixed-variant Pokémon rows: `.pokemon-card-main>.pokemon-fixed-badge+.pokemon-stock{margin-top:-35px}` was still active and lifted the quantity/−/+ block upward, especially visible in First Partner.
+- 704.14.58 overrides that legacy offset with `margin-top:0!important` and centers the stock block.
+- Regression contract: fixed-badge Pokémon rows (including First Partner) must keep xN / − / + vertically contained and centered in each card row. Do not restore the negative stock margin.
+- No inventory/checklist/cloud behavior changed.
+
 ## Build 704.14.57 — 30/08/2026 — Mis Singles: Cardmarket oficial directo
 - Precios: fuente primaria = JSON público oficial de Cardmarket Pokémon (`products_singles_6.json` + `price_guide_6.json`), enlazados por `idProduct`.
 - Cardmarket actualiza la guía de precios diariamente; la app no debe presentar valores 0 como precios válidos.
