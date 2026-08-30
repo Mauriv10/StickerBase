@@ -2848,6 +2848,14 @@ body{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
   font-size:30px;
   letter-spacing:-.045em;
 }
+.stats-ring strong.is-money{
+  max-width:98px;
+  font-size:21px;
+  line-height:1.05;
+  text-align:center;
+  letter-spacing:-.035em;
+  white-space:nowrap;
+}
 .stats-ring span{
   color:rgba(255,255,255,.60);
   font-size:11px;

@@ -1,3 +1,12 @@
+## 704.14.64 — 30/08/2026
+- Mis Singles: la hidratación de imágenes ya no depende de que la carta pertenezca a un álbum/checklist. Orden de fallback: TCGdex exacto (idioma -> EN) -> Pokémon TCG API consultada por nombre+número -> Limitless solo en sets mapeados con seguridad.
+- El fallback de Pokémon TCG API persiste miniatura y versión grande (`image` + `imageLarge`) y acepta numeraciones promocionales con prefijo/sufijo numérico (p. ej. `MEP032` / `032`). Esto cubre promos como Mega-Gardevoir ex MEP #032 aunque First Partner solo tenga 037-063.
+- El esquema canónico de Singles sube a 3 para permitir una nueva revisión de mirrors existentes con la cadena de imagen actualizada.
+- Estadísticas de Mis Singles: el aro de `completado` pasa a mostrar `valor total`, sumando el precio principal Cardmarket que se ve en cada ficha.
+- Estadísticas separa `Valor en colección` y `Valor en camino`; cada bloque indica cuántas cartas tienen precio y cuántas siguen sin valorar para no presentar un total incompleto como definitivo.
+- El aro de estadísticas usa formato monetario adaptado y vuelve automáticamente a `% / completado` al entrar en álbumes normales.
+- No modifica inventarios, cantidades, variantes, routing álbum + Mis Singles ni Supabase.
+
 ## 704.14.63 — 30/08/2026
 - Mis Singles elimina el segundo hero interno de `Cromos`; se conserva la cabecera general y las pestañas compactas muestran los contadores `Colección / En camino`.
 - La pestaña Colección muestra solo cartas recibidas; las cartas `status="incoming"` quedan exclusivamente en `En camino`, evitando el contador/listado incoherente.

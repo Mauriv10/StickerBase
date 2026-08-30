@@ -1,3 +1,14 @@
+# Update 704.14.64 — Mis Singles: fallback visual universal + valor económico
+
+- Fuente de verdad para esta build: 704.14.63 COMPLETO.
+- Una Single no puede depender del rango/checklist de un álbum para conseguir imagen. Cadena permanente: TCGdex exacto (idioma -> EN) -> Pokémon TCG API consultada por nombre+número -> Limitless únicamente para mappings seguros -> PK si ninguna fuente fiable responde.
+- Pokémon TCG API debe persistir `image` y `imageLarge`; la comparación de número admite promos cuyo proveedor devuelve códigos como `MEP032` mientras StickerBase guarda `032`. Caso de regresión: Mega-Gardevoir ex, MEP Black Star Promos #032.
+- `POKEMON_SINGLES_CANONICAL_SCHEMA=3`: permite volver a revisar mirrors previos tras el cambio de hidratación.
+- En Estadísticas de `pokemon-singles`, el círculo no representa completado. Debe mostrar la suma de `pokemonSinglesCardmarketView(card).primary` de colección + en camino con etiqueta `valor total`.
+- El desglose debe mostrar por separado `Valor en colección` y `Valor en camino`, además del número de cartas sin precio. Nunca sumar una carta sin precio como si estuviera valorada; se excluye de la suma y se informa como `sin valorar`.
+- Al cambiar a un álbum Pokémon normal o Panini, el aro debe restaurar `%` y la etiqueta `completado`.
+- No tocar inventarios, cantidades, variantes, routing, En camino ni Supabase por estos cambios.
+
 # Update 704.14.60 — Mis Singles como índice paralelo + navegación propia
 
 - Regla permanente: **álbum y Mis Singles no son excluyentes**. Si una carta buscada pertenece a un álbum/checklist existente, se registra en el álbum correspondiente y además conserva una ficha en Mis Singles para imagen, estado y Cardmarket. No duplicar cantidades por el hecho de existir en ambos sitios.

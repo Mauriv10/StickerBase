@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.63";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.64";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2595,7 +2595,7 @@ function renderPokemonStatistics(){
  if(genericGrid)genericGrid.hidden=true;if(shinyBreakdown)shinyBreakdown.hidden=true;if(albumProgressRoot)albumProgressRoot.hidden=true;
  $("#statsTotalStickers").textContent=`${ps.unique}/${ps.def.total} cartas`;
  $("#statsCompleteTeamsText").textContent=`${ps.missing} pendientes · ${ps.copies} copias`;
- $("#statsProgress").textContent=`${ps.progress}%`;
+ const progress=$("#statsProgress"),progressLabel=$("#statsProgressLabel");if(progress){progress.textContent=`${ps.progress}%`;progress.classList.remove("is-money");}if(progressLabel)progressLabel.textContent="completado";
  const ring=$("#statsProgressRing");if(ring)ring.style.setProperty("--progress",String(ps.progress));
  if(custom){
    custom.hidden=false;
@@ -2635,7 +2635,7 @@ function renderStatistics(){
    statsCollaborationTotal:s.collaboration.toLocaleString("es-ES"),
    statsCompleteTeamsText:`${(isLiga||isMega)?s.normalComplete:s.complete} ${(isLiga||isMega)?"clubes completos":"selecciones completas"}`
  };
- Object.entries(values).forEach(([id,value])=>{const node=$("#"+id);if(node)node.textContent=value});
+ Object.entries(values).forEach(([id,value])=>{const node=$("#"+id);if(node)node.textContent=value});const progressNode=$("#statsProgress"),progressLabel=$("#statsProgressLabel");if(progressNode)progressNode.classList.remove("is-money");if(progressLabel)progressLabel.textContent="completado";
  const ring=$("#statsProgressRing");
  if(ring)ring.style.setProperty("--progress",String(s.progress));
  const albumProgressRoot=$("#albumProgressStats");
@@ -2691,7 +2691,7 @@ let pokemonSinglesSearchResults=[],pokemonSinglesSearchBusy=false,pokemonSingles
 let pokemonSinglesCollectionTab="owned";
 let pokemonSinglesAutoSyncInFlight=false;
 let pokemonSinglesCanonicalRepairInFlight=false;
-const POKEMON_SINGLES_CANONICAL_SCHEMA=2;
+const POKEMON_SINGLES_CANONICAL_SCHEMA=3;
 const POKEMON_SINGLES_PRICE_THRESHOLD=2;
 const POKEMON_SINGLES_RECENT_VIEWED_KEY="stickerbase.pokemon.singles.recentViewed.v1";
 const POKEMON_SINGLES_RECENT_ADDED_KEY="stickerbase.pokemon.singles.recentAdded.v1";
@@ -2847,20 +2847,25 @@ async function pokemonSinglesPokemonTcgFallback(card){
  const promise=(async()=>{try{
    let searchName=String(card?.name||"");const {tcgdexId}=pokemonSinglesTcgdexParts(card);if(card?.language!=="en"&&tcgdexId){try{const en=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/en/cards/${encodeURIComponent(tcgdexId)}`);if(en?.name)searchName=en.name;}catch{}}const name=searchName.replace(/["\\]/g," ").trim(),wantedNumber=String(card?.number||"").replace(/^0+(?=\d)/,"");if(!name||!wantedNumber)return null;
    const q=`name:"${name}"`;const data=await pokemonSinglesFetchJson(`${POKEMON_TCG_API}/cards?q=${encodeURIComponent(q)}&pageSize=50`);const rows=Array.isArray(data?.data)?data.data:[];
-   const sameNumber=rows.filter(row=>String(row?.number||"").replace(/^0+(?=\d)/,"")===wantedNumber);const wantedSet=normalizeTradeName(card?.setName||"");sameNumber.sort((a,b)=>{const score=row=>{const set=normalizeTradeName(row?.set?.name||"");let n=0;if(set===wantedSet)n+=100;if(set.includes(wantedSet)||wantedSet.includes(set))n+=50;return n};return score(b)-score(a)});const hit=sameNumber[0]||null;if(!hit)return null;return {image:hit?.images?.small||hit?.images?.large||""};
+   const numberMatches=value=>{const raw=String(value||"").trim().toLowerCase(),digits=raw.match(/(\d+)$/)?.[1]||"";return (digits?String(Number(digits)):raw.replace(/^0+(?=\d)/,""))===wantedNumber;};const sameNumber=rows.filter(row=>numberMatches(row?.number));const wantedSet=normalizeTradeName(card?.setName||"");sameNumber.sort((a,b)=>{const score=row=>{const set=normalizeTradeName(row?.set?.name||"");let n=0;if(set===wantedSet)n+=100;if(set.includes(wantedSet)||wantedSet.includes(set))n+=50;return n};return score(b)-score(a)});const hit=sameNumber[0]||null;if(!hit)return null;return {image:hit?.images?.small||hit?.images?.large||"",imageLarge:hit?.images?.large||hit?.images?.small||""};
   }catch{return null}})();pokemonSinglesPtcgCache.set(key,promise);return promise;
 }
 async function pokemonSinglesEnsureCardImage(project,card,onUpdated){
  if(!project||!card)return "";
  const alreadyCanonical=Boolean(card.image&&card.imageLarge);if(alreadyCanonical)return card.image;
- const {tcgdexId}=pokemonSinglesTcgdexParts(card);if(!tcgdexId)return card.image||"";
- const hydrationKey=`${project.id}|||${card.id||tcgdexId}`;if(pokemonSinglesImageHydration.has(hydrationKey))return card.image||"";pokemonSinglesImageHydration.add(hydrationKey);
+ const {tcgdexId}=pokemonSinglesTcgdexParts(card);
+ const hydrationKey=`${project.id}|||${card.id||tcgdexId||`${card.setId||card.setName}:${card.number||""}`}`;if(pokemonSinglesImageHydration.has(hydrationKey))return card.image||"";pokemonSinglesImageHydration.add(hydrationKey);
+ const commit=(image,large=image,source="")=>{if(!image)return "";card.image=image;card.imageLarge=large||image;if(source)card.imageSource=source;card.imageHydratedAt=new Date().toISOString();persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return image;};
  try{
-  const langs=[card.language||"es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i);
-  for(const lang of langs){
-   try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(tcgdexId)}`),base=String(detail?.image||"").replace(/\/$/,""),image=pokemonSinglesImageUrl(base,"low"),large=pokemonSinglesImageUrl(base,"high");if(image){card.imageBase=base;card.image=image;card.imageLarge=large||image;persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return image;}}catch{}
-  }
-  if(!card.image){const fallback=pokemonSinglesFallbackImage(card);if(fallback){card.image=fallback;card.imageLarge=fallback;persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return fallback;}}
+  // 1) TCGdex exacto en idioma de la ficha y después EN.
+  if(tcgdexId){const langs=[card.language||"es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i);for(const lang of langs){
+   try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(tcgdexId)}`),base=String(detail?.image||"").replace(/\/$/,""),image=pokemonSinglesImageUrl(base,"low"),large=pokemonSinglesImageUrl(base,"high");if(image){card.imageBase=base;return commit(image,large||image,`tcgdex-${lang}`);}}catch{}
+  }}
+  // 2) Fallback consultado por nombre+número, independiente del checklist de álbumes.
+  // Cubre promos/singles como MEP032 aunque no formen parte del rango First Partner 037-063.
+  try{const ptcg=await pokemonSinglesPokemonTcgFallback(card);if(ptcg?.image)return commit(ptcg.image,ptcg.imageLarge||ptcg.image,"pokemontcg-api");}catch{}
+  // 3) CDN segura únicamente en sets que tienen mapping conocido.
+  const fallback=pokemonSinglesFallbackImage(card);if(fallback)return commit(fallback,fallback,"limitless");
  }finally{pokemonSinglesImageHydration.delete(hydrationKey)}
  return card.image||"";
 }
@@ -3099,8 +3104,14 @@ function wirePokemonSingleCards(){
  document.querySelectorAll("[data-single-incoming]").forEach(button=>button.onclick=()=>{const card=project.pokemonSingles.find(item=>item.id===button.dataset.singleIncoming);if(!card)return;const target=pokemonSinglesTargetFromMirror(card);if(target){const variant=card.routeVariant||target.options?.[0]?.[0]||"fixed",next=card.status!=="incoming";pokemonSetIncoming(target.project,target.section,target.code,variant,next);card.status=next?"incoming":"owned";}else card.status=card.status==="incoming"?"owned":"incoming";card.addedAt=new Date().toISOString();persistProjects();scheduleCloudSave();renderPokemonSinglesCollection();updateNavigationBadges();showToast(card.status==="incoming"?"📦 Marcada como en camino":"Quitada de En camino");});
  document.querySelectorAll("[data-single-remove]").forEach(button=>button.onclick=()=>{const card=project.pokemonSingles.find(item=>item.id===button.dataset.singleRemove);if(!card||!confirm(`¿Eliminar ${card.name} de Mis Singles?`))return;project.pokemonSingles=project.pokemonSingles.filter(item=>item.id!==card.id);persistProjects();scheduleCloudSave();renderPokemonSinglesCollection();showToast("Single eliminado");});
 }
+function pokemonSinglesValueSummary(cards=[]){let total=0,priced=0;for(const card of cards){const view=pokemonSinglesCardmarketView(card);if(!view||!Number.isFinite(view.primary))continue;total+=view.primary;priced++;}return {total,priced,missing:Math.max(0,cards.length-priced)};}
 function renderPokemonSinglesStatistics(project=projects?.[activeProjectId]){
- const cards=project?.pokemonSingles||[],owned=cards.filter(c=>c.status!=="incoming"),incoming=cards.filter(c=>c.status==="incoming"),sets=new Set(cards.map(c=>c.setId||c.setName).filter(Boolean));const genericGrid=document.querySelector(".visual-stats-grid"),shinyBreakdown=document.querySelector(".shiny-breakdown"),custom=$("#collectionSpecificStats"),albumProgressRoot=$("#albumProgressStats");if(genericGrid)genericGrid.hidden=true;if(shinyBreakdown)shinyBreakdown.hidden=true;if(albumProgressRoot)albumProgressRoot.hidden=true;$("#statsTotalStickers").textContent=`${cards.length} singles`;$("#statsCompleteTeamsText").textContent=`${owned.length} recibidas · ${incoming.length} en camino`;$("#statsProgress").textContent="—";const ring=$("#statsProgressRing");if(ring)ring.style.setProperty("--progress","0");if(custom){custom.hidden=false;custom.innerHTML=`<div class="pokemon-stats-grid"><article><span>★</span><div><small>Singles registrados</small><strong>${cards.length}</strong><em>cualquier expansión</em></div></article><article><span>✓</span><div><small>En colección</small><strong>${owned.length}</strong><em>cartas recibidas</em></div></article><article><span>📦</span><div><small>En camino</small><strong>${incoming.length}</strong><em>pendientes de recibir</em></div></article><article><span>▦</span><div><small>Expansiones</small><strong>${sets.size}</strong><em>representadas</em></div></article></div>`;}}
+ const cards=project?.pokemonSingles||[],owned=cards.filter(c=>c.status!=="incoming"),incoming=cards.filter(c=>c.status==="incoming"),sets=new Set(cards.map(c=>c.setId||c.setName).filter(Boolean)),ownedValue=pokemonSinglesValueSummary(owned),incomingValue=pokemonSinglesValueSummary(incoming),allValue={total:ownedValue.total+incomingValue.total,priced:ownedValue.priced+incomingValue.priced,missing:ownedValue.missing+incomingValue.missing};
+ const genericGrid=document.querySelector(".visual-stats-grid"),shinyBreakdown=document.querySelector(".shiny-breakdown"),custom=$("#collectionSpecificStats"),albumProgressRoot=$("#albumProgressStats");if(genericGrid)genericGrid.hidden=true;if(shinyBreakdown)shinyBreakdown.hidden=true;if(albumProgressRoot)albumProgressRoot.hidden=true;
+ $("#statsTotalStickers").textContent=`${cards.length} singles`;$("#statsCompleteTeamsText").textContent=`${owned.length} recibidas · ${incoming.length} en camino`;
+ const progress=$("#statsProgress"),label=$("#statsProgressLabel");if(progress){progress.textContent=pokemonSinglesEuro(allValue.total);progress.classList.add("is-money");}if(label)label.textContent="valor total";const ring=$("#statsProgressRing");if(ring)ring.style.setProperty("--progress","100");
+ const missingNote=count=>count?`${count} sin valorar`:"todas valoradas";
+ if(custom){custom.hidden=false;custom.innerHTML=`<div class="pokemon-stats-grid"><article><span>€</span><div><small>Valor en colección</small><strong>${pokemonSinglesEuro(ownedValue.total)}</strong><em>${ownedValue.priced}/${owned.length} con precio · ${missingNote(ownedValue.missing)}</em></div></article><article><span>📦</span><div><small>Valor en camino</small><strong>${pokemonSinglesEuro(incomingValue.total)}</strong><em>${incomingValue.priced}/${incoming.length} con precio · ${missingNote(incomingValue.missing)}</em></div></article><article><span>★</span><div><small>Singles registrados</small><strong>${cards.length}</strong><em>${owned.length} recibidas · ${incoming.length} en camino</em></div></article><article><span>▦</span><div><small>Expansiones</small><strong>${sets.size}</strong><em>${allValue.missing?`${allValue.missing} cartas sin valoración`:"valoración completa"}</em></div></article></div>`;}}
 function wirePokemonIncomingView(){}
 
 function setMainTab(tab){
