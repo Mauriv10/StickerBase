@@ -1767,3 +1767,13 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Si no hay destino compatible: almacenar en `pokemonSingles`.
 - En BASE con múltiples acabados, pedir la variante mediante selector antes de registrar o marcar En camino.
 - Nunca crear automáticamente una colección completa solo porque se busque/compre un single.
+
+## 704.14.53 — contrato Mis Singles / En camino estable
+- `En camino` debe mostrar pendientes de `pokemonSingles` con `status="incoming"` y de `pokemonIncoming` de todos los álbumes Pokémon. La colección virtual `pokemon-singles` se procesa explícitamente antes del filtro de álbumes.
+- En modo Pokémon + pestaña `trade`, `#tradeView` y `#pokemonIncomingView` deben quedar sin atributo `hidden` y visibles de forma determinista; `#paniniTradeView` queda oculto. No volver a depender de una sola capa de `hidden` en Safari/PWA.
+- El buscador de Mis Singles es predictivo: a partir de 2 caracteres lanza búsqueda tras ~350 ms sin exigir botón. Enter/Búsqueda manual siguen disponibles.
+- Inputs de búsqueda Pokémon en móvil deben usar mínimo 16 px para impedir el auto-zoom de Safari/iOS.
+- En móvil, los resultados deben conservar miniatura visible + nombre/set/número/rareza/estado y colocar acciones sin comprimir la información principal.
+- Si un resultado puede enrutarse a un álbum existente, su miniatura debe priorizar `meta.images.small` / `pokemonDirectImageUrl()` de ese álbum. Esto evita aceptar assets de catálogo que sean reversos/placeholders para cartas ya conocidas por StickerBase (especialmente First Partner).
+- Mantener detección `Ya la tienes` / `Ya está en camino` por carta y variante. No duplicar el mismo estado.
+- No modificar inventarios existentes, checklists, variantes ni la lógica de sincronización rápida/Supabase.

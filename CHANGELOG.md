@@ -666,3 +666,11 @@
 - `Mis Singles` permite buscar cartas en TCGdex por nombre/número e idioma, registrarlas, marcarlas en camino, recibirlas y eliminarlas.
 - `pokemonIncoming` y `pokemonSingles` se incorporan al fingerprint comparable para sincronización Supabase y protección de conflictos.
 - Sin cambios en las checklists existentes, inventarios previos ni intercambio de fútbol.
+
+## Build 704.14.53 — 30/08/2026
+- Mis Singles: buscador predictivo con debounce mientras se escribe; en iPhone el input usa 16 px para impedir el auto-zoom de Safari.
+- Mis Singles: resultados móviles rediseñados con miniatura mayor, información legible y acciones debajo, manteniendo detección de `Ya la tienes` / `En camino`.
+- Imágenes: cuando una carta pertenece a un álbum existente, el buscador prioriza la imagen canónica que ya usa ese álbum en lugar de aceptar la miniatura de catálogo; evita casos como First Partner mostrando el reverso.
+- En camino: visibilidad determinista del panel Pokémon en la pestaña y agregación explícita de singles pendientes antes del filtro de álbumes normales.
+- Responsive: se bloquea el desbordamiento horizontal del shell Pokémon durante búsqueda/teclado en iPhone.
+- Sin cambios en inventarios existentes, checklists, variantes ni contrato de sincronización Supabase.

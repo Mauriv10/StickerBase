@@ -8715,3 +8715,34 @@ body.collection-theme-pokemon .bottom-nav-button[data-main-view="trade"]{display
 
 /* 704.14.52 — estado de posesión visible en búsquedas de Mis Singles */
 .pokemon-single-existing-state{display:block;margin-top:3px;font-style:normal;font-size:10px;font-weight:900;color:#70d99a}.pokemon-single-existing-state.is-incoming{color:#f0c36b}.pokemon-single-existing-state[hidden]{display:none!important}
+
+/* BUILD 704.14.53 — Mis Singles mobile autocomplete + En camino deterministic */
+body.pokemon-incoming-active.main-tab-trade #tradeView{display:block!important}
+body.pokemon-incoming-active.main-tab-trade #pokemonIncomingView{display:block!important;visibility:visible!important;opacity:1!important}
+body.pokemon-incoming-active.main-tab-trade #paniniTradeView{display:none!important}
+.pokemon-single-query-wrap{min-width:0;display:flex;align-items:center;gap:7px;min-height:46px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:#0c141b;padding:0 11px}
+.pokemon-single-query-wrap>span{flex:0 0 auto;color:#8f9ca7;font-size:19px;line-height:1}
+.pokemon-single-query-wrap input{width:100%;min-width:0;min-height:44px!important;border:0!important;border-radius:0!important;background:transparent!important;padding:0!important;font-size:16px!important;outline:0;color:#fff}
+.pokemon-single-search-results:empty{display:none}
+.pokemon-single-result aside{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media(max-width:430px){
+  .pokemon-singles-shell{width:100%;min-width:0;overflow-x:hidden}
+  .pokemon-single-add{padding:12px}
+  .pokemon-single-search-row{grid-template-columns:104px minmax(0,1fr);gap:7px;align-items:stretch}
+  .pokemon-single-search-row select{grid-column:auto;min-width:0;font-size:16px!important;padding:0 8px}
+  .pokemon-single-query-wrap{min-width:0}
+  .pokemon-single-search-row>button{display:none}
+  .pokemon-single-search-status{margin-top:6px}
+  .pokemon-single-search-results{max-height:min(52vh,470px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+  .pokemon-single-result{grid-template-columns:64px minmax(0,1fr);gap:10px;padding:10px;align-items:start}
+  .pokemon-single-result>div{width:64px;height:88px;grid-row:1/3}
+  .pokemon-single-result section{padding-top:1px}
+  .pokemon-single-result small{font-size:10px}
+  .pokemon-single-result strong{font-size:14px}
+  .pokemon-single-result span,.pokemon-single-existing-state{font-size:11px}
+  .pokemon-single-result aside{grid-column:2;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .pokemon-single-result aside button{grid-column:auto;justify-self:auto;padding:8px 9px;font-size:10px}
+  .pokemon-single-route-variant{max-width:100%;min-height:32px;font-size:12px}
+  body.pokemon-ui-active{overflow-x:hidden}
+  body.pokemon-ui-active .app-shell,body.pokemon-ui-active .app-scroll{max-width:100vw;overflow-x:hidden}
+}
