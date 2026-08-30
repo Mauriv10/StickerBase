@@ -1,3 +1,22 @@
+## 704.14.60 — 30/08/2026
+- Mis Singles pasa a ser un índice paralelo: una carta puede estar simultáneamente en su álbum correcto y en Mis Singles para consultar imagen/estado/precio.
+- Las altas desde Búsqueda con álbum compatible actualizan el álbum y conservan/crean también su ficha en Mis Singles; si ya estaba en el álbum, se puede conservar igualmente la ficha de Single sin duplicar inventario.
+- Sincronización automática de Mis Singles desde álbumes Pokémon: toda carta poseída fuera de BASE se refleja en Mis Singles; las cartas BASE poseídas se reflejan si su precio guía Cardmarket supera 2 €.
+- La comprobación de valor y los precios usan el snapshot público de Cardmarket con caducidad de 24 h; al abrir Mis Singles se refresca si corresponde.
+- Mis Singles cambia su navegación: `Cromos` muestra solo la colección y tabs internos `Colección / En camino`; la tercera pestaña inferior pasa a `Búsqueda` y contiene buscador, idioma, añadidas recientemente y vistas recientemente.
+- En camino dentro de Mis Singles agrega pendientes de todos los álbumes Pokémon y singles libres, con Recibida/Quitar.
+- Los registros espejo guardan vínculo de álbum/sección/código y no multiplican inventario ni forman una segunda fuente de cantidades.
+
+## 704.14.59 — 30/08/2026
+
+### Mis Singles · routing de álbum + precios Cardmarket 24 h
+- Corregida la identificación de expansiones entre TCGdex y StickerBase: IDs como `me03`, `me02.5`, `sv03.5`, `sv08`, etc. se normalizan al formato interno (`me3`, `me2pt5`, `sv3pt5`, `sv8`).
+- Las cartas buscadas desde Mis Singles que pertenecen a una colección ya creada y están dentro de su checklist se envían ahora al álbum correcto, incluidas cartas de secciones IR/UR/SIR/Hyper, no solo First Partner.
+- Al abrir Mis Singles, las entradas antiguas que quedaron allí por el fallo de ID se reconcilian automáticamente con su álbum. La migración es conservadora: si el álbum ya tenía esa carta no duplica la cantidad; los estados `En camino` se trasladan al álbum correspondiente.
+- Los precios guardados de Mis Singles se refrescan automáticamente contra los ficheros públicos de Cardmarket cuando han pasado 24 horas desde la última comprobación. La comprobación se hace al abrir/volver a Mis Singles; no requiere un servidor en segundo plano.
+- El catálogo/price guide de Cardmarket en memoria también caduca a las 24 h y se vuelve a descargar con `cache: no-store`.
+- Inventario, checklists y sincronización Supabase se mantienen intactos salvo la reconciliación explícita de singles que pertenecían a álbumes existentes.
+
 ## 704.14.58 — 30/08/2026
 
 - First Partner: corregido el desplazamiento vertical de los controles de stock − / + en cartas de variante fija.

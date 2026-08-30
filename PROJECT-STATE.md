@@ -1,3 +1,25 @@
+# Update 704.14.60 — Mis Singles como índice paralelo + navegación propia
+
+- Regla permanente: **álbum y Mis Singles no son excluyentes**. Si una carta buscada pertenece a un álbum/checklist existente, se registra en el álbum correspondiente y además conserva una ficha en Mis Singles para imagen, estado y Cardmarket. No duplicar cantidades por el hecho de existir en ambos sitios.
+- `pokemonSinglesUpsertMirror()` crea/actualiza el espejo de una carta del álbum en Mis Singles mediante `linkedAlbumProjectId`, `linkedSection`, `linkedCode`, `routeVariant` y `mirror:true`.
+- Auto-inclusión en Mis Singles al abrir la colección: (a) toda carta Pokémon poseída cuya sección no sea `BASE`; (b) toda carta BASE poseída cuyo precio guía Cardmarket principal sea **> 2 €**. Los espejos automáticos se marcan `autoManaged`; los añadidos expresamente desde Búsqueda se preservan con `manualKeep:true`.
+- El escaneo de valor BASE tiene sello `autoValueScanAt` y máximo una vez cada 24 h. `POKEMON_CARDMARKET_REFRESH_MS` sigue siendo 24 h y el refresco solo puede ejecutarse cuando la PWA está abierta.
+- Navegación específica al abrir `pokemon-singles`: `Cromos` = colección Mis Singles con tabs internos `★ Colección` / `📦 En camino`; tercera pestaña inferior = `⌕ Búsqueda`. `Búsqueda` contiene el Discover predictivo, selector de idioma, recientes añadidas/vistas, Mejor resultado y Cartas y versiones.
+- Para otros álbumes Pokémon la tercera pestaña sigue siendo `📦 En camino`; para Panini sigue siendo `⇄ Cambiar`.
+- `pokemonSinglesSearchView` es una vista de primer nivel independiente. No volver a meter búsqueda dentro de la lista de colección.
+- `En camino` del tab interno usa `pokemonIncomingEntries()` como fuente global. Los mirrors vinculados no se duplican como single + álbum en esa lista.
+- Al recibir una carta vinculada, el álbum aumenta y el mirror queda `owned`. Al cancelar una pendiente vinculada, si ya existe una copia en el álbum el mirror vuelve a `owned`; si no, se retira la ficha incoming.
+- Migración/reconciliación: singles existentes con álbum compatible deben asegurar presencia en el álbum pero permanecer en Mis Singles. Nunca volver a aplicar el comportamiento 704.14.59 de mover y borrar la ficha de Mis Singles.
+
+# Update 704.14.59 — Mis Singles routing + Cardmarket diario
+
+- Mis Singles debe resolver el destino por **set + número** usando IDs canonizados. TCGdex usa formatos como `me03`, `me02.5`, `sv03.5` mientras StickerBase puede usar `me3`, `me2pt5`, `sv3pt5`; `pokemonSinglesCanonicalSetId()` es ahora parte del contrato y no debe eliminarse.
+- Si una carta buscada pertenece a una colección Pokémon ya creada y su número existe en cualquiera de las secciones del checklist de ese álbum (BASE, IR, UR, SIR, Hyper, etc.), debe registrarse allí. Mis Singles solo conserva cartas que no tienen un álbum/checklist destino en StickerBase.
+- `pokemonSinglesMoveExistingToAlbums()` reconcilia entradas antiguas creadas durante el fallo de IDs. No debe incrementar una carta que el álbum ya posea; `incoming` se traslada a `pokemonIncoming` sin duplicar.
+- Precios Mis Singles: refresco máximo cada 24 h mediante los ficheros públicos oficiales de Cardmarket (`products_singles_6.json` + `price_guide_6.json`). `pokemonSinglesLoadCardmarketData()` caduca su snapshot en memoria tras 24 h y `pokemonSinglesRefreshStoredPrices()` actualiza los singles guardados al entrar en la vista si sus precios están caducados.
+- Un PWA en GitHub Pages no puede garantizar una tarea en segundo plano con la app cerrada: el contrato es “al abrir/volver a Mis Singles, si han pasado >=24 h, refrescar”.
+- No cambiar inventarios/checklists fuera de la reconciliación de singles mal encaminados.
+
 # Update 704.14.58 — First Partner stock controls
 
 - Build source: 704.14.57 COMPLETE.
