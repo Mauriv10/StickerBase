@@ -595,3 +595,11 @@
 - Se añade `Leer ahora` como fallback manual dentro del fullscreen, sin eliminar la captura automática por estabilidad.
 - En cuanto obtiene número completo + nombre (o confirma dos veces el mismo número si hay reflejos), detiene físicamente la cámara antes de resolver la carta/precios.
 - Sin cambios en inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni intercambio de fútbol.
+
+## 704.14.44 — Scanner Pokémon multiframe sin bloqueo por movimiento
+- Elimina el requisito de estabilizar la carta y los mensajes que bloqueaban el reconocimiento por pulso normal.
+- El scanner procesa continuamente mientras la carta está en el visor y acumula pistas de nombre y número entre frames no consecutivos.
+- Nombre y número se preparan en dos recortes ampliados pero se envían juntos en una sola pasada OCR por frame, reduciendo drásticamente el coste frente a las 2–3 pasadas secuenciales anteriores.
+- Al obtener un número completo se lanza en paralelo una búsqueda global de candidatos; si el producto es único o nombre+número dejan una coincidencia clara, la cámara se detiene inmediatamente.
+- Si todavía hay ambigüedad, continúa acumulando nombre/número sin exigir que el teléfono esté inmóvil.
+- Sin cambios en inventario, checklists, estadísticas, fingerprint ni Supabase.

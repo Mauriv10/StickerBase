@@ -1696,3 +1696,12 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Mantener botón `Leer ahora` como fallback, pero el flujo normal debe ser automático tras ~480 ms de estabilidad.
 - Al conseguir una identificación suficiente, detener tracks/cámara antes de buscar y mostrar resultado/candidatos. Nunca continuar escaneando tras haber aceptado una carta.
 - Este módulo no modifica inventario, variantes, checklists, estadísticas, fingerprint, Supabase ni funciones de intercambio de fútbol.
+
+## 704.14.44 — contrato scanner Pokémon rápido multiframe
+- No volver a bloquear el OCR por un umbral de movimiento ni exigir ~500 ms de estabilidad; el pulso normal de la mano debe ser aceptado.
+- El reconocimiento es continuo y acumula votos/pistas entre frames: nombre y número no necesitan aparecer perfectos en el mismo frame.
+- Cada frame OCR usa un canvas combinado con recorte superior (nombre) e inferior (numeración), procesados en una sola llamada Tesseract.
+- En cuanto número/set sean únicos, o nombre+número produzcan una coincidencia clara, detener físicamente la cámara antes de renderizar precios.
+- Mantener la búsqueda global Pokémon independiente de la colección desde la que se abrió Intercambio.
+- Nunca inventar una carta cuando siga habiendo ambigüedad; mostrar candidatos.
+- No tocar inventario, checklists, estadísticas, fingerprint ni Supabase.
