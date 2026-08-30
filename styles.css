@@ -8712,3 +8712,6 @@ body.collection-theme-pokemon .bottom-nav-button[data-main-view="trade"]{display
 .pokemon-single-route-variant{margin-top:7px;max-width:190px;border:1px solid rgba(120,140,170,.28);border-radius:9px;padding:6px 8px;background:rgba(255,255,255,.92);color:#172033;font:inherit;font-size:12px;font-weight:700}
 /* 704.14.49 · Mis Singles card previews */
 .pokemon-single-search-image.is-clickable,.pokemon-single-owned-image.is-clickable{cursor:zoom-in;outline:none}.pokemon-single-search-image.is-clickable:focus-visible,.pokemon-single-owned-image.is-clickable:focus-visible{box-shadow:0 0 0 2px var(--pk-accent,#68d3ec)}
+
+/* 704.14.52 — estado de posesión visible en búsquedas de Mis Singles */
+.pokemon-single-existing-state{display:block;margin-top:3px;font-style:normal;font-size:10px;font-weight:900;color:#70d99a}.pokemon-single-existing-state.is-incoming{color:#f0c36b}.pokemon-single-existing-state[hidden]{display:none!important}

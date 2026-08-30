@@ -1,3 +1,10 @@
+## 704.14.52 — En camino robusto + detección de cartas ya registradas
+- Corrige la vista Pokémon `En camino` en iPhone/PWA controlando también el `#tradeView` padre y re-renderizando tras el cambio real de pestaña.
+- `En camino` vuelve a agregar pendientes de álbumes Pokémon y de `Mis Singles`, incluida la colección activa `pokemon-singles`.
+- El buscador de `Mis Singles` comprueba cada resultado contra el estado real: carta ya poseída o ya `En camino`, tanto en Mis Singles como en un álbum compatible.
+- Para cartas BASE con varias variantes, el aviso se recalcula al cambiar Normal/Holo/Reverse/etc.
+- Los botones reflejan el estado (`Ya la tienes` / `Ya en camino`) y bloquean duplicados del mismo estado.
+
 ## 704.14.51 — Mis Singles: segunda fuente de imágenes + header Pokémon full-bleed
 - Cuando TCGdex no aporta imagen, Mis Singles intenta una fuente visual secundaria: CDN de Limitless para sets/lenguajes compatibles y `images.pokemontcg.io` como fallback genérico por set + número.
 - El fallback se aplica tanto a resultados nuevos como a singles ya guardados que conservaban `image: ""`; la URL resuelta se persiste para que la miniatura y el visor grande funcionen también después.

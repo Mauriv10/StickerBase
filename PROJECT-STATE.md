@@ -1,3 +1,10 @@
+## Build 704.14.52 — 30/08/2026
+- Fix de regresión `En camino` en iPhone/PWA: al entrar en la tercera pestaña Pokémon se fuerza visible `#tradeView` y `#pokemonIncomingView`, se oculta Panini y se repite el render en el siguiente frame/50 ms para evitar estados DOM/CSS heredados.
+- `pokemonIncomingEntries()` sigue siendo la fuente única de pendientes globales (álbumes + Mis Singles). Un single con `status: "incoming"` debe aparecer siempre en la pestaña.
+- El buscador de Mis Singles debe detectar si el resultado ya está poseído o En camino antes de permitir duplicarlo. La detección respeta el routing: álbum compatible si existe/checklist coincide; si no, Mis Singles.
+- En BASE con variantes, la detección se evalúa para la variante seleccionada y se refresca al cambiar el selector.
+- Regresión permanente: buscar una carta que ya existe debe mostrar `Ya la tienes` o `Ya está en camino` y desactivar solo la acción redundante correspondiente.
+
 ## Build 704.14.51 — 30/08/2026
 - `Mis Singles` no debe depender de una única fuente de imágenes. Orden: TCGdex localizado -> TCGdex EN -> Limitless CDN cuando el set está mapeado -> `images.pokemontcg.io` genérico por set/número.
 - Los singles antiguos sin imagen deben rehidratarse y persistir el fallback para que miniatura + visor grande funcionen sin volver a buscar manualmente.

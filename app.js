@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.51";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.52";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2734,11 +2734,16 @@ function pokemonCancelIncoming(key){
  persistProjects();scheduleCloudSave();renderPokemonIncomingView();if(row.project.id===activeProjectId)renderGlobalCollection();updateNavigationBadges();showToast("Quitada de En camino");
 }
 function renderPokemonIncomingView(){
- const active=projects?.[activeProjectId],activeType=inferCollectionType(active),isPokemon=isPokemonCollectionType(activeType),pokeView=$("#pokemonIncomingView"),panini=$("#paniniTradeView");
+ const active=projects?.[activeProjectId],activeType=inferCollectionType(active);
+ // En iOS/PWA no fiarse solo del tipo inferido: mientras cambia la pestaña el chrome Pokémon
+ // puede estar ya activo aunque el proyecto aún esté terminando de renderizar.
+ const isPokemon=activeType==="pokemon-singles"||isPokemonCollectionType(activeType)||document.body.classList.contains("pokemon-ui-active");
+ const tradeView=$("#tradeView"),pokeView=$("#pokemonIncomingView"),panini=$("#paniniTradeView");
  const tradeButton=document.querySelector('.bottom-nav-button[data-main-view="trade"]'),nav=tradeButton?.querySelector("span:last-child"),icon=tradeButton?.querySelector(".bottom-nav-icon");if(nav)nav.textContent=isPokemon?"En camino":"Cambiar";if(icon)icon.textContent=isPokemon?"📦":"⇄";
- // No depender solo del atributo hidden: en iOS/PWA el contenido podía quedarse oculto tras alternar de pestaña.
- if(pokeView){pokeView.hidden=!isPokemon;pokeView.style.display=isPokemon?"block":"none";}
- if(panini){panini.hidden=isPokemon;panini.style.display=isPokemon?"none":"block";}
+ // Controlar también el contenedor padre. Safari/PWA puede conservar display:none del estado anterior.
+ if(tradeView&&mainTab==="trade"){tradeView.hidden=false;tradeView.style.display="block";}
+ if(pokeView){pokeView.hidden=!isPokemon;pokeView.style.setProperty("display",isPokemon?"block":"none","important");}
+ if(panini){panini.hidden=isPokemon;panini.style.setProperty("display",isPokemon?"none":"block","important");}
  if(!isPokemon)return;
  const rows=pokemonIncomingEntries(),count=$("#pokemonIncomingCount"),list=$("#pokemonIncomingList"),empty=$("#pokemonIncomingEmpty");if(count)count.textContent=String(rows.length);if(empty)empty.hidden=rows.length>0;if(!list)return;
  list.innerHTML=rows.map((row,index)=>{const info=pokemonIncomingCardInfo(row),clickable=Boolean(info.image);return `<article class="pokemon-incoming-card"><div class="pokemon-incoming-thumb ${clickable?"is-clickable":""}" ${clickable?`data-incoming-preview="${index}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(info.name)} en grande"`:""}>${info.image?`<img src="${collectionSafeText(info.image)}" alt="${collectionSafeText(info.name)}" loading="lazy">`:'<span>PK</span>'}</div><div class="pokemon-incoming-copy"><small>${collectionSafeText(info.setName)}</small><strong>${collectionSafeText(info.name)}</strong><span>#${collectionSafeText(info.number)}${info.detail?` · ${collectionSafeText(info.detail)}`:""}</span></div><div class="pokemon-incoming-actions"><button type="button" class="pokemon-receive-button" data-pokemon-receive="${collectionSafeText(row.key)}">✓ Recibida</button><button type="button" class="pokemon-cancel-incoming" data-pokemon-cancel-incoming="${collectionSafeText(row.key)}">Quitar</button></div></article>`}).join("");
@@ -2840,13 +2845,36 @@ async function pokemonSinglesSearch(){
  }catch(error){console.warn("Pokemon singles search",error);if(status)status.textContent="No se pudo consultar el catálogo. Comprueba la conexión.";pokemonSinglesSearchResults=[];renderPokemonSinglesSearchResults();}
  finally{pokemonSinglesSearchBusy=false;if(button)button.disabled=false;}
 }
+function pokemonSinglesTargetState(card,target){
+ if(!target){
+  const single=pokemonSinglesProject()?.pokemonSingles?.find(item=>item.id===card.id);
+  if(!single)return {owned:false,incoming:false,label:""};
+  return {owned:single.status!=="incoming",incoming:single.status==="incoming",label:single.status==="incoming"?"📦 Ya la tienes en camino":"✓ Ya la tienes"};
+ }
+ const {project,section,code,options}=target;
+ const variant=pokemonSinglesRouteVariant(card,target);
+ let owned=false;
+ if(options.length){owned=(Number(project?.pokemonVariants?.[code]?.[variant])||0)>0;}
+ else owned=(Number(project?.inventory?.[section]?.[code])||0)>0;
+ const incoming=pokemonIncomingHas(project,section,code,variant);
+ return {owned,incoming,label:incoming?`📦 Ya está en camino · ${project.name}`:(owned?`✓ Ya la tienes · ${project.name}`:"")};
+}
+function pokemonSinglesRefreshResultState(article,index){
+ const card=pokemonSinglesSearchResults[index];if(!card||!article)return;const target=pokemonSinglesCollectionTarget(card),state=pokemonSinglesTargetState(card,target);
+ const badge=article.querySelector("[data-single-existing-state]");if(badge){badge.textContent=state.label;badge.hidden=!state.label;badge.classList.toggle("is-incoming",state.incoming);}
+ const own=article.querySelector('[data-single-status="owned"]'),incoming=article.querySelector('[data-single-status="incoming"]');
+ if(own){own.disabled=state.owned;own.textContent=state.owned?"✓ Ya la tienes":"＋ La tengo";}
+ if(incoming){incoming.disabled=state.incoming;incoming.textContent=state.incoming?"📦 Ya en camino":"📦 En camino";}
+}
 function renderPokemonSinglesSearchResults(){
  const root=$("#pokemonSingleSearchResults");if(!root)return;const project=pokemonSinglesProject();const existing=new Set((project?.pokemonSingles||[]).map(card=>card.id));
- root.innerHTML=pokemonSinglesSearchResults.slice(0,24).map((card,index)=>{const target=pokemonSinglesCollectionTarget(card),alreadySingle=existing.has(card.id),variant=target?.options?.length?`<select class="pokemon-single-route-variant" data-single-variant="${collectionSafeText(card.id)}">${target.options.map(([key,label])=>`<option value="${collectionSafeText(key)}">${collectionSafeText(label)}</option>`).join("")}</select>`:"",destination=target?`<em class="pokemon-single-destination">→ ${collectionSafeText(target.project.name)}</em>`:`<em class="pokemon-single-destination">→ Mis Singles</em>`;return `<article class="pokemon-single-result"><div class="pokemon-single-search-image ${card.image?"is-clickable":""}" ${card.image?`data-single-preview="${index}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(card.name)} en grande"`:""}>${card.image?`<img src="${collectionSafeText(card.image)}" alt="${collectionSafeText(card.name)}" loading="lazy">`:'<span>PK</span>'}</div><section><small>${collectionSafeText(card.setName)}</small><strong>${collectionSafeText(card.name)}</strong><span>#${collectionSafeText(card.number)}${card.rarity?` · ${collectionSafeText(card.rarity)}`:""}</span>${destination}${variant}</section><aside><button type="button" data-add-single="${index}" data-single-status="owned" ${!target&&alreadySingle?"disabled":""}>${!target&&alreadySingle?"Añadida":"＋ La tengo"}</button><button type="button" data-add-single="${index}" data-single-status="incoming" ${!target&&alreadySingle?"disabled":""}>📦 En camino</button></aside></article>`}).join("");
+ root.innerHTML=pokemonSinglesSearchResults.slice(0,24).map((card,index)=>{const target=pokemonSinglesCollectionTarget(card),variant=target?.options?.length?`<select class="pokemon-single-route-variant" data-single-variant="${collectionSafeText(card.id)}">${target.options.map(([key,label])=>`<option value="${collectionSafeText(key)}">${collectionSafeText(label)}</option>`).join("")}</select>`:"",destination=target?`<em class="pokemon-single-destination">→ ${collectionSafeText(target.project.name)}</em>`:`<em class="pokemon-single-destination">→ Mis Singles</em>`;return `<article class="pokemon-single-result" data-single-result-index="${index}"><div class="pokemon-single-search-image ${card.image?"is-clickable":""}" ${card.image?`data-single-preview="${index}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(card.name)} en grande"`:""}>${card.image?`<img src="${collectionSafeText(card.image)}" alt="${collectionSafeText(card.name)}" loading="lazy">`:'<span>PK</span>'}</div><section><small>${collectionSafeText(card.setName)}</small><strong>${collectionSafeText(card.name)}</strong><span>#${collectionSafeText(card.number)}${card.rarity?` · ${collectionSafeText(card.rarity)}`:""}</span>${destination}${variant}<em class="pokemon-single-existing-state" data-single-existing-state hidden></em></section><aside><button type="button" data-add-single="${index}" data-single-status="owned">＋ La tengo</button><button type="button" data-add-single="${index}" data-single-status="incoming">📦 En camino</button></aside></article>`}).join("");
  root.querySelectorAll("[data-add-single]").forEach(button=>button.onclick=()=>pokemonAddSingle(Number(button.dataset.addSingle),button.dataset.singleStatus||"owned"));
+ root.querySelectorAll("[data-single-result-index]").forEach(article=>pokemonSinglesRefreshResultState(article,Number(article.dataset.singleResultIndex)));
+ root.querySelectorAll("[data-single-variant]").forEach(select=>select.addEventListener("change",()=>{const article=select.closest("[data-single-result-index]");if(article)pokemonSinglesRefreshResultState(article,Number(article.dataset.singleResultIndex));}));
  root.querySelectorAll("[data-single-preview]").forEach(el=>{const open=()=>{const card=pokemonSinglesSearchResults[Number(el.dataset.singlePreview)];if(card?.image)openPokemonCardImageViewer(card.image,card.number,{name:card.name});};el.onclick=open;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};});
 }
-function pokemonAddSingle(index,status="owned"){const project=pokemonSinglesProject(),card=pokemonSinglesSearchResults[index];if(!project||!card)return;const target=pokemonSinglesCollectionTarget(card);if(target){pokemonSinglesAddToCollection(card,status,target);return;}project.pokemonSingles=project.pokemonSingles||[];if(project.pokemonSingles.some(item=>item.id===card.id)){showToast("Esta carta ya está registrada");return;}project.pokemonSingles.push({...card,status:status==="incoming"?"incoming":"owned",addedAt:new Date().toISOString()});persistProjects();scheduleCloudSave();renderPokemonSinglesCollection();updateNavigationBadges();showToast(status==="incoming"?"📦 Single añadido a En camino":"✓ Single añadido");}
+function pokemonAddSingle(index,status="owned"){const project=pokemonSinglesProject(),card=pokemonSinglesSearchResults[index];if(!project||!card)return;const target=pokemonSinglesCollectionTarget(card);if(target){const state=pokemonSinglesTargetState(card,target);if(status==="owned"&&state.owned){showToast(`✓ Ya tienes esta carta en ${target.project.name}`);return;}if(status==="incoming"&&state.incoming){showToast(`📦 Esta carta ya está En camino en ${target.project.name}`);return;}pokemonSinglesAddToCollection(card,status,target);return;}project.pokemonSingles=project.pokemonSingles||[];const existing=project.pokemonSingles.find(item=>item.id===card.id);if(existing){showToast(existing.status==="incoming"?"📦 Esta carta ya está En camino":"✓ Esta carta ya está en Mis Singles");return;}project.pokemonSingles.push({...card,status:status==="incoming"?"incoming":"owned",addedAt:new Date().toISOString()});persistProjects();scheduleCloudSave();renderPokemonSinglesCollection();updateNavigationBadges();showToast(status==="incoming"?"📦 Single añadido a En camino":"✓ Single añadido");}
 function wirePokemonSingleCards(){
  const project=pokemonSinglesProject();if(!project)return;
  document.querySelectorAll("[data-owned-single-preview]").forEach(el=>{const open=()=>{const card=project.pokemonSingles.find(item=>item.id===el.dataset.ownedSinglePreview);if(card?.image)openPokemonCardImageViewer(card.image,card.number,{name:card.name});};el.onclick=open;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};});
@@ -2888,7 +2916,7 @@ function setMainTab(tab){
 
  if(tab==="collection")renderGlobalCollection();
  if(tab==="statistics")renderStatistics();
- if(tab==="trade")renderPokemonIncomingView();
+ if(tab==="trade"){renderPokemonIncomingView();requestAnimationFrame(()=>renderPokemonIncomingView());setTimeout(()=>{if(mainTab==="trade")renderPokemonIncomingView();},50);}
  if(tab==="collections")renderCollections();
 
  window.scrollTo({top:0,behavior:"auto"});
