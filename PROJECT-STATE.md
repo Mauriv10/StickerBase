@@ -1705,3 +1705,13 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Mantener la búsqueda global Pokémon independiente de la colección desde la que se abrió Intercambio.
 - Nunca inventar una carta cuando siga habiendo ambigüedad; mostrar candidatos.
 - No tocar inventario, checklists, estadísticas, fingerprint ni Supabase.
+
+
+## 704.14.45 — contrato Scanner Visual v2
+- El scanner Pokémon es híbrido visual-first para la decisión: OCR de nombre/número = recuperación de candidatos; comparación visual = condición necesaria para autoaceptar.
+- `pokemon-scanner/visual-matcher.js` está desacoplado de `app.js` y expone `StickerBasePokemonVisual.rank(...)`. Su implementación actual usa firmas perceptuales de artwork/carta completa (bordes, RGB e histogramas), con caché de referencias.
+- Está prohibido volver a detener la cámara solo porque un número OCR aparezca una o dos veces. Un candidato único por numeración tampoco se acepta sin confirmación visual o evidencia textual+visual suficiente.
+- Si la confianza visual es insuficiente, continuar escaneando o mostrar candidatos; nunca inventar una coincidencia.
+- El scanner puede generar candidatos solo por nombre cuando el número todavía no sea legible.
+- Mantener cámara fullscreen, búsqueda global Pokémon, idiomas ES/EN/JA/ZH, Cardmarket Trend/AVG1/AVG7/AVG30/Low y fallback manual.
+- No tocar inventario, variantes, checklists, estadísticas, fingerprint ni Supabase.

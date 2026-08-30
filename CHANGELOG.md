@@ -603,3 +603,13 @@
 - Al obtener un número completo se lanza en paralelo una búsqueda global de candidatos; si el producto es único o nombre+número dejan una coincidencia clara, la cámara se detiene inmediatamente.
 - Si todavía hay ambigüedad, continúa acumulando nombre/número sin exigir que el teléfono esté inmóvil.
 - Sin cambios en inventario, checklists, estadísticas, fingerprint ni Supabase.
+
+
+## 704.14.45 — Scanner Visual v2
+- El OCR deja de tener autoridad para seleccionar una carta: nombre y número solo generan candidatos.
+- Nuevo módulo aislado `pokemon-scanner/visual-matcher.js` que compara la carta capturada con las imágenes de referencia usando firma visual de artwork, bordes, color e histograma.
+- Una carta solo se acepta automáticamente cuando la coincidencia visual y las pistas de texto superan umbrales de confianza y margen frente a la segunda candidata.
+- Si un OCR lee un número incorrecto pero la imagen no corresponde, el scanner NO se detiene ni muestra ese precio.
+- Se añade búsqueda por nombre cuando todavía no se puede leer el número; el reconocimiento puede avanzar con nombre + imagen.
+- El pulso normal sigue sin bloquear el scanner; no vuelve el requisito de estabilidad.
+- Sin cambios en inventario, checklists, estadísticas, fingerprint, Supabase ni precios aprobados (Trend/AVG1/AVG7/AVG30/Low).

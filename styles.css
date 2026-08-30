@@ -8808,3 +8808,13 @@ body.pokemon-scanner-fullscreen > .pokemon-scan-camera #pokemonScanCameraButton{
 @media(max-width:430px){
  body.pokemon-scanner-fullscreen > .pokemon-scan-camera .pokemon-scan-guide{width:min(84vw,calc((100dvh - 170px) * .7159),360px)!important}
 }
+
+/* 704.14.45 · Scanner Visual v2 */
+body.pokemon-scanner-fullscreen > .pokemon-scan-camera .pokemon-scan-guide{
+  border:3px solid rgba(var(--pk-rgb,255,214,0),.92)!important;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.22),0 0 24px rgba(var(--pk-rgb,255,214,0),.28)!important;
+  transition:border-color .16s ease,box-shadow .16s ease!important;
+}
+body.pokemon-scanner-fullscreen > .pokemon-scan-camera .pokemon-scan-guide:before{content:"CARTA"!important}
+body.pokemon-scanner-fullscreen > .pokemon-scan-camera .pokemon-scan-guide:after{content:"VISUAL + TEXTO"!important}
+body.pokemon-scanner-fullscreen > .pokemon-scan-camera .pokemon-scan-fullscreen-copy span{max-width:520px;margin:0 auto}
