@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.60";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.61";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2898,17 +2898,18 @@ async function pokemonSinglesSyncOwnedCollections(force=false){
     if(section!=="BASE"){
       const row=pokemonSinglesUpsertMirror(stub,target,existing?.status==="incoming"?"incoming":"owned",{autoManaged:true,autoReason:"non-base",linkedAlbumProjectId:project.id,linkedAlbumName:project.name,linkedSection:section,linkedCode:code});if(!existing)changed=true;
       // Los precios de los espejos ya creados los actualiza pokemonSinglesRefreshStoredPrices().
-      if(priceScanDue&&!row.cardmarket)baseCandidates.push(row);
+      if(!row.cardmarket)baseCandidates.push(row);
     }else if(priceScanDue)baseCandidates.push(existing||{stub,target});
    }}
   }
-  if(priceScanDue){
+  const mirrorPriceDue=baseCandidates.some(item=>!item?.stub);
+  if(priceScanDue||mirrorPriceDue){
    await pokemonSinglesLoadCardmarketData(force);
    for(let i=0;i<baseCandidates.length;i+=4){const batch=baseCandidates.slice(i,i+4);const results=await Promise.all(batch.map(async item=>{const row=item?.stub?item.stub:item,price=await pokemonSinglesCardmarketDirect(row);return {item,row,price};}));
     for(const {item,row,price} of results){const primary=price?pokemonSinglesCardmarketView({cardmarket:price})?.primary:null;if(item?.stub){if(Number(primary)>POKEMON_SINGLES_PRICE_THRESHOLD){const mirror=pokemonSinglesUpsertMirror({...row,cardmarket:price,cardmarketFetchedAt:new Date().toISOString()},item.target,"owned",{autoManaged:true,autoReason:"price>2",linkedAlbumProjectId:item.target.project.id,linkedAlbumName:item.target.project.name,linkedSection:item.target.section,linkedCode:item.target.code});if(mirror)changed=true;}}else if(price){item.cardmarket={...price,fetchedAt:new Date().toISOString()};item.cardmarketFetchedAt=new Date().toISOString();changed=true;}}
    }
-   const before=singles.pokemonSingles.length;singles.pokemonSingles=singles.pokemonSingles.filter(card=>{if(!card.autoManaged||card.manualKeep||card.status==="incoming")return true;if(card.linkedSection!=="BASE")return true;const key=`${card.linkedAlbumProjectId}|${card.linkedSection}|${card.linkedCode}`;if(!seen.has(key))return false;return Number(pokemonSinglesCardmarketView(card)?.primary)>POKEMON_SINGLES_PRICE_THRESHOLD;});if(singles.pokemonSingles.length!==before)changed=true;
-   singles.autoValueScanAt=new Date().toISOString();changed=true;
+   if(priceScanDue){const before=singles.pokemonSingles.length;singles.pokemonSingles=singles.pokemonSingles.filter(card=>{if(!card.autoManaged||card.manualKeep||card.status==="incoming")return true;if(card.linkedSection!=="BASE")return true;const key=`${card.linkedAlbumProjectId}|${card.linkedSection}|${card.linkedCode}`;if(!seen.has(key))return false;return Number(pokemonSinglesCardmarketView(card)?.primary)>POKEMON_SINGLES_PRICE_THRESHOLD;});if(singles.pokemonSingles.length!==before)changed=true;
+    singles.autoValueScanAt=new Date().toISOString();changed=true;}
   }
   if(changed){persistProjects();scheduleCloudSave();}
  }catch(error){console.warn("Pokemon singles auto-sync",error)}finally{pokemonSinglesAutoSyncInFlight=false;if(changed&&activeProjectId===pokemonSinglesProject()?.id&&mainTab==="collection")requestAnimationFrame(()=>renderPokemonSinglesCollection());}

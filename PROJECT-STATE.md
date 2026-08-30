@@ -1837,3 +1837,10 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Historial local (NO cloud/fingerprint): `stickerbase.pokemon.singles.recentViewed.v1` y `stickerbase.pokemon.singles.recentAdded.v1`, máximo 20 snapshots.
 - El ranking "Mejor resultado" es relevancia textual (nombre/número/set), no popularidad externa.
 - Las acciones siguen respetando routing automático: si la carta está en el checklist de un álbum existente, se registra allí; si no, en Mis Singles.
+
+
+## 704.14.61 — precios de mirrors de álbumes
+- Toda carta no-BASE que se espeje automáticamente desde un álbum Pokémon a Mis Singles debe intentar obtener Cardmarket inmediatamente si aún no tiene `cardmarket`, aunque `autoValueScanAt` sea reciente.
+- No usar `autoValueScanAt` como bloqueo para enriquecer con precio una ficha recién creada. Ese timestamp solo limita la reevaluación global de cartas BASE para la regla > 2 €.
+- Los precios ya existentes conservan refresco máximo cada 24 h mediante `pokemonSinglesRefreshStoredPrices()`.
+- No alterar inventario, cantidades, checklists ni routing álbum + Mis Singles.

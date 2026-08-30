@@ -1,3 +1,8 @@
+## 704.14.61
+- Corrige el refresco de precios Cardmarket de cartas incorporadas automáticamente desde álbumes a Mis Singles.
+- Los mirrors no-BASE sin precio se consultan inmediatamente aunque el escaneo global de valor de 24 h todavía no haya vencido.
+- La regla de 24 h se mantiene para revaluar cartas BASE > 2 € y para refrescar precios ya existentes; no se modifica inventario ni checklists.
+
 ## 704.14.60 — 30/08/2026
 - Mis Singles pasa a ser un índice paralelo: una carta puede estar simultáneamente en su álbum correcto y en Mis Singles para consultar imagen/estado/precio.
 - Las altas desde Búsqueda con álbum compatible actualizan el álbum y conservan/crean también su ficha en Mis Singles; si ya estaba en el álbum, se puede conservar igualmente la ficha de Single sin duplicar inventario.
