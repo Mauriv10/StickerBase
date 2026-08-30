@@ -1,3 +1,13 @@
+## 704.14.63 — 30/08/2026
+- Mis Singles elimina el segundo hero interno de `Cromos`; se conserva la cabecera general y las pestañas compactas muestran los contadores `Colección / En camino`.
+- La pestaña Colección muestra solo cartas recibidas; las cartas `status="incoming"` quedan exclusivamente en `En camino`, evitando el contador/listado incoherente.
+- Los mirrors de álbum ya no vuelven a sobrescribir una ficha enriquecida con el stub antiguo del álbum. El merge automático conserva identidad canónica, imagen HD y Cardmarket ya resueltos.
+- Nueva reparación canónica de mirrors existentes: resuelve la carta real en TCGdex por set+número, con variantes de ID y fallback por `localId`; persiste `tcgdexId`, set, número, rareza, variantes e imagen TCGdex.
+- La reparación recupera `pricing.cardmarket` del detalle TCGdex (mismo fallback que usa el buscador) y después intenta el cruce Cardmarket directo. Así las cartas migradas dejan de depender exclusivamente del matcher del snapshot público.
+- Las imágenes migradas guardan `image` (low) e `imageLarge` (high); el visor usa explícitamente `imageLarge`, por lo que ya no amplía la miniatura `/small` de Scrydex.
+- La migración correctiva se ejecuta sobre mirrors ya existentes y se marca con `canonicalSchema=2`; si una resolución falla, no se martillea la API y se permite reintento después.
+- No modifica cantidades, variantes, checklists ni la lógica álbum + Mis Singles.
+
 ## 704.14.62
 - Corrige la resolución de precios Cardmarket de cartas espejadas desde álbumes Pokémon.
 - Los IDs compactos internos (por ejemplo `me5`) prueban también el formato oficial/TCGdex (`me05`) para recuperar el nombre inglés correcto.

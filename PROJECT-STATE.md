@@ -1852,3 +1852,14 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Al resolver una carta se persisten en memoria `tcgdexId` y `englishName`, por lo que los mirrors ya creados se autorreparan durante el refresco; no hace falta borrarlos/recrearlos.
 - Un fallo de Cardmarket ya NO actualiza `cardmarketFetchedAt`. Solo una obtención de precio válida marca el refresco de 24 h. Los fallos registran `cardmarketLastErrorAt` únicamente como diagnóstico y pueden reintentarse.
 - No alterar inventario, cantidades, checklists ni routing álbum + Mis Singles.
+
+
+## 704.14.63 — normalización canónica de Mis Singles
+- Problema raíz confirmado: los singles añadidos desde Búsqueda nacían de un detalle completo de TCGdex, mientras los espejos de álbum nacían de un stub local con imagen Scrydex `small` y podían depender solo del matcher Cardmarket. Eran dos pipelines de ficha distintos.
+- Contrato nuevo: todo mirror existente debe converger a una ficha canónica equivalente a una alta desde Búsqueda. `pokemonSinglesRepairExistingMirrors()` resuelve TCGdex por set+número (incluyendo candidatos `me3/me03`, `.5`, y fallback por `localId`) y persiste identidad técnica, imagen low/high y pricing.
+- `pokemonSinglesUpsertMirror()` NO debe permitir que un stub automático pise campos ya enriquecidos de un mirror. Solo una acción manual puede aportar una ficha de catálogo más completa sobre un mirror existente; enlace de álbum, estado y fecha se conservan explícitamente.
+- Los mirrors guardan `imageLarge`; `wirePokemonSingleCards()` la pasa al visor. No depender de reemplazar `/low.webp` cuando la fuente original puede ser Scrydex `/small`.
+- Cardmarket para mirrors usa dos vías: primero `pricing.cardmarket` del detalle TCGdex como fallback coherente con Búsqueda, y después el dataset público directo cuando existe coincidencia válida. Un fallo no escribe `cardmarketFetchedAt`.
+- La reparación se marca con `canonicalSchema=2` y `canonicalHydratedAt`; fallos temporales usan `canonicalRepairAttemptAt` con reintento diferido para evitar llamadas repetitivas en cada render.
+- UX de Cromos/Mis Singles: eliminar el hero interno duplicado. Mantener la cabecera global y tabs compactos con contadores. `Colección` lista solo recibidas; `En camino` contiene los pendientes.
+- No tocar inventario, cantidades, variantes, checklists, fingerprint ni sincronización Supabase salvo persistir los campos enriquecidos de las fichas de Mis Singles.
