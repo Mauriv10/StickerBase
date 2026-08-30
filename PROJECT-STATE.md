@@ -1,3 +1,10 @@
+## Build 704.14.55 — 30/08/2026 — Mis Singles: buscador único + Cardmarket
+- `Mis Singles` NO debe mostrar el buscador global `#teamSearch`; el único buscador visible es `#pokemonSingleQuery` dentro de Discover. La ocultación es específica de `body[data-collection-type="pokemon-singles"]` y no afecta al buscador de álbumes Pokémon normales ni a Panini.
+- Los detalles de carta de TCGdex ya incluyen `pricing.cardmarket`; aprovechar esa misma respuesta para mostrar Cardmarket sin API key adicional ni backend.
+- Mostrar como cifra principal la tendencia disponible y añadir medias 7d/30d cuando existan. Si la carta solo dispone de acabado holo/reverse, priorizar las métricas `*-holo`.
+- Estos precios son guía de mercado de Cardmarket distribuida por TCGdex, no una consulta en tiempo real a ofertas por idioma/condición. No presentar el dato como precio específico de castellano.
+- No tocar Supabase, inventarios, checklists, routing `Mis Singles -> álbum`, `En camino` ni las fuentes/fallbacks de imágenes.
+
 ## Build 704.14.52 — 30/08/2026
 - Fix de regresión `En camino` en iPhone/PWA: al entrar en la tercera pestaña Pokémon se fuerza visible `#tradeView` y `#pokemonIncomingView`, se oculta Panini y se repite el render en el siguiente frame/50 ms para evitar estados DOM/CSS heredados.
 - `pokemonIncomingEntries()` sigue siendo la fuente única de pendientes globales (álbumes + Mis Singles). Un single con `status: "incoming"` debe aparecer siempre en la pestaña.

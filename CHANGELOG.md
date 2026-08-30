@@ -1,3 +1,10 @@
+## 704.14.55 — Mis Singles: buscador único + Cardmarket
+- El buscador global superior se oculta únicamente dentro de `Mis Singles`; se conserva el buscador Discover predictivo como único campo de búsqueda en esa pantalla.
+- Los resultados de `Mis Singles` muestran precio Cardmarket cuando TCGdex lo proporciona, usando tendencia como referencia principal y medias de 7/30 días como contexto.
+- Para cartas cuyo acabado disponible es solo holo/reverse, se prioriza la guía foil/holo de Cardmarket cuando existe.
+- La fuente es `pricing.cardmarket` del detalle público de TCGdex: no requiere claves ni cambios de backend/Supabase.
+- El snapshot de precio viaja con un single añadido desde la búsqueda para poder mostrarse también en `Mis Singles`; no altera inventarios, checklists ni routing.
+
 ## 704.14.52 — En camino robusto + detección de cartas ya registradas
 - Corrige la vista Pokémon `En camino` en iPhone/PWA controlando también el `#tradeView` padre y re-renderizando tras el cambio real de pestaña.
 - `En camino` vuelve a agregar pendientes de álbumes Pokémon y de `Mis Singles`, incluida la colección activa `pokemon-singles`.
