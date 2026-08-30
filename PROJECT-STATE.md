@@ -1,3 +1,10 @@
+## Build 704.14.51 — 30/08/2026
+- `Mis Singles` no debe depender de una única fuente de imágenes. Orden: TCGdex localizado -> TCGdex EN -> Limitless CDN cuando el set está mapeado -> `images.pokemontcg.io` genérico por set/número.
+- Los singles antiguos sin imagen deben rehidratarse y persistir el fallback para que miniatura + visor grande funcionen sin volver a buscar manualmente.
+- Mantener especialmente soporte para subsets Trainer Gallery / Shiny Vault; Oranguru Astros Brillantes TG12 es caso de regresión real confirmado por el usuario.
+- En Pokémon, `.app-header` debe ser full-bleed con `margin:0`: no reintroducir el margen superior global que genera una franja negra entre el safe area y el header en iPhone/PWA.
+- No modificar inventarios, checklists, variantes ni sincronización por estos fixes visuales.
+
 ## Build 704.14.50 — 30/08/2026
 - Fix confirmado tras prueba real en iPhone: un single antiguo podía conservar `image: ""`, por lo que seguía mostrando `PK` aunque 704.14.49 ya supiera guardar imágenes en nuevas búsquedas. Ahora Mis Singles rehidrata en segundo plano cualquier carta guardada sin imagen consultando TCGdex (idioma original -> EN fallback), persiste la URL y vuelve a renderizar.
 - El visor ampliado se mantiene para resultados y cartas registradas; además las miniaturas de `En camino` son pulsables y abren el mismo visor.

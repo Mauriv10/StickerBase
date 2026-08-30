@@ -1,3 +1,10 @@
+## 704.14.51 — Mis Singles: segunda fuente de imágenes + header Pokémon full-bleed
+- Cuando TCGdex no aporta imagen, Mis Singles intenta una fuente visual secundaria: CDN de Limitless para sets/lenguajes compatibles y `images.pokemontcg.io` como fallback genérico por set + número.
+- El fallback se aplica tanto a resultados nuevos como a singles ya guardados que conservaban `image: ""`; la URL resuelta se persiste para que la miniatura y el visor grande funcionen también después.
+- Corrige especialmente subsets como Trainer Gallery/Shiny Vault (p. ej. Oranguru TG12), donde TCGdex puede tener la ficha pero no el asset localizado.
+- El header Pokémon elimina el `margin-top` heredado del layout general y pasa a full-bleed, sin borde/radio/sombra externos, evitando la franja negra/descuadre que aparecía encima del header en iPhone/PWA.
+- Sin cambios en inventario, checklists, variantes, En camino, fingerprint ni Supabase.
+
 ## 704.14.50 — Mis Singles: imágenes reparadas + En camino visible
 - Repara automáticamente cartas de Mis Singles ya guardadas sin URL de imagen: vuelve a consultar TCGdex en el idioma de la carta y, si hace falta, en inglés; al encontrarla persiste la miniatura para no perderla de nuevo.
 - Las miniaturas de Mis Singles siguen abriendo el visor grande y la vista En camino también permite abrir la carta en grande cuando hay imagen.

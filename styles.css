@@ -6223,7 +6223,7 @@ body.collection-theme-pokemon,
 body.collection-theme-pokemon .app-shell,
 body.collection-theme-pokemon .app-scroll{background:#070b10!important;color:#f8fafc!important}
 body.collection-theme-pokemon .app-main{background:linear-gradient(180deg,#080c11 0%,#0b0f14 100%)!important;padding-left:10px!important;padding-right:10px!important}
-body.collection-theme-pokemon .app-header{padding:0 14px 14px!important;background:#070b10!important}
+body.collection-theme-pokemon .app-header{width:100%!important;max-width:none!important;margin:0!important;padding:0 14px 14px!important;border:0!important;border-radius:0!important;background:#070b10!important;box-shadow:none!important}
 body.collection-theme-pokemon .compact-home-titlebar{
  min-height:126px!important;height:auto!important;margin:0 -14px 14px!important;padding:calc(18px + env(safe-area-inset-top)) 18px 18px!important;border:0!important;border-radius:0!important;
  display:grid!important;grid-template-columns:64px minmax(0,1fr) 54px!important;gap:14px!important;align-items:center!important;color:#fff!important;
