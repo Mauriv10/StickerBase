@@ -298,18 +298,14 @@ Bug histórico:
 La solución actual no debe reintroducir ese problema.
 
 ## 7.8 Navegación Pokémon
-Por ahora:
-- NO mostrar pestaña `Cambiar` dentro de colecciones Pokémon.
-- La idea era mantener Pokémon en modo colección/Pokédex.
-- Se quitó la barra `Todos / Pedir / Entregar`.
-
-La navegación Pokémon actual:
+La navegación Pokémon actual es:
 - Cromos
 - Estadísticas
+- En camino
 - Colecciones
 - Ajustes
 
-No añadir `Cambiar` sin petición expresa.
+`En camino` ocupa la tercera posición que en fútbol sigue siendo `Cambiar`. En Pokémon NO se muestran herramientas de intercambio Panini ni scanner de precios. La barra `Todos / Pedir / Entregar` continúa retirada.
 
 ## 7.9 Estadísticas Pokémon
 Debe tener estética idéntica al tema premium de la expansión.
@@ -1715,3 +1711,33 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - El scanner puede generar candidatos solo por nombre cuando el número todavía no sea legible.
 - Mantener cámara fullscreen, búsqueda global Pokémon, idiomas ES/EN/JA/ZH, Cardmarket Trend/AVG1/AVG7/AVG30/Low y fallback manual.
 - No tocar inventario, variantes, checklists, estadísticas, fingerprint ni Supabase.
+
+## 704.14.46 — contrato Vision 3 backend-first
+- Para perseguir latencia/precisión premium, el reconocimiento pesado queda desacoplado de la PWA. `WC26_CONFIG.pokemonVisionApi` activa el servicio visual.
+- Con endpoint activo, NO ejecutar Tesseract antes de la identificación visual: enviar el crop guiado y procesar respuesta del backend.
+- Aceptación automática exige `CONFIDENT`, margen Top1/Top2 y confianza alta o consenso temporal de al menos 2 frames.
+- Si el backend no está configurado, conservar el matcher local como fallback, nunca romper el scanner existente.
+- El backend es un artefacto separado para modelo ONNX + índice de embeddings precalculado + rectificación + fusión; no mezclarlo con inventario/Supabase.
+- No tocar inventario, variantes, checklists, estadísticas, fingerprint ni Supabase.
+
+
+## 704.14.47 — En camino + Mis Singles / scanner retirado
+- Se elimina completamente el scanner Pokémon experimental de la PWA: no existe `pokemonPriceScannerView`, cámara, OCR, matcher visual, Vision client ni scripts `pokemon-scanner/*`. Los contratos 704.14.39–704.14.46 quedan como historial técnico y están SUPERADOS por esta build.
+- En Pokémon, la tercera pestaña de la navegación inferior pasa a ser `📦 En camino`. En fútbol conserva `⇄ Cambiar` y todas las funciones de intercambio existentes.
+- Cada carta de una colección Pokémon puede marcarse `En camino`. En BASE la marca pertenece a la variante seleccionada (Normal/Holo/Reverse/etc.); en cartas fijas pertenece a esa carta concreta.
+- El estado pendiente se guarda en `project.pokemonIncoming` y forma parte del fingerprint/cloud sync. Marcar `Recibida` incrementa exactamente la carta/variante correspondiente y elimina el pendiente. Nunca contar una carta en camino como inventario antes de recibirla.
+- `En camino` agrega pendientes de TODAS las colecciones Pokémon, no solo la activa, y permite `Recibida` o `Quitar`.
+- Nueva colección virtual `Mis Singles`: sirve para registrar cartas sueltas de cualquier expansión sin crear/completar el set entero. Se crea solo al abrirla por primera vez para no introducir mutaciones al arrancar/sincronizar.
+- `Mis Singles` busca manualmente en TCGdex por nombre o número, permite ES/EN/JP/CN, conserva imagen/set/número/rareza/idioma y admite estado `En camino`.
+- Los singles forman parte de `project.pokemonSingles`, del fingerprint y de Supabase igual que el resto de datos persistentes.
+- La biblioteca Pokémon muestra siempre una tarjeta `Mis Singles`; no crear una subcarpeta por expansión.
+- No modificar las checklists, variantes, cantidades existentes ni la lógica de sincronización rápida 704.14.23.
+
+
+## Build 704.14.48 — routing desde Mis Singles
+- Regla permanente: una búsqueda iniciada en `Mis Singles` no implica que la carta deba almacenarse allí.
+- Resolver primero por `setId` contra las colecciones Pokémon existentes y confirmar que el número de carta existe como clave real en el checklist/inventario de una sección de ese proyecto.
+- Si hay destino compatible: `La tengo` suma en ese álbum; `En camino` se guarda en `pokemonIncoming` de ese álbum.
+- Si no hay destino compatible: almacenar en `pokemonSingles`.
+- En BASE con múltiples acabados, pedir la variante mediante selector antes de registrar o marcar En camino.
+- Nunca crear automáticamente una colección completa solo porque se busque/compre un single.

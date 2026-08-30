@@ -1,3 +1,12 @@
+# Build 704.14.48 — Mis Singles enruta al álbum correcto
+
+- Al añadir una carta desde **Mis Singles**, StickerBase detecta si su `setId` corresponde a una colección Pokémon ya creada y si el número existe realmente en el checklist de ese álbum.
+- Si existe, `La tengo` suma la carta directamente al álbum correspondiente y `En camino` crea el pendiente dentro de ese álbum.
+- Si no existe una colección/checklist compatible, la carta continúa guardándose en **Mis Singles**.
+- Para cartas BASE con varias variantes físicas, el resultado de búsqueda muestra un selector (Normal/Holo/Reverse/etc.) antes de `La tengo` o `En camino`, evitando registrar una variante incorrecta.
+- La vista global **En camino** conserva el flujo `Recibida` y coloca la carta en el destino real.
+- Sin cambios en inventario existente, checklists, Supabase ni colecciones de fútbol.
+
 
 ## Build 704.14.34 — artwork independiente en headers Pokémon
 - Sustituido el sistema de recorte de cartas por assets visuales locales dedicados al header.
@@ -613,3 +622,22 @@
 - Se añade búsqueda por nombre cuando todavía no se puede leer el número; el reconocimiento puede avanzar con nombre + imagen.
 - El pulso normal sigue sin bloquear el scanner; no vuelve el requisito de estabilidad.
 - Sin cambios en inventario, checklists, estadísticas, fingerprint, Supabase ni precios aprobados (Trend/AVG1/AVG7/AVG30/Low).
+
+## 704.14.46 — Vision 3 / backend-first
+- Se introduce un camino de reconocimiento visual remoto configurable (`pokemonVisionApi`) que saca Tesseract del camino crítico cuando el servicio está activo.
+- El cliente envía únicamente el crop de la carta, JPEG comprimido, y usa consenso temporal de resultados visuales.
+- Un resultado solo se acepta con estado CONFIDENT, margen sobre runner-up y confianza/consenso suficientes.
+- Fallback local 704.14.45 se conserva si no hay endpoint configurado.
+- Añadido `pokemon-scanner/vision-client.js`; el motor pesado vive en el paquete separado `StickerBase-Vision-3.0`.
+- Sin cambios de inventario, checklists, estadísticas, fingerprint ni Supabase.
+
+
+## 704.14.47 — Pokémon: En camino + Mis Singles
+- Retirado por completo el scanner de precios Pokémon y sus módulos `pokemon-scanner/visual-matcher.js` y `pokemon-scanner/vision-client.js`.
+- La pestaña Pokémon `Intercambio` se sustituye por `📦 En camino`; fútbol mantiene `Cambiar` sin cambios.
+- Añadido estado `En camino` por carta/variante desde la checklist Pokémon.
+- Nueva vista global de pedidos Pokémon con todas las cartas pendientes y acción `Recibida`, que suma la carta/variante al inventario correcto.
+- Nueva colección libre `Mis Singles` para cartas que no pertenecen a expansiones que el usuario quiera completar.
+- `Mis Singles` permite buscar cartas en TCGdex por nombre/número e idioma, registrarlas, marcarlas en camino, recibirlas y eliminarlas.
+- `pokemonIncoming` y `pokemonSingles` se incorporan al fingerprint comparable para sincronización Supabase y protección de conflictos.
+- Sin cambios en las checklists existentes, inventarios previos ni intercambio de fútbol.
