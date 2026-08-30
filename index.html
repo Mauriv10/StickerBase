@@ -336,65 +336,18 @@
 </section>
 
 
-<section id="tradeView" class="main-tab-view" hidden>
-  <section id="pokemonPriceScannerView" class="pokemon-price-scanner-view" hidden>
-    <div class="tab-page-heading pokemon-scan-heading">
-      <span>POKÉMON · CARDMARKET</span>
-      <h2>Escanear precio</h2>
-      <p>Apunta a cualquier carta Pokémon. StickerBase detecta la carta y muestra Trend, AVG1, AVG7, AVG30 y Low.</p>
+  <section id="pokemonIncomingView" class="pokemon-incoming-view" hidden>
+    <div class="tab-page-heading pokemon-incoming-heading">
+      <span>POKÉMON · PEDIDOS</span>
+      <h2>En camino</h2>
+      <p>Todas las cartas que ya has comprado y todavía no han llegado, reunidas en una sola vista.</p>
     </div>
-
-    <section class="pokemon-scan-card">
-      <div class="pokemon-scan-camera">
-        <div id="pokemonScanPreview" class="pokemon-scan-preview">
-          <div class="pokemon-scan-placeholder"><b>⌁</b><span>Apunta a cualquier carta Pokémon</span><small>Detectará nombre + número de la carta</small></div>
-          <video id="pokemonScanVideo" playsinline muted hidden></video>
-          <img id="pokemonScanImage" alt="Carta escaneada" hidden>
-          <div id="pokemonScanGuide" class="pokemon-scan-guide" hidden></div>
-          <div id="pokemonScanFullscreenHud" class="pokemon-scan-fullscreen-hud" hidden>
-            <div class="pokemon-scan-fullscreen-top"><strong>ESCANEAR CARTA</strong><button id="pokemonScanFullscreenClose" type="button" aria-label="Cerrar scanner">✕</button></div>
-            <div class="pokemon-scan-fullscreen-copy"><b id="pokemonScanFullscreenStatus">Coloca toda la carta dentro del marco</b><span>Reconocimiento visual + nombre + número · sin inmovilizar la carta</span><button id="pokemonScanFullscreenReadNow" type="button">Leer ahora</button></div>
-          </div>
-        </div>
-        <input id="pokemonScanImageInput" type="file" accept="image/*" capture="environment" hidden>
-        <button id="pokemonScanCameraButton" class="pokemon-scan-main-button" type="button"><span>📷</span> Escanear carta</button>
-      </div>
-
-      <div class="pokemon-scan-controls">
-        <label><span>Idioma de la carta</span>
-          <select id="pokemonScanLanguage">
-            <option value="es">Castellano</option>
-            <option value="en">English</option>
-            <option value="ja">日本語</option>
-            <option value="zh-cn">中文（简体）</option>
-            <option value="zh-tw">中文（繁體）</option>
-          </select>
-        </label>
-        <label><span>Número detectado</span>
-          <div class="pokemon-scan-number-row"><input id="pokemonScanNumber" inputmode="numeric" autocomplete="off" placeholder="Ej. 238/191"><button id="pokemonScanLookupButton" type="button">Buscar</button></div>
-        </label>
-        <div id="pokemonScanStatus" class="pokemon-scan-status" aria-live="polite">Scanner global · escanea cualquier carta Pokémon o escribe su número.</div>
-        <div id="pokemonScanCandidates" class="pokemon-scan-candidates" hidden></div>
-      </div>
-    </section>
-
-    <section id="pokemonScanResult" class="pokemon-scan-result" hidden>
-      <div class="pokemon-scan-result-head">
-        <img id="pokemonScanResultImage" alt="">
-        <div><span id="pokemonScanSetLabel">—</span><h3 id="pokemonScanCardName">—</h3><p id="pokemonScanCardMeta">—</p></div>
-      </div>
-      <div class="pokemon-market-grid">
-        <article><span>Trend</span><strong id="pokemonPriceTrend">—</strong></article>
-        <article><span>AVG1</span><strong id="pokemonPriceAvg1">—</strong></article>
-        <article><span>AVG7</span><strong id="pokemonPriceAvg7">—</strong></article>
-        <article><span>AVG30</span><strong id="pokemonPriceAvg30">—</strong></article>
-        <article class="pokemon-market-low"><span>Low</span><strong id="pokemonPriceLow">—</strong></article>
-      </div>
-      <div class="pokemon-scan-result-foot"><small id="pokemonPriceUpdated">Datos Cardmarket</small><a id="pokemonCardmarketLink" href="https://www.cardmarket.com/en/Pokemon/Products/Singles" target="_blank" rel="noopener">Ver en Cardmarket ↗</a></div>
-      <button id="pokemonScanAgainButton" class="pokemon-scan-again-button" type="button">📷 Escanear otra carta</button>
-    </section>
+    <section class="pokemon-incoming-summary"><div><span>Pendientes de recibir</span><strong id="pokemonIncomingCount">0</strong></div><small>Al marcar una carta como recibida se añade automáticamente a su colección.</small></section>
+    <div id="pokemonIncomingList" class="pokemon-incoming-list"></div>
+    <div id="pokemonIncomingEmpty" class="pokemon-incoming-empty"><span>📦</span><strong>No tienes cartas en camino</strong><p>Desde cualquier carta Pokémon pulsa “En camino”. También puedes hacerlo desde Mis Singles.</p></div>
   </section>
 
+<section id="tradeView" class="main-tab-view" hidden>
   <section id="paniniTradeView">
   <div class="tab-page-heading">
     <span>INTERCAMBIOS</span>
@@ -940,7 +893,6 @@
 <script src="./megacracks-data.js"></script>
 <script src="./assets/vendor/qrcode-stickerbase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
-<script src="./pokemon-scanner/visual-matcher.js" defer></script>
 <script src="./app.js" defer></script>
 
 

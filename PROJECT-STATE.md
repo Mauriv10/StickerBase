@@ -1777,3 +1777,10 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Si un resultado puede enrutarse a un álbum existente, su miniatura debe priorizar `meta.images.small` / `pokemonDirectImageUrl()` de ese álbum. Esto evita aceptar assets de catálogo que sean reversos/placeholders para cartas ya conocidas por StickerBase (especialmente First Partner).
 - Mantener detección `Ya la tienes` / `Ya está en camino` por carta y variante. No duplicar el mismo estado.
 - No modificar inventarios existentes, checklists, variantes ni la lógica de sincronización rápida/Supabase.
+
+### Build 704.14.54 — Mis Singles Discover + En camino independiente
+- `pokemonIncomingView` es ahora hermano de `tradeView`, no hijo. En Pokémon, `setMainTab("trade")` muestra exclusivamente `pokemonIncomingView`; en Panini muestra `tradeView`. No volver a anidar En camino dentro del intercambio Panini.
+- Mis Singles adopta UX Discover: búsqueda predictiva (300 ms), Mejor resultado y Cartas y versiones en grid de 2 columnas móvil.
+- Historial local (NO cloud/fingerprint): `stickerbase.pokemon.singles.recentViewed.v1` y `stickerbase.pokemon.singles.recentAdded.v1`, máximo 20 snapshots.
+- El ranking "Mejor resultado" es relevancia textual (nombre/número/set), no popularidad externa.
+- Las acciones siguen respetando routing automático: si la carta está en el checklist de un álbum existente, se registra allí; si no, en Mis Singles.

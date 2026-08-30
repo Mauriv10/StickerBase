@@ -674,3 +674,11 @@
 - En camino: visibilidad determinista del panel Pokémon en la pestaña y agregación explícita de singles pendientes antes del filtro de álbumes normales.
 - Responsive: se bloquea el desbordamiento horizontal del shell Pokémon durante búsqueda/teclado en iPhone.
 - Sin cambios en inventarios existentes, checklists, variantes ni contrato de sincronización Supabase.
+
+## 704.14.54 — En camino independiente + Mis Singles Discover
+- `En camino` deja de vivir dentro de `tradeView`: ahora es una vista Pokémon de primer nivel y no comparte capas/hidden con el intercambio Panini.
+- Mis Singles se rediseña como buscador tipo Discover: campo grande, búsqueda predictiva, mejor resultado, grid de cartas/versiones y scroll continuo.
+- Añade historiales locales de `Añadidas recientemente` y `Vistas recientemente` (no entran en Supabase/fingerprint).
+- El mejor resultado se ordena por relevancia de nombre/número/expansión, sin inventar popularidad.
+- Se mantienen acciones `La tengo` / `En camino`, detección de ya poseída/en camino y routing automático al álbum correcto.
+- Responsive iPhone: input >=16px, grid 2 columnas y sin dependencia del botón Buscar.
