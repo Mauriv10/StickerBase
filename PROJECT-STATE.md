@@ -1,3 +1,12 @@
+# Update 704.14.65 — MEP universal + contrato de idioma Cardmarket
+
+- Fuente de verdad: 704.14.64 COMPLETO.
+- `MEP Black Star Promos` es un set de Singles completo, no solo el subconjunto First Partner 037-063. Toda ficha con `setId=mep` debe poder resolver imagen aunque no pertenezca a ningún checklist.
+- Para MEP conservar/probar numeración promocional de tres cifras: `032` -> `mep-032`. No normalizar destructivamente a `mep-32` como única opción. La resolución canónica prueba ambas formas y `localId` tanto padded como no padded.
+- Fallback visual MEP: `https://assets.tcgdex.net/en/me/mep/{NNN}/low.webp` y `high.webp`, persistidos como `image`/`imageLarge`. Casos de regresión obligatorios: MEP032 Mega-Gardevoir ex, MEP033 Mega-Lucario ex, MEP070 Tyrunt.
+- Contrato Cardmarket: la fuente primaria sigue siendo el snapshot público oficial `products_singles_6.json` + `price_guide_6.json`. Ese price guide agrega idiomas. `pokemonSinglesEnglishIdentity()` sirve para emparejar el producto correcto por nombre inglés, pero no debe interpretarse como filtro de precio por idioma. No mostrar ni guardar un precio como “English-only” hasta disponer de una fuente fiable que filtre ofertas/ventas por idioma.
+- No tocar inventarios, routing álbum + Mis Singles, En camino, estadísticas ni Supabase por esta corrección.
+
 # Update 704.14.64 — Mis Singles: fallback visual universal + valor económico
 
 - Fuente de verdad para esta build: 704.14.63 COMPLETO.

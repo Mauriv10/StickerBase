@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.64";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.65";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2797,7 +2797,7 @@ function pokemonSinglesTcgdexParts(card){
 }
 async function pokemonSinglesEnglishIdentity(card){
  let name=String(card?.englishName||card?.name||""),resolvedId=String(card?.tcgdexId||"");const parts=pokemonSinglesTcgdexParts(card),number=String(parts.number||card?.number||"");if(!number)return {name,resolvedId};
- const ids=[];const push=id=>{if(id&&!ids.includes(id))ids.push(id)};push(parts.tcgdexId);pokemonSinglesTcgdexSetCandidates(parts.setId||card?.setId).forEach(setId=>push(`${setId}-${number}`));
+ const ids=[];const push=id=>{if(id&&!ids.includes(id))ids.push(id)};push(parts.tcgdexId);const canonicalSet=pokemonSinglesCanonicalSetId(parts.setId||card?.setId),promoNumber=canonicalSet==="mep"&&/^\d+$/.test(number)?String(Number(number)).padStart(3,"0"):number;pokemonSinglesTcgdexSetCandidates(parts.setId||card?.setId).forEach(setId=>{push(`${setId}-${promoNumber}`);if(promoNumber!==number)push(`${setId}-${number}`);});
  if(card?.language==="en")return {name,resolvedId:ids[0]||resolvedId};
  for(const id of ids){try{const en=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/en/cards/${encodeURIComponent(id)}`);if(en?.name){name=en.name;resolvedId=en.id||id;card.englishName=name;card.tcgdexId=resolvedId;return {name,resolvedId};}}catch{}}
  return {name,resolvedId};
@@ -2807,7 +2807,12 @@ function pokemonSinglesLimitlessImage(card){
  const clean=/^\d+$/.test(number)?String(Number(number)).padStart(3,"0"):number.toUpperCase();
  return `https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/${setCode}/${setCode}_${encodeURIComponent(clean)}_R_${lang}.png`;
 }
-function pokemonSinglesFallbackImage(card){return pokemonSinglesLimitlessImage(card)}
+function pokemonSinglesMepImage(card,quality="low"){
+ const parts=pokemonSinglesTcgdexParts(card),setId=pokemonSinglesCanonicalSetId(parts.setId||card?.setId||"");if(setId!=="mep")return "";
+ const raw=String(parts.number||card?.number||"").trim(),digits=raw.match(/(\d+)$/)?.[1]||"";if(!digits)return "";
+ const localId=String(Number(digits)).padStart(3,"0");return `https://assets.tcgdex.net/en/me/mep/${localId}/${quality==="high"?"high":"low"}.webp`;
+}
+function pokemonSinglesFallbackImage(card){return pokemonSinglesMepImage(card,"low")||pokemonSinglesLimitlessImage(card)}
 function pokemonSinglesPositiveNumber(value){const n=Number(value);return Number.isFinite(n)&&n>0?n:null}
 function pokemonSinglesNormalizeCardmarket(cm){
  if(!cm)return null;const prices=cm.prices||cm;const trend=pokemonSinglesPositiveNumber(prices.trendPrice??prices.trend),avg7=pokemonSinglesPositiveNumber(prices.avg7),avg30=pokemonSinglesPositiveNumber(prices.avg30),avg=pokemonSinglesPositiveNumber(prices.averageSellPrice??prices.avg),low=pokemonSinglesPositiveNumber(prices.lowPrice??prices.low);
@@ -2864,8 +2869,11 @@ async function pokemonSinglesEnsureCardImage(project,card,onUpdated){
   // 2) Fallback consultado por nombre+número, independiente del checklist de álbumes.
   // Cubre promos/singles como MEP032 aunque no formen parte del rango First Partner 037-063.
   try{const ptcg=await pokemonSinglesPokemonTcgFallback(card);if(ptcg?.image)return commit(ptcg.image,ptcg.imageLarge||ptcg.image,"pokemontcg-api");}catch{}
-  // 3) CDN segura únicamente en sets que tienen mapping conocido.
-  const fallback=pokemonSinglesFallbackImage(card);if(fallback)return commit(fallback,fallback,"limitless");
+  // 3) MEP Black Star Promos: TCGdex publica el frontal en su CDN aunque la ficha no esté en un álbum de StickerBase.
+  // Se conserva la numeración promocional de tres dígitos (MEP032, MEP033, MEP070...).
+  const mepLow=pokemonSinglesMepImage(card,"low"),mepHigh=pokemonSinglesMepImage(card,"high");if(mepLow)return commit(mepLow,mepHigh||mepLow,"tcgdex-mep");
+  // 4) CDN segura únicamente en sets que tienen mapping conocido.
+  const fallback=pokemonSinglesLimitlessImage(card);if(fallback)return commit(fallback,fallback,"limitless");
  }finally{pokemonSinglesImageHydration.delete(hydrationKey)}
  return card.image||"";
 }
@@ -2913,14 +2921,14 @@ function pokemonSinglesMirrorNeedsCanonicalRepair(card){
  return false;
 }
 async function pokemonSinglesCanonicalDetail(card,target){
- const number=String(card?.number||Number(target?.code)||"").replace(/^0+(?=\d)/,"");if(!number)return null;
- const expected=pokemonSinglesCanonicalSetId(target?.def?.setId||card?.setId||"");
+ const rawNumber=String(card?.number||Number(target?.code)||"").trim(),number=rawNumber.replace(/^0+(?=\d)/,"");if(!number)return null;
+ const expected=pokemonSinglesCanonicalSetId(target?.def?.setId||card?.setId||""),promoNumber=expected==="mep"?String(Number(number)).padStart(3,"0"):number;
  const ids=[];const push=id=>{id=String(id||"").trim();if(id&&!ids.includes(id))ids.push(id)};
- push(card?.tcgdexId);pokemonSinglesTcgdexSetCandidates(target?.def?.setId||card?.setId||"").forEach(setId=>push(`${setId}-${number}`));
+ push(card?.tcgdexId);pokemonSinglesTcgdexSetCandidates(target?.def?.setId||card?.setId||"").forEach(setId=>{push(`${setId}-${promoNumber}`);if(promoNumber!==number)push(`${setId}-${number}`);});
  const langs=[card?.language||"es","es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i);
  for(const lang of langs){
   for(const id of ids){try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(id)}`);if(detail?.id&&(!expected||pokemonSinglesCanonicalSetId(detail?.set?.id||String(detail.id).slice(0,String(detail.id).lastIndexOf("-")))===expected))return {detail,lang};}catch{}}
-  try{const briefs=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards?localId=${encodeURIComponent(number)}`);if(Array.isArray(briefs)){const hit=briefs.find(row=>{const id=String(row?.id||""),cut=id.lastIndexOf("-");return cut>0&&pokemonSinglesCanonicalSetId(id.slice(0,cut))===expected;});if(hit?.id){try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(hit.id)}`);if(detail?.id)return {detail,lang};}catch{}}}}catch{}
+  for(const localId of [promoNumber,number].filter((v,i,a)=>v&&a.indexOf(v)===i)){try{const briefs=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards?localId=${encodeURIComponent(localId)}`);if(Array.isArray(briefs)){const hit=briefs.find(row=>{const id=String(row?.id||""),cut=id.lastIndexOf("-");return cut>0&&pokemonSinglesCanonicalSetId(id.slice(0,cut))===expected;});if(hit?.id){try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(hit.id)}`);if(detail?.id)return {detail,lang};}catch{}}}}catch{}}
  }
  return null;
 }

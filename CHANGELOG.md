@@ -1,3 +1,10 @@
+## 704.14.65 — 31/08/2026
+- Mis Singles: corrige específicamente imágenes de `MEP Black Star Promos` fuera del rango First Partner. El fallback de Singles reconoce `setId=mep` y construye frontal TCGdex en CDN para cualquier numeración promocional (`032`, `033`, `070`, etc.), con `low` + `high`.
+- La resolución canónica de MEP prueba tanto el identificador promocional con tres dígitos (`mep-032`) como la forma numérica (`mep-32`) y consulta `localId` en ambas formas. Evita perder la identidad por eliminar ceros iniciales.
+- La hidratación de imágenes da prioridad al fallback MEP antes de Limitless y persiste `imageSource=tcgdex-mep`; casos de regresión: Mega-Gardevoir ex #032, Mega-Lucario ex #033 y Tyrunt #070.
+- Cardmarket: se mantiene el snapshot público oficial actual. Importante: su guía de precios es agregada entre idiomas; resolver el nombre/ID en inglés asegura el producto correcto, pero no convierte la tendencia en un precio exclusivo de cartas inglesas. No etiquetar esos valores como `EN` sin una fuente de ofertas/precios filtrada por idioma.
+- No modifica inventarios, cantidades, variantes, routing, estadísticas ni Supabase.
+
 ## 704.14.64 — 30/08/2026
 - Mis Singles: la hidratación de imágenes ya no depende de que la carta pertenezca a un álbum/checklist. Orden de fallback: TCGdex exacto (idioma -> EN) -> Pokémon TCG API consultada por nombre+número -> Limitless solo en sets mapeados con seguridad.
 - El fallback de Pokémon TCG API persiste miniatura y versión grande (`image` + `imageLarge`) y acepta numeraciones promocionales con prefijo/sufijo numérico (p. ej. `MEP032` / `032`). Esto cubre promos como Mega-Gardevoir ex MEP #032 aunque First Partner solo tenga 037-063.
