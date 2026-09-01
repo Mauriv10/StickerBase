@@ -1,3 +1,13 @@
+## 704.14.67 — 01/09/2026
+
+- Singles: corregido el resolver de imágenes residuales para collector numbers especiales (TGxx, GGxx y promos MEP).
+- Pokémon TCG API: la comparación del número de colección conserva el prefijo; `TG03` ya no se reduce erróneamente a `3` ni `GG05` a `5`.
+- TCGdex: nuevo resolver por `localId` + afinidad de set/nombre cuando el ID guardado no es suficiente o es sintético.
+- Imágenes: añadido Scrydex como fallback validado por carga real, probando variantes seguras de set y collector number.
+- Contrato de imágenes: `pokemonSinglesCanonicalizeMirror()` deja de escribir `card.image`/`imageLarge` sin validación; toda persistencia pasa por `pokemonSinglesEnsureCardImage()`.
+- Migración visual schema 3: las fichas antiguas se vuelven a comprobar una sola vez sin sustituir imágenes que ya funcionan.
+- Objetivos de regresión: MEP032 Mega-Gardevoir ex, MEP033 Mega-Lucario ex, MEP070 Tyrunt, MEP080 Fennekin, TG03 Charizard y GG05 Lapras.
+
 ## 704.14.66 — 01/09/2026
 - Corrige la regresión de imágenes introducida en 704.14.64/65: una URL construida de TCGdex/MEP/Limitless ya no se guarda como imagen válida sin comprobar primero que el frontal carga realmente.
 - Una miniatura existente y válida nunca se sustituye solo porque falte `imageLarge`; la app intenta enriquecer la versión HD y, si no la encuentra, conserva la miniatura conocida.

@@ -1,3 +1,24 @@
+# Update 704.14.67 — resolver de collector numbers especiales y cierre de imágenes residuales
+
+## Problema corregido
+Tras 704.14.66 la mayoría de imágenes de Singles se recuperaron, pero quedaban fallos concentrados en subsets/promos con numeración no puramente numérica o identidad especial: MEP032/033/070/080, TG03 y GG05.
+
+## Regla estructural nueva
+- El collector number es una identidad: `TG03`, `GG05`, `032`, etc. No se deben comparar todos como un entero desnudo.
+- TCGdex se resuelve primero por ID conocido y después por `localId`, puntuando coincidencia de set y nombre.
+- Pokémon TCG API usa la misma normalización semántica del collector number.
+- Ningún canonicalizador puede guardar una URL de imagen directamente: solo `pokemonSinglesEnsureCardImage()` puede persistirla tras `Image.onload`/probe válido.
+- Scrydex queda como fallback adicional validado; una URL construida nunca equivale a una imagen existente.
+- `imageSchema = 3` fuerza una única revisión de fichas antiguas y conserva cualquier miniatura/HD que siga cargando correctamente.
+
+## Casos de regresión a comprobar
+- Mega-Gardevoir ex MEP #032
+- Mega-Lucario ex MEP #033
+- Tyrunt MEP #070
+- Fennekin MEP #080
+- Charizard TG03
+- Lapras GG05
+
 # Update 704.14.66 — contrato de imágenes verificadas y reparación de regresión
 
 - Fuente de verdad: 704.14.65 COMPLETO.
