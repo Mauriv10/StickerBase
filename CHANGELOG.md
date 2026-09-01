@@ -1,3 +1,11 @@
+## 704.14.66 — 01/09/2026
+- Corrige la regresión de imágenes introducida en 704.14.64/65: una URL construida de TCGdex/MEP/Limitless ya no se guarda como imagen válida sin comprobar primero que el frontal carga realmente.
+- Una miniatura existente y válida nunca se sustituye solo porque falte `imageLarge`; la app intenta enriquecer la versión HD y, si no la encuentra, conserva la miniatura conocida.
+- Cuando una imagen guardada falla en el navegador, el error deja de limitarse a ocultar el `<img>`: registra esa URL como fallida y lanza automáticamente el siguiente fallback fiable para reparar y persistir la ficha.
+- First Partner/MEP vinculadas a álbum recuperan primero la imagen conocida del propio checklist (`meta.images` / `FIRST_PARTNER_IMAGE_FALLBACKS`) antes de probar proveedores externos. Esto recupera especialmente 046-063 si una build anterior las sustituyó por una URL inválida.
+- La misma reparación por fallo se aplica a Singles libres de `En camino` (por ejemplo promos MEP o Trainer Gallery): TCGdex exacto -> Pokémon TCG API -> MEP/Limitless, validando cada candidato antes de persistirlo.
+- Se añade caché de validación visual por sesión para no descargar/probar repetidamente la misma URL; no cambia inventario, precios, estados ni Supabase.
+
 ## 704.14.65 — 31/08/2026
 - Mis Singles: corrige específicamente imágenes de `MEP Black Star Promos` fuera del rango First Partner. El fallback de Singles reconoce `setId=mep` y construye frontal TCGdex en CDN para cualquier numeración promocional (`032`, `033`, `070`, etc.), con `low` + `high`.
 - La resolución canónica de MEP prueba tanto el identificador promocional con tres dígitos (`mep-032`) como la forma numérica (`mep-32`) y consulta `localId` en ambas formas. Evita perder la identidad por eliminar ceros iniciales.

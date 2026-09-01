@@ -1,3 +1,15 @@
+# Update 704.14.66 — contrato de imágenes verificadas y reparación de regresión
+
+- Fuente de verdad: 704.14.65 COMPLETO.
+- Regla absoluta de imágenes en Mis Singles: **construir una URL no significa que exista una imagen**. Cualquier fallback generado (TCGdex CDN, MEP, Limitless) debe superar una carga real mediante `Image()` antes de persistirse en `card.image` / `card.imageLarge`.
+- Nunca reemplazar una miniatura existente y cargable únicamente porque falte `imageLarge`. En ese caso conservar `card.image`; intentar HD por separado y usar la miniatura como `imageLarge` solo si no existe una versión grande fiable.
+- `pokemonSinglesOwnedImageError()` y `pokemonSinglesIncomingImageError()` convierten el error visual en señal de reparación: guardan la URL fallida y llaman a `pokemonSinglesEnsureCardImage(..., force=true)` para recorrer fuentes alternativas. No volver al patrón antiguo de ocultar el `<img>` y dejar el dato roto persistido.
+- Para mirrors vinculados, la primera fuente de recuperación es el propio álbum/checklist (`pokemonMeta.images` / `pokemonDirectImageUrl`). En First Partner esto recupera los fallbacks conocidos 046-063 de `FIRST_PARTNER_IMAGE_FALLBACKS` antes de intentar una URL MEP construida.
+- Orden general de recuperación tras fallo: imagen conocida del álbum -> TCGdex exacto idioma/EN -> Pokémon TCG API por identidad -> MEP construido verificado -> Limitless construido verificado -> PK.
+- Las URLs fallidas se conservan en una lista corta `imageFailedUrls` para evitar reintentar inmediatamente el mismo recurso roto. El probe se cachea solo durante la sesión.
+- Casos de regresión obligatorios: First Partner 046 Chikorita / 047 Cyndaquil / 048 Totodile / 049 Snivy no deben perder una imagen que ya funcionaba; Singles libres como MEP032/033/070 y Trainer Gallery TG03 deben intentar reparación automática si el frontal guardado falla.
+- No cambiar inventario, cantidades, routing, Cardmarket, estadísticas ni Supabase por este fix.
+
 # Update 704.14.65 — MEP universal + contrato de idioma Cardmarket
 
 - Fuente de verdad: 704.14.64 COMPLETO.

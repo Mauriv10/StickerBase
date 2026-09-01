@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.65";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.66";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2692,6 +2692,7 @@ let pokemonSinglesCollectionTab="owned";
 let pokemonSinglesAutoSyncInFlight=false;
 let pokemonSinglesCanonicalRepairInFlight=false;
 const POKEMON_SINGLES_CANONICAL_SCHEMA=3;
+const POKEMON_SINGLES_IMAGE_SCHEMA=2;
 const POKEMON_SINGLES_PRICE_THRESHOLD=2;
 const POKEMON_SINGLES_RECENT_VIEWED_KEY="stickerbase.pokemon.singles.recentViewed.v1";
 const POKEMON_SINGLES_RECENT_ADDED_KEY="stickerbase.pokemon.singles.recentAdded.v1";
@@ -2700,6 +2701,22 @@ function pokemonSinglesRecentPush(key,card){if(!card)return;const clean={id:card
 function pokemonSinglesRecentCardHtml(card,kind,index){const image=card.image||pokemonSinglesFallbackImage(card);return `<button type="button" class="pokemon-discover-recent-card" data-recent-kind="${kind}" data-recent-index="${index}">${image?`<img src="${collectionSafeText(image)}" alt="${collectionSafeText(card.name||"Carta Pokémon")}" loading="lazy">`:'<span>PK</span>'}<strong>${collectionSafeText(card.name||"Carta Pokémon")}</strong><small>${collectionSafeText(card.setName||"")}${card.number?` · #${collectionSafeText(card.number)}`:""}</small></button>`;}
 function pokemonSinglesRecentStrip(title,key,kind){const rows=pokemonSinglesRecentRead(key);if(!rows.length)return "";return `<section class="pokemon-discover-recent"><div class="pokemon-discover-section-head"><span>${collectionSafeText(title)}</span></div><div class="pokemon-discover-recent-strip">${rows.slice(0,10).map((c,i)=>pokemonSinglesRecentCardHtml(c,kind,i)).join("")}</div></section>`;}
 const pokemonSinglesImageHydration=new Set();
+const pokemonSinglesImageProbeCache=new Map();
+function pokemonSinglesProbeImage(url){
+ url=String(url||"").trim();if(!url)return Promise.resolve(false);if(pokemonSinglesImageProbeCache.has(url))return pokemonSinglesImageProbeCache.get(url);
+ const promise=new Promise(resolve=>{if(typeof Image==="undefined"){resolve(true);return;}const img=new Image();let done=false,timer=null;const finish=ok=>{if(done)return;done=true;if(timer)clearTimeout(timer);img.onload=null;img.onerror=null;resolve(Boolean(ok));};img.onload=()=>finish((img.naturalWidth||0)>20&&(img.naturalHeight||0)>20);img.onerror=()=>finish(false);timer=setTimeout(()=>finish(false),8000);img.src=url;});pokemonSinglesImageProbeCache.set(url,promise);return promise;
+}
+function pokemonSinglesBrokenImageUrls(card){const rows=Array.isArray(card?.imageFailedUrls)?card.imageFailedUrls:[];return new Set(rows.filter(Boolean));}
+function pokemonSinglesRememberBrokenImage(card,url){url=String(url||"").trim();if(!card||!url)return;const rows=Array.isArray(card.imageFailedUrls)?card.imageFailedUrls.filter(Boolean):[];if(!rows.includes(url))rows.push(url);card.imageFailedUrls=rows.slice(-8);card.imageBrokenAt=new Date().toISOString();}
+function pokemonSinglesKnownAlbumImage(card,size="small"){
+ const target=pokemonSinglesTargetFromMirror(card)||pokemonSinglesCollectionTarget(card);if(!target)return "";const meta=target.meta||{},fromMeta=size==="large"?meta.images?.large:meta.images?.small;if(fromMeta)return fromMeta;return pokemonDirectImageUrl(target.type,target.code,size)||"";
+}
+function pokemonSinglesOwnedImageError(img){
+ try{img.style.display="none";img.parentElement?.classList.add("image-missing");const article=img.closest?.("[data-single-id]"),project=pokemonSinglesProject(),card=project?.pokemonSingles?.find(item=>item.id===article?.dataset?.singleId);if(!project||!card)return;pokemonSinglesRememberBrokenImage(card,img.currentSrc||img.src||card.image);pokemonSinglesEnsureCardImage(project,card,()=>{if(project.id===activeProjectId&&mainTab==="collection")renderPokemonSinglesCollection();},true);}catch{}
+}
+function pokemonSinglesIncomingImageError(img){
+ try{img.style.display="none";img.parentElement?.classList.add("image-missing");const key=img.dataset?.incomingImageKey,row=pokemonIncomingEntries().find(entry=>entry.key===key);if(row?.kind!=="single"||!row?.card)return;pokemonSinglesRememberBrokenImage(row.card,img.currentSrc||img.src||row.card.image);pokemonSinglesEnsureCardImage(row.project,row.card,()=>{if(mainTab==="trade"||pokemonSinglesCollectionTab==="incoming")renderPokemonIncomingView();},true);}catch{}
+}
 function pokemonIncomingKey(section,code,variant="fixed"){return `${section}|||${code}|||${variant||"fixed"}`}
 function pokemonIncomingHas(project,section,code,variant="fixed"){return Boolean(project?.pokemonIncoming?.[pokemonIncomingKey(section,code,variant)])}
 function pokemonIncomingLabel(project,code,variant){
@@ -2764,7 +2781,7 @@ function renderPokemonIncomingView(){
  if(pokeView)pokeView.hidden=!(isPokemon&&!singlesActive&&mainTab==="trade");
  if(!isPokemon)return;
  const rows=pokemonIncomingEntries(),count=$("#pokemonIncomingCount"),list=$("#pokemonIncomingList"),empty=$("#pokemonIncomingEmpty");if(count)count.textContent=String(rows.length);if(empty)empty.hidden=rows.length>0;if(!list)return;
- list.innerHTML=rows.map((row,index)=>{const info=pokemonIncomingCardInfo(row),clickable=Boolean(info.image);return `<article class="pokemon-incoming-card"><div class="pokemon-incoming-thumb ${clickable?"is-clickable":""}" ${clickable?`data-incoming-preview="${index}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(info.name)} en grande"`:""}>${info.image?`<img src="${collectionSafeText(info.image)}" alt="${collectionSafeText(info.name)}" loading="lazy">`:'<span>PK</span>'}</div><div class="pokemon-incoming-copy"><small>${collectionSafeText(info.setName)}</small><strong>${collectionSafeText(info.name)}</strong><span>#${collectionSafeText(info.number)}${info.detail?` · ${collectionSafeText(info.detail)}`:""}</span></div><div class="pokemon-incoming-actions"><button type="button" class="pokemon-receive-button" data-pokemon-receive="${collectionSafeText(row.key)}">✓ Recibida</button><button type="button" class="pokemon-cancel-incoming" data-pokemon-cancel-incoming="${collectionSafeText(row.key)}">Quitar</button></div></article>`}).join("");
+ list.innerHTML=rows.map((row,index)=>{const info=pokemonIncomingCardInfo(row),clickable=Boolean(info.image);return `<article class="pokemon-incoming-card"><div class="pokemon-incoming-thumb ${clickable?"is-clickable":""}" ${clickable?`data-incoming-preview="${index}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(info.name)} en grande"`:""}>${info.image?`<img src="${collectionSafeText(info.image)}" alt="${collectionSafeText(info.name)}" loading="lazy" data-incoming-image-key="${collectionSafeText(row.key)}" onerror="pokemonSinglesIncomingImageError(this)">`:'<span>PK</span>'}</div><div class="pokemon-incoming-copy"><small>${collectionSafeText(info.setName)}</small><strong>${collectionSafeText(info.name)}</strong><span>#${collectionSafeText(info.number)}${info.detail?` · ${collectionSafeText(info.detail)}`:""}</span></div><div class="pokemon-incoming-actions"><button type="button" class="pokemon-receive-button" data-pokemon-receive="${collectionSafeText(row.key)}">✓ Recibida</button><button type="button" class="pokemon-cancel-incoming" data-pokemon-cancel-incoming="${collectionSafeText(row.key)}">Quitar</button></div></article>`}).join("");
  list.querySelectorAll("[data-pokemon-receive]").forEach(button=>button.onclick=()=>pokemonReceiveIncoming(button.dataset.pokemonReceive));
  list.querySelectorAll("[data-pokemon-cancel-incoming]").forEach(button=>button.onclick=()=>pokemonCancelIncoming(button.dataset.pokemonCancelIncoming));
  list.querySelectorAll("[data-incoming-preview]").forEach(el=>{const open=()=>{const row=rows[Number(el.dataset.incomingPreview)],info=row&&pokemonIncomingCardInfo(row);if(info?.image)openPokemonCardImageViewer(info.image,info.number,{name:info.name});};el.onclick=open;el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};});
@@ -2855,25 +2872,31 @@ async function pokemonSinglesPokemonTcgFallback(card){
    const numberMatches=value=>{const raw=String(value||"").trim().toLowerCase(),digits=raw.match(/(\d+)$/)?.[1]||"";return (digits?String(Number(digits)):raw.replace(/^0+(?=\d)/,""))===wantedNumber;};const sameNumber=rows.filter(row=>numberMatches(row?.number));const wantedSet=normalizeTradeName(card?.setName||"");sameNumber.sort((a,b)=>{const score=row=>{const set=normalizeTradeName(row?.set?.name||"");let n=0;if(set===wantedSet)n+=100;if(set.includes(wantedSet)||wantedSet.includes(set))n+=50;return n};return score(b)-score(a)});const hit=sameNumber[0]||null;if(!hit)return null;return {image:hit?.images?.small||hit?.images?.large||"",imageLarge:hit?.images?.large||hit?.images?.small||""};
   }catch{return null}})();pokemonSinglesPtcgCache.set(key,promise);return promise;
 }
-async function pokemonSinglesEnsureCardImage(project,card,onUpdated){
+async function pokemonSinglesEnsureCardImage(project,card,onUpdated,force=false){
  if(!project||!card)return "";
- const alreadyCanonical=Boolean(card.image&&card.imageLarge);if(alreadyCanonical)return card.image;
- const {tcgdexId}=pokemonSinglesTcgdexParts(card);
- const hydrationKey=`${project.id}|||${card.id||tcgdexId||`${card.setId||card.setName}:${card.number||""}`}`;if(pokemonSinglesImageHydration.has(hydrationKey))return card.image||"";pokemonSinglesImageHydration.add(hydrationKey);
- const commit=(image,large=image,source="")=>{if(!image)return "";card.image=image;card.imageLarge=large||image;if(source)card.imageSource=source;card.imageHydratedAt=new Date().toISOString();persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return image;};
+ const failed=pokemonSinglesBrokenImageUrls(card),current=String(card.image||"").trim(),currentLarge=String(card.imageLarge||"").trim();
+ if(!force&&current&&currentLarge&&!failed.has(current)&&!failed.has(currentLarge))return current;
+ const {tcgdexId}=pokemonSinglesTcgdexParts(card),hydrationKey=`${project.id}|||${card.id||tcgdexId||`${card.setId||card.setName}:${card.number||""}`}`;if(pokemonSinglesImageHydration.has(hydrationKey))return card.image||"";pokemonSinglesImageHydration.add(hydrationKey);
+ const valid=async url=>{url=String(url||"").trim();if(!url||failed.has(url))return false;return pokemonSinglesProbeImage(url)};
+ const commit=async(image,large=image,source="")=>{if(!(await valid(image)))return "";let safeLarge=large&&await valid(large)?large:image;card.image=image;card.imageLarge=safeLarge||image;card.imageFailedUrls=(card.imageFailedUrls||[]).filter(url=>url!==image&&url!==safeLarge);if(source)card.imageSource=source;card.imageSchema=POKEMON_SINGLES_IMAGE_SCHEMA;card.imageHydratedAt=new Date().toISOString();persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return image;};
  try{
-  // 1) TCGdex exacto en idioma de la ficha y después EN.
-  if(tcgdexId){const langs=[card.language||"es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i);for(const lang of langs){
-   try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(tcgdexId)}`),base=String(detail?.image||"").replace(/\/$/,""),image=pokemonSinglesImageUrl(base,"low"),large=pokemonSinglesImageUrl(base,"high");if(image){card.imageBase=base;return commit(image,large||image,`tcgdex-${lang}`);}}catch{}
-  }}
-  // 2) Fallback consultado por nombre+número, independiente del checklist de álbumes.
-  // Cubre promos/singles como MEP032 aunque no formen parte del rango First Partner 037-063.
-  try{const ptcg=await pokemonSinglesPokemonTcgFallback(card);if(ptcg?.image)return commit(ptcg.image,ptcg.imageLarge||ptcg.image,"pokemontcg-api");}catch{}
-  // 3) MEP Black Star Promos: TCGdex publica el frontal en su CDN aunque la ficha no esté en un álbum de StickerBase.
-  // Se conserva la numeración promocional de tres dígitos (MEP032, MEP033, MEP070...).
-  const mepLow=pokemonSinglesMepImage(card,"low"),mepHigh=pokemonSinglesMepImage(card,"high");if(mepLow)return commit(mepLow,mepHigh||mepLow,"tcgdex-mep");
-  // 4) CDN segura únicamente en sets que tienen mapping conocido.
-  const fallback=pokemonSinglesLimitlessImage(card);if(fallback)return commit(fallback,fallback,"limitless");
+  // Si la miniatura que ya teníamos sigue viva, nunca la sustituimos solo porque falte HD.
+  if(current&&!failed.has(current)&&await pokemonSinglesProbeImage(current)){
+   if(currentLarge&&!failed.has(currentLarge)&&await pokemonSinglesProbeImage(currentLarge)){card.imageSchema=POKEMON_SINGLES_IMAGE_SCHEMA;return current;}
+   // Intentamos enriquecer únicamente la versión grande; si falla, la miniatura válida sigue intacta.
+   if(tcgdexId){for(const lang of [card.language||"es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i)){try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(tcgdexId)}`),base=String(detail?.image||"").replace(/\/$/,""),large=pokemonSinglesImageUrl(base,"high");if(large&&await valid(large)){card.imageLarge=large;card.imageSchema=POKEMON_SINGLES_IMAGE_SCHEMA;persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return current;}}catch{}}}
+   card.imageLarge=current;card.imageSchema=POKEMON_SINGLES_IMAGE_SCHEMA;persistProjects();scheduleCloudSave();return current;
+  }
+  if(current)failed.add(current);if(currentLarge)failed.add(currentLarge);
+  // 1) Imagen conocida del propio álbum/checklist. Especialmente importante para First Partner 046-063.
+  const albumSmall=pokemonSinglesKnownAlbumImage(card,"small"),albumLarge=pokemonSinglesKnownAlbumImage(card,"large");if(albumSmall){const hit=await commit(albumSmall,albumLarge||albumSmall,"album-known");if(hit)return hit;}
+  // 2) TCGdex exacto, pero la URL SOLO se persiste después de cargar correctamente.
+  if(tcgdexId){for(const lang of [card.language||"es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i)){try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(tcgdexId)}`),base=String(detail?.image||"").replace(/\/$/,""),image=pokemonSinglesImageUrl(base,"low"),large=pokemonSinglesImageUrl(base,"high");if(image){const hit=await commit(image,large||image,`tcgdex-${lang}`);if(hit){card.imageBase=base;return hit;}}}catch{}}}
+  // 3) Pokémon TCG API consultada por nombre+número. También se valida el frontal antes de guardarlo.
+  try{const ptcg=await pokemonSinglesPokemonTcgFallback(card);if(ptcg?.image){const hit=await commit(ptcg.image,ptcg.imageLarge||ptcg.image,"pokemontcg-api");if(hit)return hit;}}catch{}
+  // 4) MEP/Limitless son URLs construidas: ya no equivalen a "imagen existente"; deben superar el probe.
+  const mepLow=pokemonSinglesMepImage(card,"low"),mepHigh=pokemonSinglesMepImage(card,"high");if(mepLow){const hit=await commit(mepLow,mepHigh||mepLow,"tcgdex-mep");if(hit)return hit;}
+  const fallback=pokemonSinglesLimitlessImage(card);if(fallback){const hit=await commit(fallback,fallback,"limitless");if(hit)return hit;}
  }finally{pokemonSinglesImageHydration.delete(hydrationKey)}
  return card.image||"";
 }
@@ -3053,7 +3076,7 @@ function pokemonSinglesCardmarketView(card){
 }
 function pokemonSinglesCardmarketHtml(card,compact=false){const price=pokemonSinglesCardmarketView(card);if(!price)return "";const details=[];if(price.avg7!==null)details.push(`7d ${pokemonSinglesEuro(price.avg7)}`);if(price.avg30!==null)details.push(`30d ${pokemonSinglesEuro(price.avg30)}`);return `<div class="pokemon-cardmarket-price ${compact?"is-compact":""}"><span>Cardmarket</span><strong>${pokemonSinglesEuro(price.primary)}</strong>${details.length?`<small>${details.join(" · ")}</small>`:""}</div>`}
 function pokemonSingleOwnedCardHtml(card){
- const incoming=card.status==="incoming";return `<article class="pokemon-single-owned ${incoming?"is-incoming":""}" data-single-id="${collectionSafeText(card.id)}"><div class="pokemon-single-owned-image ${card.image?"is-clickable":""}" ${card.image?`data-owned-single-preview="${collectionSafeText(card.id)}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(card.name||"carta Pokémon")} en grande"`:""}>${card.image?`<img src="${collectionSafeText(card.image)}" alt="${collectionSafeText(card.name||"Carta Pokémon")}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('image-missing');">`:'<span>PK</span>'}</div><div class="pokemon-single-owned-copy"><small>${collectionSafeText(card.setName||"Pokémon TCG")}</small><strong>${collectionSafeText(card.name||"Carta Pokémon")}</strong><span>#${collectionSafeText(card.number||"—")} · ${pokemonSinglesLanguageLabel(card.language)}${card.rarity?` · ${collectionSafeText(card.rarity)}`:""}</span>${pokemonSinglesCardmarketHtml(card,true)}</div><div class="pokemon-single-owned-actions"><button type="button" data-single-incoming="${collectionSafeText(card.id)}" class="${incoming?"active":""}">${incoming?"📦 En camino":"＋ En camino"}</button><button type="button" data-single-remove="${collectionSafeText(card.id)}">Eliminar</button></div></article>`;
+ const incoming=card.status==="incoming";return `<article class="pokemon-single-owned ${incoming?"is-incoming":""}" data-single-id="${collectionSafeText(card.id)}"><div class="pokemon-single-owned-image ${card.image?"is-clickable":""}" ${card.image?`data-owned-single-preview="${collectionSafeText(card.id)}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(card.name||"carta Pokémon")} en grande"`:""}>${card.image?`<img src="${collectionSafeText(card.image)}" alt="${collectionSafeText(card.name||"Carta Pokémon")}" loading="lazy" onerror="pokemonSinglesOwnedImageError(this)">`:'<span>PK</span>'}</div><div class="pokemon-single-owned-copy"><small>${collectionSafeText(card.setName||"Pokémon TCG")}</small><strong>${collectionSafeText(card.name||"Carta Pokémon")}</strong><span>#${collectionSafeText(card.number||"—")} · ${pokemonSinglesLanguageLabel(card.language)}${card.rarity?` · ${collectionSafeText(card.rarity)}`:""}</span>${pokemonSinglesCardmarketHtml(card,true)}</div><div class="pokemon-single-owned-actions"><button type="button" data-single-incoming="${collectionSafeText(card.id)}" class="${incoming?"active":""}">${incoming?"📦 En camino":"＋ En camino"}</button><button type="button" data-single-remove="${collectionSafeText(card.id)}">Eliminar</button></div></article>`;
 }
 async function pokemonSinglesFetchJson(url){const response=await fetch(url,{cache:"no-store"});if(!response.ok)throw new Error(`TCGdex ${response.status}`);return response.json()}
 async function pokemonSinglesSearch(force=false){
