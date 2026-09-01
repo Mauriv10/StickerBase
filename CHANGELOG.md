@@ -1,3 +1,9 @@
+## 704.14.68 — 01/09/2026
+- Corrige los tres MEP residuales que mostraban el reverso genérico en vez del frontal.
+- Añade `mep -> MEP` al mapa de imágenes de Limitless y prioriza esa fuente para promos MEP.
+- Scrydex deja de aceptarse como fallback de MEP porque puede devolver un card-back técnicamente válido como placeholder.
+- Sube el esquema de imágenes a v4: las imágenes MEP guardadas por Scrydex en v3 se reevalúan automáticamente sin tocar el resto de cartas.
+
 ## 704.14.67 — 01/09/2026
 
 - Singles: corregido el resolver de imágenes residuales para collector numbers especiales (TGxx, GGxx y promos MEP).

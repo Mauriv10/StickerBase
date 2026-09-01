@@ -2692,7 +2692,7 @@ let pokemonSinglesCollectionTab="owned";
 let pokemonSinglesAutoSyncInFlight=false;
 let pokemonSinglesCanonicalRepairInFlight=false;
 const POKEMON_SINGLES_CANONICAL_SCHEMA=4;
-const POKEMON_SINGLES_IMAGE_SCHEMA=3;
+const POKEMON_SINGLES_IMAGE_SCHEMA=4;
 const POKEMON_SINGLES_PRICE_THRESHOLD=2;
 const POKEMON_SINGLES_RECENT_VIEWED_KEY="stickerbase.pokemon.singles.recentViewed.v1";
 const POKEMON_SINGLES_RECENT_ADDED_KEY="stickerbase.pokemon.singles.recentAdded.v1";
@@ -2799,7 +2799,7 @@ function pokemonSinglesImageUrl(base,quality="low"){const root=String(base||"").
 const POKEMON_SINGLE_LIMITLESS_SET_CODES={
  sm1:"SUM",sm2:"GRI",sm3:"BUS","sm3.5":"SLG",sm4:"CIN",sm5:"UPR",sm6:"FLI",sm7:"CES","sm7.5":"DRM",sm8:"LOT",sm9:"TEU",sm10:"UNB",sm11:"UNM","sm11.5":"HIF",sm12:"CEC",
  swsh1:"SSH",swsh2:"RCL",swsh3:"DAA","swsh3.5":"CPA",swsh4:"VIV","swsh4.5":"SHF","swsh4.5sv":"SHF",swsh5:"BST",swsh6:"CRE",swsh7:"EVS",swsh8:"FST",swsh9:"BRS",swsh9tg:"BRS",swsh10:"ASR",swsh10tg:"ASR",swsh11:"LOR",swsh11tg:"LOR",swsh12:"SIT",swsh12tg:"SIT","swsh12.5":"CRZ","swsh12.5gg":"CRZ",
- sv1:"SVI",sv2:"PAL",sv3:"OBF","sv3.5":"MEW",sv4:"PAR","sv4.5":"PAF",sv5:"TEF",sv6:"TWM","sv6.5":"SFA",sv7:"SCR",sv8:"SSP","sv8.5":"PRE",sv9:"JTG",sv10:"DRI"
+ sv1:"SVI",sv2:"PAL",sv3:"OBF","sv3.5":"MEW",sv4:"PAR","sv4.5":"PAF",sv5:"TEF",sv6:"TWM","sv6.5":"SFA",sv7:"SCR",sv8:"SSP","sv8.5":"PRE",sv9:"JTG",sv10:"DRI",mep:"MEP"
 };
 function pokemonSinglesTcgdexSetCandidates(value){
  const raw=String(value||"").trim().toLowerCase(),out=[];const push=v=>{v=String(v||"").trim().toLowerCase();if(v&&!out.includes(v))out.push(v)};push(raw);
@@ -2905,7 +2905,10 @@ async function pokemonSinglesEnsureCardImage(project,card,onUpdated,force=false)
  const commit=async(image,large=image,source="")=>{if(!(await valid(image)))return "";let safeLarge=large&&await valid(large)?large:image;card.image=image;card.imageLarge=safeLarge||image;card.imageFailedUrls=(card.imageFailedUrls||[]).filter(url=>url!==image&&url!==safeLarge);if(source)card.imageSource=source;card.imageSchema=POKEMON_SINGLES_IMAGE_SCHEMA;card.imageHydratedAt=new Date().toISOString();persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return image;};
  try{
   // Si la miniatura que ya teníamos sigue viva, nunca la sustituimos solo porque falte HD.
-  if(current&&!failed.has(current)&&await pokemonSinglesProbeImage(current)){
+  // Excepción de migración v4: Scrydex puede devolver el reverso genérico como placeholder para MEP.
+  // Es una imagen técnicamente válida, pero no es el frontal; por eso no reutilizamos ese resultado antiguo.
+  const currentSet=pokemonSinglesCanonicalSetId(pokemonSinglesTcgdexParts(card).setId||card?.setId||""),legacyMepBack=Number(card.imageSchema||0)<POKEMON_SINGLES_IMAGE_SCHEMA&&currentSet==="mep"&&String(card.imageSource||"").toLowerCase()==="scrydex";
+  if(current&&!legacyMepBack&&!failed.has(current)&&await pokemonSinglesProbeImage(current)){
    if(currentLarge&&!failed.has(currentLarge)&&await pokemonSinglesProbeImage(currentLarge)){card.imageSchema=POKEMON_SINGLES_IMAGE_SCHEMA;return current;}
    // Intentamos enriquecer únicamente la versión grande; si falla, la miniatura válida sigue intacta.
    if(tcgdexId){for(const lang of [card.language||"es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i)){try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(tcgdexId)}`),base=String(detail?.image||"").replace(/\/$/,""),large=pokemonSinglesImageUrl(base,"high");if(large&&await valid(large)){card.imageLarge=large;card.imageSchema=POKEMON_SINGLES_IMAGE_SCHEMA;persistProjects();scheduleCloudSave();if(typeof onUpdated==="function")onUpdated();return current;}}catch{}}}
@@ -2918,11 +2921,16 @@ async function pokemonSinglesEnsureCardImage(project,card,onUpdated,force=false)
   try{const resolved=await pokemonSinglesResolveTcgdexDetail(card),detail=resolved?.detail,base=String(detail?.image||"").replace(/\/$/,""),image=pokemonSinglesImageUrl(base,"low"),large=pokemonSinglesImageUrl(base,"high");if(detail?.id)card.tcgdexId=detail.id;if(image){const hit=await commit(image,large||image,`tcgdex-${resolved?.lang||"resolved"}`);if(hit){card.imageBase=base;return hit;}}}catch{}
   // 3) Pokémon TCG API por nombre + collector number normalizado (TG03 ya no se compara contra "3").
   try{const ptcg=await pokemonSinglesPokemonTcgFallback(card);if(ptcg?.image){const hit=await commit(ptcg.image,ptcg.imageLarge||ptcg.image,"pokemontcg-api");if(hit)return hit;}}catch{}
-  // 4) Scrydex como fallback validado, incluyendo variantes de set/collector number. Nunca se persiste una URL que no cargue.
-  for(const scrydex of pokemonSinglesScrydexImages(card)){const hit=await commit(scrydex.image,scrydex.imageLarge||scrydex.image,"scrydex");if(hit)return hit;}
-  // 5) MEP/Limitless construidas, siempre detrás del probe.
+  // 4) Para MEP priorizamos Limitless antes de Scrydex: Scrydex puede responder con el reverso genérico
+  // cuando aún no dispone del frontal. Limitless sí expone MEP/33, MEP/70, MEP/80, etc.
+  const isMep=pokemonSinglesCanonicalSetId(pokemonSinglesTcgdexParts(card).setId||card?.setId||"")==="mep";
+  const fallback=pokemonSinglesLimitlessImage(card);if(isMep&&fallback){const hit=await commit(fallback,fallback,"limitless");if(hit)return hit;}
+  // 5) MEP de TCGdex, siempre detrás del probe.
   const mepLow=pokemonSinglesMepImage(card,"low"),mepHigh=pokemonSinglesMepImage(card,"high");if(mepLow){const hit=await commit(mepLow,mepHigh||mepLow,"tcgdex-mep");if(hit)return hit;}
-  const fallback=pokemonSinglesLimitlessImage(card);if(fallback){const hit=await commit(fallback,fallback,"limitless");if(hit)return hit;}
+  // 6) Scrydex queda como último recurso para MEP; para el resto sigue siendo un fallback validado.
+  // No lo usamos para MEP en esta ruta porque un card-back carga correctamente y engañaría al probe técnico.
+  if(!isMep){for(const scrydex of pokemonSinglesScrydexImages(card)){const hit=await commit(scrydex.image,scrydex.imageLarge||scrydex.image,"scrydex");if(hit)return hit;}}
+  if(!isMep&&fallback){const hit=await commit(fallback,fallback,"limitless");if(hit)return hit;}
  }finally{pokemonSinglesImageHydration.delete(hydrationKey)}
  return card.image||"";
 }

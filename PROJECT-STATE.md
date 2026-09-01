@@ -1,3 +1,10 @@
+# Update 704.14.68 — rechazo del reverso genérico en MEP
+
+- En MEP, una respuesta de Scrydex puede ser el reverso genérico de Pokémon aunque la URL cargue correctamente. Por tanto, un probe técnico (onload/dimensiones) no basta para validar ese proveedor en MEP.
+- Para MEP, StickerBase prioriza ahora Limitless (`MEP`) y TCGdex; Scrydex queda excluido de la ruta MEP para impedir persistir card-backs como frontales.
+- `POKEMON_SINGLES_IMAGE_SCHEMA = 4` fuerza una única reevaluación de los MEP previamente guardados con `imageSource=scrydex`; las imágenes correctas del resto se preservan.
+- Casos de regresión usados como control: Mega-Lucario ex MEP033, Tyrunt MEP070 y Fennekin MEP080.
+
 # Update 704.14.67 — resolver de collector numbers especiales y cierre de imágenes residuales
 
 ## Problema corregido
