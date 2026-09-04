@@ -1,3 +1,11 @@
+# Update 704.14.70 — Búsqueda Pokémon con fallback de catálogo
+
+- La vista Búsqueda sigue siendo global y accesible desde cualquier colección Pokémon.
+- Fuente principal: TCGdex. Si la consulta primaria falla por red/API, se usa automáticamente Pokémon TCG API.
+- Un fallo temporal de TCGdex no debe dejar el buscador inutilizable.
+- El catálogo alternativo normaliza guiones del término buscado y conserva los datos necesarios para mostrar/registrar un single.
+- No se modifica inventario ni la arquitectura de En camino.
+
 # Update 704.14.69 — Búsqueda global accesible desde cualquier álbum Pokémon
 - Regla de navegación: en cualquier colección Pokémon, la tercera pestaña inferior debe mostrarse como `Búsqueda` (icono `⌕`), no como `En camino`.
 - Esa pestaña reutiliza exactamente `pokemonSinglesSearchView`; no crear buscadores duplicados ni específicos por expansión.

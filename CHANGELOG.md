@@ -1,3 +1,9 @@
+## 704.14.70 — 04/09/2026
+- Búsqueda Pokémon resiliente: si TCGdex no responde, el buscador global usa automáticamente Pokémon TCG API como catálogo alternativo.
+- El fallo de un proveedor ya no vacía el buscador ni muestra un falso problema general de conexión mientras exista un catálogo alternativo disponible.
+- El fallback conserva nombre, número, set, rareza e imagen, e intenta mantener Cardmarket mediante el resolver existente.
+- No cambia inventario, En camino, Mis Singles ni routing de álbumes.
+
 ## 704.14.69 — 04/09/2026
 - Navegación Pokémon: la tercera pestaña inferior deja de ser `En camino` en los álbumes y pasa a ser `Búsqueda`, igual que en `Mis Singles`.
 - `Búsqueda` abre el mismo buscador global de singles desde cualquier colección Pokémon, sin cambiar de colección activa.

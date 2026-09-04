@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.67";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.70";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3115,20 +3115,41 @@ function pokemonSingleOwnedCardHtml(card){
  const incoming=card.status==="incoming";return `<article class="pokemon-single-owned ${incoming?"is-incoming":""}" data-single-id="${collectionSafeText(card.id)}"><div class="pokemon-single-owned-image ${card.image?"is-clickable":""}" ${card.image?`data-owned-single-preview="${collectionSafeText(card.id)}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(card.name||"carta Pokémon")} en grande"`:""}>${card.image?`<img src="${collectionSafeText(card.image)}" alt="${collectionSafeText(card.name||"Carta Pokémon")}" loading="lazy" onerror="pokemonSinglesOwnedImageError(this)">`:'<span>PK</span>'}</div><div class="pokemon-single-owned-copy"><small>${collectionSafeText(card.setName||"Pokémon TCG")}</small><strong>${collectionSafeText(card.name||"Carta Pokémon")}</strong><span>#${collectionSafeText(card.number||"—")} · ${pokemonSinglesLanguageLabel(card.language)}${card.rarity?` · ${collectionSafeText(card.rarity)}`:""}</span>${pokemonSinglesCardmarketHtml(card,true)}</div><div class="pokemon-single-owned-actions"><button type="button" data-single-incoming="${collectionSafeText(card.id)}" class="${incoming?"active":""}">${incoming?"📦 En camino":"＋ En camino"}</button><button type="button" data-single-remove="${collectionSafeText(card.id)}">Eliminar</button></div></article>`;
 }
 async function pokemonSinglesFetchJson(url){const response=await fetch(url,{cache:"no-store"});if(!response.ok)throw new Error(`TCGdex ${response.status}`);return response.json()}
+async function pokemonSinglesSearchFallbackCatalog(raw,lang="es"){
+ const clean=String(raw||"").trim().replace(/[-_]+/g," ").replace(/\s+/g," ");if(clean.length<2)return [];
+ const fraction=clean.match(/(\d{1,3})\s*\/\s*(\d{1,3})/),onlyNumber=clean.match(/^\s*(\d{1,3})\s*$/),trailing=clean.match(/^(.*?)\s+(\d{1,3})\s*$/);
+ const clauses=[];
+ if(fraction||onlyNumber){clauses.push(`number:${Number((fraction||onlyNumber)[1])}`);}else{
+  const name=(trailing?.[1]||clean).replace(/["\\]/g," ").trim();if(name)clauses.push(`name:"${name}"`);if(trailing?.[2])clauses.push(`number:${Number(trailing[2])}`);
+ }
+ if(!clauses.length)return [];
+ const data=await pokemonSinglesFetchJson(`${POKEMON_TCG_API}/cards?q=${encodeURIComponent(clauses.join(" "))}&pageSize=24`),rows=Array.isArray(data?.data)?data.data:[];
+ return Promise.all(rows.slice(0,24).map(async card=>{
+  const result={id:`${lang}:ptcg:${card.id}`,tcgdexId:"",name:card.name||"Carta Pokémon",number:String(card.number||""),setName:card.set?.name||"",setId:card.set?.id||"",rarity:card.rarity||"",language:lang,image:card.images?.small||card.images?.large||"",imageLarge:card.images?.large||card.images?.small||"",variants:{},cardmarket:null,searchSource:"pokemontcg"};
+  const direct=await pokemonSinglesCardmarketDirect(result).catch(()=>null);if(direct)result.cardmarket=direct;return result;
+ }));
+}
 async function pokemonSinglesSearch(force=false){
  if(pokemonSinglesSearchBusy){pokemonSinglesSearchQueued=true;return;}const input=$("#pokemonSingleQuery"),lang=$("#pokemonSingleLanguage")?.value||"es",raw=input?.value?.trim()||"",status=$("#pokemonSingleSearchStatus");if(raw.length<2){if(status)status.textContent="Escribe al menos 2 caracteres.";return;}
  pokemonSinglesSearchBusy=true;if(status)status.textContent="Buscando cartas…";const button=$("#pokemonSingleSearchButton");if(button)button.disabled=true;
  try{
-   const fraction=raw.match(/(\d{1,3})\s*\/\s*(\d{1,3})/),onlyNumber=raw.match(/^\s*(\d{1,3})\s*$/),trailing=raw.match(/^(.*?)\s+(\d{1,3})\s*$/);let briefs=[];
-   if(fraction||onlyNumber){const local=String(Number((fraction||onlyNumber)[1]));briefs=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards?localId=${encodeURIComponent(local)}`);}else{const nameQuery=(trailing?.[1]||raw).trim();briefs=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards?name=${encodeURIComponent(nameQuery)}`);if(trailing?.[2]&&Array.isArray(briefs)){const wanted=Number(trailing[2]);briefs=briefs.filter(card=>Number(card.localId)===wanted||Number(String(card.localId||'').replace(/\D/g,''))===wanted);}}
-   if(!Array.isArray(briefs))briefs=[];briefs=briefs.slice(0,24);
-   const details=(await Promise.all(briefs.map(async card=>{try{return await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards/${encodeURIComponent(card.id)}`)}catch{return null}}))).filter(Boolean);
-   pokemonSinglesSearchResults=await Promise.all(details.map(async card=>{let image=pokemonSinglesImageUrl(card.image,"low");if(!image&&lang!=="en"){try{const enCard=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/en/cards/${encodeURIComponent(card.id)}`);image=pokemonSinglesImageUrl(enCard?.image,"low");}catch{}}const result={id:`${lang}:${card.id}`,tcgdexId:card.id,name:card.name||"Carta Pokémon",number:String(card.localId||""),setName:card.set?.name||"",setId:card.set?.id||"",rarity:card.rarity||"",language:lang,image,variants:card.variants||{},cardmarket:null};const [directPrice,fallback]=await Promise.all([pokemonSinglesCardmarketDirect(result),result.image?Promise.resolve(null):pokemonSinglesPokemonTcgFallback(result)]);if(directPrice)result.cardmarket=directPrice;else result.cardmarket=pokemonSinglesNormalizeCardmarket(card.pricing?.cardmarket||null);if(!result.image&&fallback?.image)result.image=fallback.image;if(!result.image)result.image=pokemonSinglesFallbackImage(result);return result;}));
+   let usedFallback=false;
+   try{
+     const fraction=raw.match(/(\d{1,3})\s*\/\s*(\d{1,3})/),onlyNumber=raw.match(/^\s*(\d{1,3})\s*$/),trailing=raw.match(/^(.*?)\s+(\d{1,3})\s*$/);let briefs=[];
+     if(fraction||onlyNumber){const local=String(Number((fraction||onlyNumber)[1]));briefs=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards?localId=${encodeURIComponent(local)}`);}else{const nameQuery=(trailing?.[1]||raw).trim();briefs=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards?name=${encodeURIComponent(nameQuery)}`);if(trailing?.[2]&&Array.isArray(briefs)){const wanted=Number(trailing[2]);briefs=briefs.filter(card=>Number(card.localId)===wanted||Number(String(card.localId||'').replace(/\D/g,''))===wanted);}}
+     if(!Array.isArray(briefs))briefs=[];briefs=briefs.slice(0,24);
+     const details=(await Promise.all(briefs.map(async card=>{try{return await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards/${encodeURIComponent(card.id)}`)}catch{return null}}))).filter(Boolean);
+     pokemonSinglesSearchResults=await Promise.all(details.map(async card=>{let image=pokemonSinglesImageUrl(card.image,"low");if(!image&&lang!=="en"){try{const enCard=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/en/cards/${encodeURIComponent(card.id)}`);image=pokemonSinglesImageUrl(enCard?.image,"low");}catch{}}const result={id:`${lang}:${card.id}`,tcgdexId:card.id,name:card.name||"Carta Pokémon",number:String(card.localId||""),setName:card.set?.name||"",setId:card.set?.id||"",rarity:card.rarity||"",language:lang,image,variants:card.variants||{},cardmarket:null};const [directPrice,fallback]=await Promise.all([pokemonSinglesCardmarketDirect(result),result.image?Promise.resolve(null):pokemonSinglesPokemonTcgFallback(result)]);if(directPrice)result.cardmarket=directPrice;else result.cardmarket=pokemonSinglesNormalizeCardmarket(card.pricing?.cardmarket||null);if(!result.image&&fallback?.image)result.image=fallback.image;if(!result.image)result.image=pokemonSinglesFallbackImage(result);return result;}));
+   }catch(primaryError){
+     console.warn("Pokemon singles search · TCGdex fallback",primaryError);pokemonSinglesSearchResults=await pokemonSinglesSearchFallbackCatalog(raw,lang);usedFallback=true;
+   }
    const nq=normalizeTradeName(raw);pokemonSinglesSearchResults.sort((a,b)=>{const score=c=>{const n=normalizeTradeName(c.name||""),set=normalizeTradeName(c.setName||""),num=String(c.number||"");let v=0;if(n===nq)v+=100;if(n.startsWith(nq))v+=60;if(n.includes(nq))v+=35;if(nq.includes(n))v+=15;if(set.includes(nq))v+=20;if(num&&nq.includes(num))v+=45;for(const token of nq.split(/\s+/).filter(Boolean)){if(n.includes(token))v+=8;if(set.includes(token))v+=5;if(num===token)v+=15;}return v};return score(b)-score(a)});
-   if(status)status.textContent=pokemonSinglesSearchResults.length?`${pokemonSinglesSearchResults.length} coincidencias`:`No he encontrado cartas para “${raw}”.`;renderPokemonSinglesSearchResults();
- }catch(error){console.warn("Pokemon singles search",error);if(status)status.textContent="No se pudo consultar el catálogo. Comprueba la conexión.";pokemonSinglesSearchResults=[];renderPokemonSinglesSearchResults();}
+   if(status){if(pokemonSinglesSearchResults.length)status.textContent=usedFallback?`${pokemonSinglesSearchResults.length} coincidencias · catálogo alternativo`:`${pokemonSinglesSearchResults.length} coincidencias`;else status.textContent=`No he encontrado cartas para “${raw}”.`;}
+   renderPokemonSinglesSearchResults();
+ }catch(error){console.warn("Pokemon singles search",error);if(status)status.textContent="No se pudo consultar ningún catálogo. Inténtalo de nuevo en unos segundos.";pokemonSinglesSearchResults=[];renderPokemonSinglesSearchResults();}
  finally{pokemonSinglesSearchBusy=false;if(button)button.disabled=false;if(pokemonSinglesSearchQueued){pokemonSinglesSearchQueued=false;setTimeout(()=>pokemonSinglesSearch(false),0);}}
 }
+
 function pokemonSinglesTargetState(card,target){
  if(!target){
   const single=pokemonSinglesProject()?.pokemonSingles?.find(item=>item.id===card.id);
