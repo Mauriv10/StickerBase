@@ -1,3 +1,11 @@
+## 704.14.69 — 04/09/2026
+- Navegación Pokémon: la tercera pestaña inferior deja de ser `En camino` en los álbumes y pasa a ser `Búsqueda`, igual que en `Mis Singles`.
+- `Búsqueda` abre el mismo buscador global de singles desde cualquier colección Pokémon, sin cambiar de colección activa.
+- Se conserva el routing automático actual: `La tengo` añade la carta al álbum compatible y la refleja en Mis Singles; `En camino` registra el pendiente en su destino correcto.
+- La gestión consolidada de pedidos permanece en `Mis Singles > En camino`; la antigua vista global `En camino` ya no se expone como pestaña inferior en álbumes.
+- Fútbol/Panini mantiene la pestaña `Cambiar` sin cambios.
+- Sin cambios en inventarios, cantidades, checklists, precios, imágenes ni sincronización Supabase.
+
 ## 704.14.68 — 01/09/2026
 - Corrige los tres MEP residuales que mostraban el reverso genérico en vez del frontal.
 - Añade `mep -> MEP` al mapa de imágenes de Limitless y prioriza esa fuente para promos MEP.

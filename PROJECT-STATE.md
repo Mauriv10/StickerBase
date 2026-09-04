@@ -1,3 +1,12 @@
+# Update 704.14.69 — Búsqueda global accesible desde cualquier álbum Pokémon
+- Regla de navegación: en cualquier colección Pokémon, la tercera pestaña inferior debe mostrarse como `Búsqueda` (icono `⌕`), no como `En camino`.
+- Esa pestaña reutiliza exactamente `pokemonSinglesSearchView`; no crear buscadores duplicados ni específicos por expansión.
+- Abrir Búsqueda desde un álbum NO cambia `activeProjectId`: al volver a `Cromos`, el usuario regresa al álbum desde el que entró.
+- El routing del buscador sigue siendo global: si una carta corresponde a un álbum existente, `La tengo` / `En camino` actúan sobre ese álbum y mantienen el espejo en Mis Singles; si no hay álbum compatible, se guarda en Mis Singles.
+- La lista consolidada de pendientes se consulta y gestiona en `Mis Singles > En camino`; no reintroducir `En camino` como pestaña inferior por álbum.
+- Las colecciones no Pokémon mantienen su navegación anterior (`Cambiar`).
+- No modificar inventario, cantidades, checklists, precios, imágenes, fingerprint ni Supabase por este cambio.
+
 # Update 704.14.68 — rechazo del reverso genérico en MEP
 
 - En MEP, una respuesta de Scrydex puede ser el reverso genérico de Pokémon aunque la URL cargue correctamente. Por tanto, un probe técnico (onload/dimensiones) no basta para validar ese proveedor en MEP.
