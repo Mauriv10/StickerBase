@@ -1,3 +1,10 @@
+# Update 704.14.71 — Búsqueda bilingüe sin perder Cardmarket
+
+- La búsqueda global Pokémon consulta primero el idioma seleccionado.
+- Con Castellano, si TCGdex ES no encuentra el texto introducido, se consulta TCGdex EN como puente y se resuelve la misma carta por ID en ES cuando existe.
+- Los resultados mantienen identidad canónica TCGdex para que el matcher de Cardmarket siga funcionando.
+- Pokémon TCG API es solo fallback final; no debe sustituir silenciosamente la identidad TCGdex si esta está disponible.
+
 # Update 704.14.70 — Búsqueda Pokémon con fallback de catálogo
 
 - La vista Búsqueda sigue siendo global y accesible desde cualquier colección Pokémon.

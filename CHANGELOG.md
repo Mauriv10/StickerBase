@@ -1,3 +1,10 @@
+## 704.14.71 — 04/09/2026
+
+- Corrige la búsqueda en Castellano: si el nombre no devuelve resultados en el catálogo ES, se usa TCGdex EN como puente de identidad y se intenta recuperar el detalle localizado ES por el mismo ID.
+- Recupera Cardmarket en resultados buscados en inglés/mediante puente internacional conservando `tcgdexId`, set y collector number canónicos.
+- El catálogo Pokémon TCG API queda únicamente como último fallback cuando TCGdex no ofrece coincidencias en ninguno de los idiomas consultados.
+- No modifica inventario, Mis Singles, En camino ni routing de álbumes.
+
 ## 704.14.70 — 04/09/2026
 - Búsqueda Pokémon resiliente: si TCGdex no responde, el buscador global usa automáticamente Pokémon TCG API como catálogo alternativo.
 - El fallo de un proveedor ya no vacía el buscador ni muestra un falso problema general de conexión mientras exista un catálogo alternativo disponible.
