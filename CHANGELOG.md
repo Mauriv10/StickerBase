@@ -1,3 +1,21 @@
+# 704.14.77 — Cardmarket no bloqueante / stale-while-revalidate
+
+- Búsqueda Pokémon deja de esperar a la descarga completa de los JSON públicos de Cardmarket. Las cartas se renderizan en cuanto termina la búsqueda de catálogo.
+- Si existe snapshot Cardmarket en IndexedDB, se usa inmediatamente para completar precios y la interfaz se actualiza sin bloquear la búsqueda.
+- Si no existe snapshot local, la descarga de Cardmarket arranca en segundo plano; cuando termina, la búsqueda visible se rehidrata automáticamente con los precios.
+- Al abrir Búsqueda se precalienta la caché Cardmarket (`pokemonSinglesPrimeCardmarketData`) para maximizar la probabilidad de tener precio listo antes de escribir.
+- El refresco de 24 h adopta comportamiento stale-while-revalidate: conserva y sirve el último snapshot mientras actualiza por detrás.
+- Pokémon TCG API sigue siendo fallback independiente para precio/imagen, pero tampoco bloquea el render principal.
+- No se modifica inventario, routing, En camino, imágenes, checklists ni Supabase.
+
+## 704.14.76 — 05/09/2026
+- Reestructura la carga de precios Cardmarket para eliminar la causa global de la ausencia de precios en Búsqueda.
+- Los JSON públicos de Cardmarket ya no usan el timeout genérico de 6,5 s del buscador: disponen de un cargador dedicado, dos intentos y hasta 60 s por descarga.
+- Tras una descarga válida, StickerBase reduce los datos a los campos necesarios y guarda una instantánea local en IndexedDB. Las búsquedas posteriores leen ese índice local en lugar de volver a descargar decenas de miles de registros.
+- Si la instantánea tiene menos de 24 h, se reutiliza inmediatamente. Si está caducada, se usa igualmente para responder y la actualización se hace en segundo plano, evitando dejar el buscador sin precios durante una incidencia externa.
+- El cruce sigue siendo por `idProduct`: catálogo de productos → mapa de precios. Se conserva TCGdex y Pokémon TCG API como fuentes complementarias, no como requisito para que Cardmarket funcione.
+- No cambia la navegación Búsqueda, inventario, En camino, imágenes, mirrors ni Supabase.
+
 ## 704.14.75 — 05/09/2026
 - Corrige la ausencia global de precios Cardmarket en Búsqueda cuando el price guide público no puede resolverse desde el navegador o TCGdex no incluye `pricing`.
 - El fallback de Pokémon TCG API ahora devuelve también `cardmarket.prices`, no solo imágenes, y se usa para enriquecer cualquier resultado que siga sin precio.

@@ -1,3 +1,12 @@
+# Estado 704.14.76 — Cardmarket desacoplado del buscador
+- La ausencia global de precios se atribuye al cargador anterior de los ficheros públicos de Cardmarket: desde 704.14.74 heredaba el timeout genérico de 6,5 s de `pokemonSinglesFetchJson()`, demasiado agresivo para `products_singles_6.json` y `price_guide_6.json`.
+- Cardmarket tiene ahora un cargador dedicado (`pokemonSinglesCardmarketFetchJson`) con timeout de 60 s y reintento, independiente del timeout corto usado para APIs interactivas.
+- Después de una descarga correcta se crea una instantánea reducida (producto + campos de precio necesarios) y se persiste en IndexedDB (`stickerbase.cardmarket.v1`).
+- La instantánea local es la fuente primaria en sesiones posteriores. TTL: 24 h. Si queda obsoleta, se sigue sirviendo el último snapshot mientras la actualización remota ocurre en segundo plano.
+- La relación de precios se construye por `idProduct`; no almacenar ni mostrar un precio si no existe correspondencia de producto y price guide.
+- TCGdex `pricing.cardmarket` y Pokémon TCG API `cardmarket.prices` siguen siendo fallbacks/enriquecimiento, pero el precio Cardmarket ya no depende de que TCGdex entregue `pricing` en ese momento.
+- Mantener intacta la navegación global de Búsqueda desde todos los álbumes Pokémon.
+
 # Estado 704.14.75 — precios de Búsqueda
 - Búsqueda conserva el motor multi-fuente de 704.14.74.
 - Orden de precio: Cardmarket de TCGdex → catálogo/price guide Cardmarket si es accesible → `cardmarket.prices` del resultado exacto de Pokémon TCG API.
@@ -1979,3 +1988,12 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - La reparación se marca con `canonicalSchema=2` y `canonicalHydratedAt`; fallos temporales usan `canonicalRepairAttemptAt` con reintento diferido para evitar llamadas repetitivas en cada render.
 - UX de Cromos/Mis Singles: eliminar el hero interno duplicado. Mantener la cabecera global y tabs compactos con contadores. `Colección` lista solo recibidas; `En camino` contiene los pendientes.
 - No tocar inventario, cantidades, variantes, checklists, fingerprint ni sincronización Supabase salvo persistir los campos enriquecidos de las fichas de Mis Singles.
+
+
+## 704.14.77 — contrato de precios Cardmarket no bloqueantes
+- La búsqueda de Pokémon NUNCA debe esperar a que se descarguen los catálogos completos de Cardmarket. Primero renderizar resultados; los precios se enriquecen después.
+- El snapshot de Cardmarket en IndexedDB es la fuente rápida: si existe, usarlo inmediatamente aunque tenga más de 24 h. La antigüedad solo dispara refresco en segundo plano; nunca invalida el último precio disponible durante una búsqueda.
+- Si no existe snapshot, iniciar la carga pública en segundo plano y rehidratar automáticamente los resultados visibles cuando termine.
+- Abrir la vista Búsqueda debe precalentar la caché Cardmarket.
+- Mantener separados los timeouts cortos de APIs interactivas y el timeout largo de los ficheros públicos Cardmarket.
+- Un fallo/latencia de Cardmarket no debe retrasar ni cancelar búsqueda, imágenes, routing, `La tengo` o `En camino`.
