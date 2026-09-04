@@ -1,3 +1,9 @@
+## 704.14.72 — 05/09/2026
+- Corrige la pérdida de precios en Búsqueda introducida al añadir el puente bilingüe.
+- La búsqueda carga siempre el detalle TCGdex inglés además del localizado y reutiliza el precio Cardmarket exacto asociado al mismo ID de carta.
+- El precio TCGdex localizado/EN tiene prioridad sobre el matcher genérico del catálogo público de Cardmarket, evitando mezclar versiones con el mismo nombre.
+- Se mantiene el fallback de catálogo y de imágenes sin cambios.
+
 ## 704.14.71 — 04/09/2026
 
 - Corrige la búsqueda en Castellano: si el nombre no devuelve resultados en el catálogo ES, se usa TCGdex EN como puente de identidad y se intenta recuperar el detalle localizado ES por el mismo ID.

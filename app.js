@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.71";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.72";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -3147,11 +3147,28 @@ async function pokemonSinglesSearch(force=false){
    if(lang!=="en"&&!briefs.length){try{briefs=await queryLang("en");usedEnglishBridge=briefs.length>0;}catch(error){if(!primaryError)primaryError=error;}}
    briefs=briefs.slice(0,24);
    if(briefs.length){
-     const details=(await Promise.all(briefs.map(async card=>{
-       if(lang!=="en")try{const localized=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards/${encodeURIComponent(card.id)}`);if(localized?.id)return {card:localized,sourceLang:lang};}catch{}
-       try{const base=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/en/cards/${encodeURIComponent(card.id)}`);return base?.id?{card:base,sourceLang:"en"}:null;}catch{return null}
+     const details=(await Promise.all(briefs.map(async brief=>{
+       let localized=null,english=null;
+       if(lang!=="en")try{localized=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${lang}/cards/${encodeURIComponent(brief.id)}`);}catch{}
+       try{english=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/en/cards/${encodeURIComponent(brief.id)}`);}catch{}
+       const display=(localized?.id?localized:(english?.id?english:null));if(!display)return null;
+       return {display,english:english?.id?english:null,sourceLang:localized?.id?lang:"en"};
      }))).filter(Boolean);
-     pokemonSinglesSearchResults=await Promise.all(details.map(async entry=>{const card=entry.card;let image=pokemonSinglesImageUrl(card.image,"low");if(!image&&entry.sourceLang!=="en"){try{const enCard=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/en/cards/${encodeURIComponent(card.id)}`);image=pokemonSinglesImageUrl(enCard?.image,"low");}catch{}}const result={id:`${lang}:${card.id}`,tcgdexId:card.id,name:card.name||"Carta Pokémon",number:String(card.localId||""),setName:card.set?.name||"",setId:card.set?.id||"",rarity:card.rarity||"",language:lang,image,variants:card.variants||{},cardmarket:null};const [directPrice,fallback]=await Promise.all([pokemonSinglesCardmarketDirect(result),result.image?Promise.resolve(null):pokemonSinglesPokemonTcgFallback(result)]);if(directPrice)result.cardmarket=directPrice;else result.cardmarket=pokemonSinglesNormalizeCardmarket(card.pricing?.cardmarket||null);if(!result.image&&fallback?.image)result.image=fallback.image;if(!result.image)result.image=pokemonSinglesFallbackImage(result);return result;}));
+     pokemonSinglesSearchResults=await Promise.all(details.map(async entry=>{
+       const card=entry.display,enCard=entry.english;let image=pokemonSinglesImageUrl(card.image,"low")||pokemonSinglesImageUrl(enCard?.image,"low");
+       const result={id:`${lang}:${card.id}`,tcgdexId:card.id,name:card.name||enCard?.name||"Carta Pokémon",number:String(card.localId||enCard?.localId||""),setName:card.set?.name||enCard?.set?.name||"",setId:card.set?.id||enCard?.set?.id||"",rarity:card.rarity||enCard?.rarity||"",language:lang,image,variants:card.variants||enCard?.variants||{},cardmarket:null};
+       // El precio exacto de TCGdex va ligado al ID de carta, no al idioma.
+       // Algunas fichas localizadas todavía no traen `pricing`, por eso siempre consultamos también EN
+       // y usamos ese precio antes del matcher genérico del catálogo de Cardmarket.
+       const localizedPrice=pokemonSinglesNormalizeCardmarket(card.pricing?.cardmarket||null),englishPrice=pokemonSinglesNormalizeCardmarket(enCard?.pricing?.cardmarket||null);
+       if(localizedPrice)result.cardmarket={...localizedPrice,source:localizedPrice.source||"tcgdex-localized"};
+       else if(englishPrice)result.cardmarket={...englishPrice,source:englishPrice.source||"tcgdex-en"};
+       let directPrice=null,fallback=null;
+       if(!result.cardmarket)directPrice=await pokemonSinglesCardmarketDirect(result).catch(()=>null);
+       if(!result.image)fallback=await pokemonSinglesPokemonTcgFallback(result).catch(()=>null);
+       if(!result.cardmarket&&directPrice)result.cardmarket=directPrice;
+       if(!result.image&&fallback?.image)result.image=fallback.image;if(!result.image)result.image=pokemonSinglesFallbackImage(result);return result;
+     }));
    }else{
      if(primaryError)console.warn("Pokemon singles search · TCGdex unavailable",primaryError);
      pokemonSinglesSearchResults=await pokemonSinglesSearchFallbackCatalog(raw,lang);usedFallback=true;

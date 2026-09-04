@@ -1,3 +1,12 @@
+# Update 704.14.72 — Precio Cardmarket exacto en Búsqueda bilingüe
+
+## Decisión funcional
+- El idioma de presentación/búsqueda y la fuente de precio se desacoplan.
+- Para cada resultado TCGdex se consulta el detalle localizado y también el detalle EN con el mismo ID canónico.
+- El precio Cardmarket se toma primero de `pricing.cardmarket` del detalle localizado; si no existe, del detalle EN del mismo ID.
+- Solo si TCGdex no aporta precio se usa el matcher genérico contra los JSON públicos de Cardmarket.
+- No inferir el precio de una versión solo por nombre, porque Cardmarket puede tener varias impresiones con el mismo nombre dentro de una expansión.
+
 # Update 704.14.71 — Búsqueda bilingüe sin perder Cardmarket
 
 - La búsqueda global Pokémon consulta primero el idioma seleccionado.
