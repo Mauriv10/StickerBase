@@ -1,3 +1,12 @@
+# 704.14.78 — Búsqueda usa la misma resolución canónica de precios que Mis Singles
+
+- Corrige la incoherencia detectada en 704.14.77: una carta podía aparecer sin precio en Búsqueda y obtener Cardmarket inmediatamente después de pulsar «La tengo».
+- Los resultados visibles ya no dependen solo del matcher rápido `cacheOnly`. Si falta precio, se canonicaliza temporalmente el resultado con la misma identidad TCGdex/set/número que utiliza el mirror al guardarse.
+- Tras canonicalizar, se ejecuta el mismo `pokemonSinglesCardmarketDirect(card)` que funciona en Mis Singles. La operación ocurre en segundo plano y no bloquea el render del catálogo.
+- Si TCGdex/Cardmarket siguen sin aportar precio, Pokémon TCG API queda como último respaldo, igual que antes.
+- La canonicalización de Búsqueda trabaja sobre objetos temporales: no añade cartas, no cambia inventario, no crea mirrors y no modifica «En camino».
+- La interfaz se refresca por lotes a medida que llegan precios, sin esperar a completar los 48 resultados.
+
 # 704.14.77 — Cardmarket no bloqueante / stale-while-revalidate
 
 - Búsqueda Pokémon deja de esperar a la descarga completa de los JSON públicos de Cardmarket. Las cartas se renderizan en cuanto termina la búsqueda de catálogo.

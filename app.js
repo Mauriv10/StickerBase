@@ -2911,9 +2911,42 @@ async function pokemonSinglesCardmarketDirect(card,cacheOnly=false){
   candidates=candidates.map(row=>({row,score:pokemonSinglesCardmarketProductScore(row,card,englishName)})).sort((a,b)=>b.score-a.score);const best=candidates[0];if(!best||best.score<100)return null;const productId=pokemonSinglesCardmarketProductId(best.row),raw=data.priceById.get(productId);if(!raw)return null;const cm=pokemonSinglesNormalizeCardmarket({...raw,productId,updated:raw.updated||data.createdAt,fetchedAt:data.fetchedAt||new Date().toISOString(),source:"cardmarket-direct"});if(!cm)return null;cm.productName=best.row?.name??best.row?.Name??"";cm.expansionName=best.row?.expansionName??best.row?.Expansion??best.row?.expansion??"";card.cardmarketProductId=productId;return cm;
  }catch{return null}})();pokemonSinglesCardmarketMatchCache.set(cacheKey,promise);return promise;
 }
+async function pokemonSinglesCanonicalizeSearchResult(card){
+ if(!card)return false;let changed=false;
+ try{
+  // Reutilizamos la misma resolución canónica que funciona al guardar una carta,
+  // pero sobre el resultado temporal del buscador: no toca inventario ni Mis Singles.
+  const target=pokemonSinglesCollectionTarget(card);let found=null;
+  if(target){found=await pokemonSinglesCanonicalDetail(card,target);}else{
+   const {tcgdexId}=pokemonSinglesTcgdexParts(card);if(tcgdexId){
+    const langs=[card.language||"es","en"].filter((v,i,a)=>v&&a.indexOf(v)===i);
+    for(const lang of langs){try{const detail=await pokemonSinglesFetchJson(`${POKEMON_TCGDEX_API}/${encodeURIComponent(lang)}/cards/${encodeURIComponent(tcgdexId)}`);if(detail?.id){found={detail,lang};break;}}catch{}}
+   }
+  }
+  if(found?.detail){
+   const d=found.detail,cm=pokemonSinglesNormalizeCardmarket(d?.pricing?.cardmarket||null);
+   if(d.id&&!card.tcgdexId){card.tcgdexId=d.id;changed=true;}
+   if(d?.set?.id&&!card.setId){card.setId=d.set.id;changed=true;}
+   if(d?.set?.name&&!card.setName){card.setName=d.set.name;changed=true;}
+   if(d.localId&&!card.number){card.number=String(d.localId);changed=true;}
+   if(d.name&&(!card.name||/^Carta Pokémon$/i.test(card.name))){card.name=d.name;changed=true;}
+   if(d.rarity&&!card.rarity){card.rarity=d.rarity;changed=true;}
+   if(cm&&!card.cardmarket){card.cardmarket=cm;changed=true;}
+  }
+  // Mismo paso final que pokemonSinglesCanonicalizeMirror(): con la identidad ya
+  // normalizada, resolvemos el producto exacto de Cardmarket.
+  if(!card.cardmarket){const direct=await pokemonSinglesCardmarketDirect(card);if(direct){card.cardmarket={...direct,fetchedAt:new Date().toISOString()};changed=true;}}
+  // Último respaldo: la API Pokémon TCG también puede aportar Cardmarket por carta.
+  if(!card.cardmarket){const fallback=await pokemonSinglesPokemonTcgFallback(card);if(fallback?.cardmarket){card.cardmarket=fallback.cardmarket;changed=true;}if(!card.image&&fallback?.image){card.image=fallback.image;card.imageLarge=fallback.imageLarge||fallback.image;changed=true;}}
+ }catch(error){console.warn("Search canonical price hydration",error);}
+ return changed;
+}
 async function pokemonSinglesHydrateVisibleSearchPrices(){
  const token=++pokemonSinglesSearchPriceHydrationToken,rows=pokemonSinglesSearchResults.slice();if(!rows.length)return;let changed=false;
- for(let i=0;i<rows.length;i+=8){const batch=rows.slice(i,i+8),found=await Promise.all(batch.map(async card=>({card,price:card.cardmarket?null:await pokemonSinglesCardmarketDirect(card,true)})));if(token!==pokemonSinglesSearchPriceHydrationToken)return;for(const {card,price} of found){if(price&&!card.cardmarket){card.cardmarket=price;changed=true;}}}
+ for(let i=0;i<rows.length;i+=4){
+  const batch=rows.slice(i,i+4),results=await Promise.all(batch.map(card=>card.cardmarket?false:pokemonSinglesCanonicalizeSearchResult(card)));
+  if(token!==pokemonSinglesSearchPriceHydrationToken)return;if(results.some(Boolean)){changed=true;renderPokemonSinglesSearchResults();}
+ }
  if(changed&&token===pokemonSinglesSearchPriceHydrationToken)renderPokemonSinglesSearchResults();
 }
 async function pokemonSinglesPokemonTcgFallback(card){

@@ -1,3 +1,10 @@
+# Estado 704.14.78 — precio canónico también en Búsqueda
+- Hallazgo confirmado por uso real: en 704.14.77 el mismo resultado podía carecer de Cardmarket en Búsqueda y mostrarlo al instante después de añadirse a Mis Singles. Esto demuestra que la fuente de precios sí funciona y que la divergencia estaba en la identidad/resolución previa del resultado temporal.
+- Búsqueda debe reutilizar la misma secuencia lógica que `pokemonSinglesCanonicalizeMirror`: resolver identidad canónica (TCGdex/set/collector number) y luego ejecutar `pokemonSinglesCardmarketDirect` con esa identidad.
+- La canonicalización de un resultado de búsqueda es temporal y nunca debe persistir inventario, mirrors, `pokemonIncoming` ni `pokemonSingles`.
+- La hidratación de precios continúa siendo no bloqueante y por lotes; el catálogo se renderiza primero y los precios actualizan las cards visibles después.
+- No volver a crear un matcher de precio específico para Búsqueda si el resolver canónico de Mis Singles ya resuelve el mismo objeto correctamente.
+
 # Estado 704.14.76 — Cardmarket desacoplado del buscador
 - La ausencia global de precios se atribuye al cargador anterior de los ficheros públicos de Cardmarket: desde 704.14.74 heredaba el timeout genérico de 6,5 s de `pokemonSinglesFetchJson()`, demasiado agresivo para `products_singles_6.json` y `price_guide_6.json`.
 - Cardmarket tiene ahora un cargador dedicado (`pokemonSinglesCardmarketFetchJson`) con timeout de 60 s y reintento, independiente del timeout corto usado para APIs interactivas.
