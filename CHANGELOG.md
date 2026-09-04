@@ -1,3 +1,10 @@
+# StickerBase · Changelog
+
+## 704.14.79
+- Eliminación Pokémon sincronizada en ambos sentidos: borrar una referencia desde un álbum elimina también su ficha de Mis Singles; borrar desde Mis Singles elimina la referencia del álbum y cualquier estado En camino asociado.
+- La eliminación desde álbum solo retira Mis Singles cuando la referencia queda realmente a cero; si todavía existe otra variante BASE, se conserva.
+- Mis Singles permite editar el idioma de una carta ya añadida (Castellano, English, 日本語, 中文). Al cambiarlo se rehidratan nombre/imagen desde la identidad canónica sin alterar el precio de Cardmarket.
+
 # 704.14.78 — Búsqueda usa la misma resolución canónica de precios que Mis Singles
 
 - Corrige la incoherencia detectada en 704.14.77: una carta podía aparecer sin precio en Búsqueda y obtener Cardmarket inmediatamente después de pulsar «La tengo».

@@ -2004,3 +2004,9 @@ Identidad visual acordada: Mega Evolution mantiene base oscura con cian/turquesa
 - Abrir la vista Búsqueda debe precalentar la caché Cardmarket.
 - Mantener separados los timeouts cortos de APIs interactivas y el timeout largo de los ficheros públicos Cardmarket.
 - Un fallo/latencia de Cardmarket no debe retrasar ni cancelar búsqueda, imágenes, routing, `La tengo` o `En camino`.
+
+## Cambio 704.14.79 — borrado global e idioma en Mis Singles
+- Contrato de borrado Pokémon: una referencia no puede quedar poseída en un álbum y en Mis Singles de forma divergente. Si se elimina desde cualquiera de los dos lados, se elimina del otro y se limpia también cualquier registro En camino de esa misma referencia.
+- Para cartas BASE con varias variantes, bajar una variante a 0 no elimina Mis Singles mientras quede al menos otra variante poseída; solo se considera eliminada la referencia cuando el total llega a 0.
+- Mis Singles incorpora selector de idioma por carta. El idioma forma parte de la ficha individual y puede cambiarse sin eliminar/recrear la referencia. Tras el cambio se rehidratan los datos visuales/localizados de la carta.
+
