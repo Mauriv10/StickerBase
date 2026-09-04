@@ -1,3 +1,8 @@
+## 704.14.75 — 05/09/2026
+- Corrige la ausencia global de precios Cardmarket en Búsqueda cuando el price guide público no puede resolverse desde el navegador o TCGdex no incluye `pricing`.
+- El fallback de Pokémon TCG API ahora devuelve también `cardmarket.prices`, no solo imágenes, y se usa para enriquecer cualquier resultado que siga sin precio.
+- La fuente alternativa de mercado solo completa el precio faltante; no cambia el resultado, inventario ni destino de álbum.
+
 ## 704.14.74 — 05/09/2026
 - Búsqueda Pokémon reforzada ante caída global de TCGdex: failover automático al endpoint beta oficial.
 - Cada petición TCGdex usa timeout y reintento transparente para evitar que una caída bloquee toda la búsqueda.

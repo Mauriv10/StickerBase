@@ -1,3 +1,9 @@
+# Estado 704.14.75 — precios de Búsqueda
+- Búsqueda conserva el motor multi-fuente de 704.14.74.
+- Orden de precio: Cardmarket de TCGdex → catálogo/price guide Cardmarket si es accesible → `cardmarket.prices` del resultado exacto de Pokémon TCG API.
+- El fallback Pokémon TCG se ejecuta también cuando la carta ya tiene imagen pero carece de precio; antes solo se utilizaba para recuperar imágenes.
+- No cambia navegación, inventario, En camino, mirrors ni Supabase.
+
 # Update 704.14.74 — Búsqueda Pokémon tolerante a fallos globales
 
 - El buscador no puede depender de un único host externo. TCGdex producción sigue siendo preferente, pero existe failover automático a `beta.api.tcgdex.net`.
