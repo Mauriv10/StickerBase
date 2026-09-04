@@ -1,3 +1,53 @@
+# Update 704.14.74 — Búsqueda Pokémon tolerante a fallos globales
+
+- El buscador no puede depender de un único host externo. TCGdex producción sigue siendo preferente, pero existe failover automático a `beta.api.tcgdex.net`.
+- Si TCGdex no responde o devuelve cero resultados, el buscador utiliza Pokémon TCG API como catálogo externo de respaldo.
+- Los álbumes Pokémon cargados en StickerBase constituyen además un catálogo local consultable, por lo que sus cartas siguen apareciendo incluso durante una caída completa de APIs externas.
+- Una caída de catálogo no debe borrar resultados provenientes de otras fuentes ni provocar el mensaje genérico de conexión mientras exista alguna fuente utilizable.
+- Los precios Cardmarket se resuelven de forma independiente del catálogo mediante la guía pública ya existente; si el resultado de Pokémon TCG API ya aporta Cardmarket, se conserva como fallback.
+- Se mantiene Búsqueda accesible desde todos los álbumes Pokémon, sin duplicar el buscador ni cambiar de colección activa.
+
+# Update 704.14.73 — Búsqueda restaurada; navegación desacoplada
+
+- La función `Búsqueda` debe mantener el motor estable anterior a 704.14.69. Añadir accesos de navegación NO autoriza a modificar el pipeline de catálogo/precios.
+- Desde cualquier álbum Pokémon, la pestaña inferior `Búsqueda` muestra el mismo `pokemonSinglesSearchView` global que Mis Singles. No duplicar ni adaptar el motor según `activeProjectId`.
+- Se revierten expresamente los experimentos 704.14.70–704.14.72: no usar Pokémon TCG API como catálogo alternativo del buscador, no introducir puente bilingüe automático y no sustituir el flujo Cardmarket estable por pricing alternativo de TCGdex.
+- La mejora 704.14.69 queda limitada a navegación: en Pokémon la tercera pestaña abre Búsqueda; la gestión consolidada de pendientes sigue en `Mis Singles > En camino`.
+- No tocar inventario, `pokemonIncoming`, `pokemonSingles`, mirrors, imágenes ni sincronización Supabase para implementar este acceso.
+
+# Update 704.14.72 — Precio Cardmarket exacto en Búsqueda bilingüe
+
+## Decisión funcional
+- El idioma de presentación/búsqueda y la fuente de precio se desacoplan.
+- Para cada resultado TCGdex se consulta el detalle localizado y también el detalle EN con el mismo ID canónico.
+- El precio Cardmarket se toma primero de `pricing.cardmarket` del detalle localizado; si no existe, del detalle EN del mismo ID.
+- Solo si TCGdex no aporta precio se usa el matcher genérico contra los JSON públicos de Cardmarket.
+- No inferir el precio de una versión solo por nombre, porque Cardmarket puede tener varias impresiones con el mismo nombre dentro de una expansión.
+
+# Update 704.14.71 — Búsqueda bilingüe sin perder Cardmarket
+
+- La búsqueda global Pokémon consulta primero el idioma seleccionado.
+- Con Castellano, si TCGdex ES no encuentra el texto introducido, se consulta TCGdex EN como puente y se resuelve la misma carta por ID en ES cuando existe.
+- Los resultados mantienen identidad canónica TCGdex para que el matcher de Cardmarket siga funcionando.
+- Pokémon TCG API es solo fallback final; no debe sustituir silenciosamente la identidad TCGdex si esta está disponible.
+
+# Update 704.14.70 — Búsqueda Pokémon con fallback de catálogo
+
+- La vista Búsqueda sigue siendo global y accesible desde cualquier colección Pokémon.
+- Fuente principal: TCGdex. Si la consulta primaria falla por red/API, se usa automáticamente Pokémon TCG API.
+- Un fallo temporal de TCGdex no debe dejar el buscador inutilizable.
+- El catálogo alternativo normaliza guiones del término buscado y conserva los datos necesarios para mostrar/registrar un single.
+- No se modifica inventario ni la arquitectura de En camino.
+
+# Update 704.14.69 — Búsqueda global accesible desde cualquier álbum Pokémon
+- Regla de navegación: en cualquier colección Pokémon, la tercera pestaña inferior debe mostrarse como `Búsqueda` (icono `⌕`), no como `En camino`.
+- Esa pestaña reutiliza exactamente `pokemonSinglesSearchView`; no crear buscadores duplicados ni específicos por expansión.
+- Abrir Búsqueda desde un álbum NO cambia `activeProjectId`: al volver a `Cromos`, el usuario regresa al álbum desde el que entró.
+- El routing del buscador sigue siendo global: si una carta corresponde a un álbum existente, `La tengo` / `En camino` actúan sobre ese álbum y mantienen el espejo en Mis Singles; si no hay álbum compatible, se guarda en Mis Singles.
+- La lista consolidada de pendientes se consulta y gestiona en `Mis Singles > En camino`; no reintroducir `En camino` como pestaña inferior por álbum.
+- Las colecciones no Pokémon mantienen su navegación anterior (`Cambiar`).
+- No modificar inventario, cantidades, checklists, precios, imágenes, fingerprint ni Supabase por este cambio.
+
 # Update 704.14.68 — rechazo del reverso genérico en MEP
 
 - En MEP, una respuesta de Scrydex puede ser el reverso genérico de Pokémon aunque la URL cargue correctamente. Por tanto, un probe técnico (onload/dimensiones) no basta para validar ese proveedor en MEP.

@@ -1,3 +1,46 @@
+## 704.14.74 — 05/09/2026
+- Búsqueda Pokémon reforzada ante caída global de TCGdex: failover automático al endpoint beta oficial.
+- Cada petición TCGdex usa timeout y reintento transparente para evitar que una caída bloquee toda la búsqueda.
+- Añadido catálogo local de los álbumes Pokémon como fuente inmediata: las cartas de colecciones existentes se pueden buscar aunque TCGdex no responda.
+- Añadido Pokémon TCG API como tercer catálogo de respaldo para búsquedas globales en inglés.
+- Los resultados de respaldo conservan imágenes y precios Cardmarket cuando la fuente los aporta, y además siguen intentando el catálogo/price guide público de Cardmarket.
+- La búsqueda ya no aborta completa porque falle un único proveedor; mezcla y deduplica resultados por nombre + set + número.
+- La navegación Búsqueda desde todos los álbumes se mantiene sin cambios.
+
+## 704.14.73 — 05/09/2026
+- Reversión controlada del motor de Búsqueda Pokémon a la implementación estable de 704.14.68.
+- Se eliminan los cambios experimentales de 704.14.70–704.14.72 (fallback de catálogo, puente bilingüe y resolución de precios alternativa) que degradaron la búsqueda en Castellano y Cardmarket.
+- Se conserva exclusivamente la mejora de navegación de 704.14.69: `Búsqueda` sigue accesible desde cualquier álbum Pokémon.
+- El acceso desde un álbum reutiliza el mismo buscador global de Mis Singles; no existe un segundo motor ni una lógica de precios distinta por colección.
+- Sin cambios en inventario, En camino, mirrors, imágenes, checklists ni sincronización Supabase.
+
+## 704.14.72 — 05/09/2026
+- Corrige la pérdida de precios en Búsqueda introducida al añadir el puente bilingüe.
+- La búsqueda carga siempre el detalle TCGdex inglés además del localizado y reutiliza el precio Cardmarket exacto asociado al mismo ID de carta.
+- El precio TCGdex localizado/EN tiene prioridad sobre el matcher genérico del catálogo público de Cardmarket, evitando mezclar versiones con el mismo nombre.
+- Se mantiene el fallback de catálogo y de imágenes sin cambios.
+
+## 704.14.71 — 04/09/2026
+
+- Corrige la búsqueda en Castellano: si el nombre no devuelve resultados en el catálogo ES, se usa TCGdex EN como puente de identidad y se intenta recuperar el detalle localizado ES por el mismo ID.
+- Recupera Cardmarket en resultados buscados en inglés/mediante puente internacional conservando `tcgdexId`, set y collector number canónicos.
+- El catálogo Pokémon TCG API queda únicamente como último fallback cuando TCGdex no ofrece coincidencias en ninguno de los idiomas consultados.
+- No modifica inventario, Mis Singles, En camino ni routing de álbumes.
+
+## 704.14.70 — 04/09/2026
+- Búsqueda Pokémon resiliente: si TCGdex no responde, el buscador global usa automáticamente Pokémon TCG API como catálogo alternativo.
+- El fallo de un proveedor ya no vacía el buscador ni muestra un falso problema general de conexión mientras exista un catálogo alternativo disponible.
+- El fallback conserva nombre, número, set, rareza e imagen, e intenta mantener Cardmarket mediante el resolver existente.
+- No cambia inventario, En camino, Mis Singles ni routing de álbumes.
+
+## 704.14.69 — 04/09/2026
+- Navegación Pokémon: la tercera pestaña inferior deja de ser `En camino` en los álbumes y pasa a ser `Búsqueda`, igual que en `Mis Singles`.
+- `Búsqueda` abre el mismo buscador global de singles desde cualquier colección Pokémon, sin cambiar de colección activa.
+- Se conserva el routing automático actual: `La tengo` añade la carta al álbum compatible y la refleja en Mis Singles; `En camino` registra el pendiente en su destino correcto.
+- La gestión consolidada de pedidos permanece en `Mis Singles > En camino`; la antigua vista global `En camino` ya no se expone como pestaña inferior en álbumes.
+- Fútbol/Panini mantiene la pestaña `Cambiar` sin cambios.
+- Sin cambios en inventarios, cantidades, checklists, precios, imágenes ni sincronización Supabase.
+
 ## 704.14.68 — 01/09/2026
 - Corrige los tres MEP residuales que mostraban el reverso genérico en vez del frontal.
 - Añade `mep -> MEP` al mapa de imágenes de Limitless y prioriza esa fuente para promos MEP.
