@@ -1,3 +1,10 @@
+## 704.14.73 — 05/09/2026
+- Reversión controlada del motor de Búsqueda Pokémon a la implementación estable de 704.14.68.
+- Se eliminan los cambios experimentales de 704.14.70–704.14.72 (fallback de catálogo, puente bilingüe y resolución de precios alternativa) que degradaron la búsqueda en Castellano y Cardmarket.
+- Se conserva exclusivamente la mejora de navegación de 704.14.69: `Búsqueda` sigue accesible desde cualquier álbum Pokémon.
+- El acceso desde un álbum reutiliza el mismo buscador global de Mis Singles; no existe un segundo motor ni una lógica de precios distinta por colección.
+- Sin cambios en inventario, En camino, mirrors, imágenes, checklists ni sincronización Supabase.
+
 ## 704.14.72 — 05/09/2026
 - Corrige la pérdida de precios en Búsqueda introducida al añadir el puente bilingüe.
 - La búsqueda carga siempre el detalle TCGdex inglés además del localizado y reutiliza el precio Cardmarket exacto asociado al mismo ID de carta.

@@ -1,3 +1,11 @@
+# Update 704.14.73 — Búsqueda restaurada; navegación desacoplada
+
+- La función `Búsqueda` debe mantener el motor estable anterior a 704.14.69. Añadir accesos de navegación NO autoriza a modificar el pipeline de catálogo/precios.
+- Desde cualquier álbum Pokémon, la pestaña inferior `Búsqueda` muestra el mismo `pokemonSinglesSearchView` global que Mis Singles. No duplicar ni adaptar el motor según `activeProjectId`.
+- Se revierten expresamente los experimentos 704.14.70–704.14.72: no usar Pokémon TCG API como catálogo alternativo del buscador, no introducir puente bilingüe automático y no sustituir el flujo Cardmarket estable por pricing alternativo de TCGdex.
+- La mejora 704.14.69 queda limitada a navegación: en Pokémon la tercera pestaña abre Búsqueda; la gestión consolidada de pendientes sigue en `Mis Singles > En camino`.
+- No tocar inventario, `pokemonIncoming`, `pokemonSingles`, mirrors, imágenes ni sincronización Supabase para implementar este acceso.
+
 # Update 704.14.72 — Precio Cardmarket exacto en Búsqueda bilingüe
 
 ## Decisión funcional
