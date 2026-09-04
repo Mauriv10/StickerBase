@@ -1,4 +1,4 @@
-const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.73";
+const APP_VERSION=globalThis.WC26_CONFIG?.version||"704.14.67";
 const DATA_SCHEMA_VERSION=2;
 const DATA_REVISION="2026-07-17-collections-v70111";
 const MASTER_SEED_KEY="world-cup-2026-master-seed-revision";
@@ -2777,10 +2777,8 @@ function renderPokemonIncomingView(){
  const active=projects?.[activeProjectId],activeType=inferCollectionType(active);
  const isPokemon=activeType==="pokemon-singles"||isPokemonCollectionType(activeType)||document.body.classList.contains("pokemon-ui-active");
  const pokeView=$("#pokemonIncomingView");
- // En Pokémon la tercera pestaña es siempre el buscador global de singles.
- // La gestión consolidada de pendientes vive en Mis Singles > En camino.
- const tradeButton=document.querySelector('.bottom-nav-button[data-main-view="trade"]'),nav=tradeButton?.querySelector("span:last-child"),icon=tradeButton?.querySelector(".bottom-nav-icon");if(nav)nav.textContent=isPokemon?"Búsqueda":"Cambiar";if(icon)icon.textContent=isPokemon?"⌕":"⇄";
- if(pokeView)pokeView.hidden=true;
+ const tradeButton=document.querySelector('.bottom-nav-button[data-main-view="trade"]'),nav=tradeButton?.querySelector("span:last-child"),icon=tradeButton?.querySelector(".bottom-nav-icon"),singlesActive=activeType==="pokemon-singles";if(nav)nav.textContent=singlesActive?"Búsqueda":(isPokemon?"En camino":"Cambiar");if(icon)icon.textContent=singlesActive?"⌕":(isPokemon?"📦":"⇄");
+ if(pokeView)pokeView.hidden=!(isPokemon&&!singlesActive&&mainTab==="trade");
  if(!isPokemon)return;
  const rows=pokemonIncomingEntries(),count=$("#pokemonIncomingCount"),list=$("#pokemonIncomingList"),empty=$("#pokemonIncomingEmpty");if(count)count.textContent=String(rows.length);if(empty)empty.hidden=rows.length>0;if(!list)return;
  list.innerHTML=rows.map((row,index)=>{const info=pokemonIncomingCardInfo(row),clickable=Boolean(info.image);return `<article class="pokemon-incoming-card"><div class="pokemon-incoming-thumb ${clickable?"is-clickable":""}" ${clickable?`data-incoming-preview="${index}" role="button" tabindex="0" aria-label="Ver ${collectionSafeText(info.name)} en grande"`:""}>${info.image?`<img src="${collectionSafeText(info.image)}" alt="${collectionSafeText(info.name)}" loading="lazy" data-incoming-image-key="${collectionSafeText(row.key)}" onerror="pokemonSinglesIncomingImageError(this)">`:'<span>PK</span>'}</div><div class="pokemon-incoming-copy"><small>${collectionSafeText(info.setName)}</small><strong>${collectionSafeText(info.name)}</strong><span>#${collectionSafeText(info.number)}${info.detail?` · ${collectionSafeText(info.detail)}`:""}</span></div><div class="pokemon-incoming-actions"><button type="button" class="pokemon-receive-button" data-pokemon-receive="${collectionSafeText(row.key)}">✓ Recibida</button><button type="button" class="pokemon-cancel-incoming" data-pokemon-cancel-incoming="${collectionSafeText(row.key)}">Quitar</button></div></article>`}).join("");
@@ -3211,16 +3209,14 @@ function setMainTab(tab){
  if(inventoryView)inventoryView.hidden=tab!=="collection";
  if(statisticsView)statisticsView.hidden=tab!=="statistics";
  if(tradeView)tradeView.hidden=tab!=="trade"||pokemonActive;
- // Para cualquier colección Pokémon, la pestaña trade se reutiliza como Búsqueda global.
- // En camino ya se administra desde Mis Singles > En camino.
- if(pokemonIncomingView)pokemonIncomingView.hidden=true;
- if(pokemonSinglesSearchView)pokemonSinglesSearchView.hidden=tab!=="trade"||!pokemonActive;
+ if(pokemonIncomingView)pokemonIncomingView.hidden=tab!=="trade"||!pokemonActive||singlesActive;
+ if(pokemonSinglesSearchView)pokemonSinglesSearchView.hidden=tab!=="trade"||!singlesActive;
  if(collectionsView)collectionsView.hidden=tab!=="collections";
  if(missingView)missingView.hidden=true;
 
  if(tab==="collection")renderGlobalCollection();
  if(tab==="statistics")renderStatistics();
- if(tab==="trade"){if(pokemonActive)renderPokemonSinglesSearchView();else renderPokemonIncomingView();}
+ if(tab==="trade"){if(singlesActive)renderPokemonSinglesSearchView();else{renderPokemonIncomingView();requestAnimationFrame(()=>renderPokemonIncomingView());setTimeout(()=>{if(mainTab==="trade")renderPokemonIncomingView();},50);}}
  if(tab==="collections")renderCollections();
 
  window.scrollTo({top:0,behavior:"auto"});
