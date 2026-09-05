@@ -1,5 +1,13 @@
 # StickerBase · Changelog
 
+## 704.14.80
+- Añadido botón 📷 en Búsqueda Pokémon para identificar una carta desde la cámara trasera del iPhone o desde una imagen de Fotos.
+- El reconocimiento funciona sobre la propia fotografía: lee el collector number/número de colección y, cuando existe, el código del set; después reutiliza exactamente el buscador estable de StickerBase, incluidos Cardmarket, «La tengo» y «En camino».
+- El OCR se carga solo al usar la cámara para no penalizar el arranque normal de la PWA. Se procesa primero la zona inferior de la carta y solo si no encuentra una identidad se analiza la carta completa.
+- Las búsquedas originadas por foto conservan una pista temporal (número total del set y código detectado) para ordenar mejor las coincidencias y colocar la versión más probable arriba.
+- Cámara y galería son entradas separadas. El idioma seleccionado en Búsqueda sigue siendo el idioma de catálogo utilizado, por lo que puede elegirse 日本語 o 中文 antes de fotografiar cartas asiáticas.
+- El reconocimiento fotográfico no modifica inventario por sí mismo: siempre desemboca en resultados normales para que el usuario confirme «La tengo» o «En camino».
+
 ## 704.14.79
 - Eliminación Pokémon sincronizada en ambos sentidos: borrar una referencia desde un álbum elimina también su ficha de Mis Singles; borrar desde Mis Singles elimina la referencia del álbum y cualquier estado En camino asociado.
 - La eliminación desde álbum solo retira Mis Singles cuando la referencia queda realmente a cero; si todavía existe otra variante BASE, se conserva.

@@ -1,3 +1,12 @@
+# Estado 704.14.80 — identificación por foto en Búsqueda
+- Búsqueda Pokémon incorpora una entrada 📷 con dos acciones: cámara trasera (`capture=environment`) y selección desde Fotos.
+- Arquitectura: la foto NO crea un segundo buscador ni escribe inventario. OCR → collector number/código de set → `pokemonSinglesSearch()` existente → resultado normal con Cardmarket/La tengo/En camino.
+- El OCR usa Tesseract.js cargado bajo demanda desde CDN y un único worker reutilizable. Se prioriza la franja inferior de la carta para reducir coste/errores; si no encuentra un identificador, analiza la imagen completa.
+- La identificación se apoya prioritariamente en números como `092/071`; esto la hace útil aunque el nombre esté en japonés/chino. La selección de idioma de Búsqueda sigue determinando el catálogo TCGdex consultado.
+- Una pista de escaneo (`pokemonSinglesScanHint`) puede contener número, denominador y set code y solo sirve para ranking temporal; se limpia al editar manualmente la consulta.
+- Nunca añadir automáticamente una carta por una coincidencia OCR: el usuario debe confirmar el resultado mediante las acciones existentes.
+- Mantener intacto el motor de precios de 704.14.78/79.
+
 # Estado 704.14.78 — precio canónico también en Búsqueda
 - Hallazgo confirmado por uso real: en 704.14.77 el mismo resultado podía carecer de Cardmarket en Búsqueda y mostrarlo al instante después de añadirse a Mis Singles. Esto demuestra que la fuente de precios sí funciona y que la divergencia estaba en la identidad/resolución previa del resultado temporal.
 - Búsqueda debe reutilizar la misma secuencia lógica que `pokemonSinglesCanonicalizeMirror`: resolver identidad canónica (TCGdex/set/collector number) y luego ejecutar `pokemonSinglesCardmarketDirect` con esa identidad.
